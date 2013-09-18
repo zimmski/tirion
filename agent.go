@@ -254,7 +254,6 @@ func (a *TirionAgent) Init() {
 	}
 
 	if a.program.exec != "" {
-		// TODO is it possible that this code ALWAYS produces a argument for the program?
 		a.V("Execute external program: %s %s", a.program.exec, strings.Join(a.program.execArguments, " "))
 		a.cmd = exec.Command(a.program.exec, a.program.execArguments...)
 

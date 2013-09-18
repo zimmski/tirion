@@ -61,6 +61,12 @@ func main() {
 		panic("Argument -send-interval must be a positive integer")
 	}
 
+	var execArguments []string
+
+	if flagExecArguments != "" {
+		execArguments = strings.Split(flagExecArguments, " ")
+	}
+
 	a := tirion.NewTirionAgent(
 		flagName,
 		flagSubName,
@@ -69,7 +75,7 @@ func main() {
 		flagPid,
 		flagMetricsFilename,
 		flagExec,
-		strings.Split(flagExecArguments, " "),
+		execArguments,
 		flagInterval,
 		flagSocket,
 		flagVerbose,
