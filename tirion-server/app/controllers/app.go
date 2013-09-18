@@ -25,39 +25,39 @@ func (c App) Index() revel.Result {
 	return c.Render(programs)
 }
 
-func (c App) ProgramIndex(program string) revel.Result {
-	runs, err := app.Db.SearchRuns(program)
+func (c App) ProgramIndex(programName string) revel.Result {
+	runs, err := app.Db.SearchRuns(programName)
 
 	if err != nil {
 		panic(err)
 	}
 
 	if len(runs) == 0 {
-		return c.NotFound("Program \"%s\" does not exists", program)
+		return c.NotFound("Program \"%s\" does not exists", programName)
 	}
 
-	return c.Render(program, runs)
+	return c.Render(programName, runs)
 }
 
-func (c App) ProgramRunIndex(program string, runId int) revel.Result {
-	run, err := app.Db.FindRun(program, runId)
+func (c App) ProgramRunIndex(programName string, runId int) revel.Result {
+	run, err := app.Db.FindRun(programName, runId)
 
 	if err != nil {
 		panic(err)
 	} else if run == nil {
-		return c.NotFound("Run %d of program \"%s\" does not exists", runId, program)
+		return c.NotFound("Run %d of program \"%s\" does not exists", runId, programName)
 	}
 
-	return c.Render(program, run)
+	return c.Render(programName, run)
 }
 
-func (c App) ProgramRunMetric(program string, runId int, metricName string) revel.Result {
-	run, err := app.Db.FindRun(program, runId)
+func (c App) ProgramRunMetric(programName string, runId int, metricName string) revel.Result {
+	run, err := app.Db.FindRun(programName, runId)
 
 	if err != nil {
 		panic(err)
 	} else if run == nil {
-		return c.NotFound("Run %d of program \"%s\" does not exists", runId, program)
+		return c.NotFound("Run %d of program \"%s\" does not exists", runId, programName)
 	}
 
 	metric, err := app.Db.SearchMetricOfRun(run, metricName)
@@ -69,7 +69,7 @@ func (c App) ProgramRunMetric(program string, runId int, metricName string) reve
 	return c.RenderJson(metric)
 }
 
-func (c App) ProgramRunStart(program string) revel.Result {
+func (c App) ProgramRunStart(programName string) revel.Result {
 	var interval, err = strconv.ParseInt(c.Params.Get("interval"), 10, 32)
 
 	if err != nil {
@@ -125,7 +125,7 @@ func (c App) ProgramRunStart(program string) revel.Result {
 	}
 }
 
-func (c App) ProgramRunInsert(program string, run int) revel.Result {
+func (c App) ProgramRunInsert(programName string, runId int) revel.Result {
 	var metrics []tirion.MessageData
 
 	var err = json.Unmarshal([]byte(c.Params.Get("metrics")), &metrics)
@@ -134,7 +134,7 @@ func (c App) ProgramRunInsert(program string, run int) revel.Result {
 		return c.RenderJson(tirion.MessageReturnStart{Error: fmt.Sprintf("Parse metrics: %v", err)})
 	}
 
-	err = app.Db.CreateMetrics(run, metrics)
+	err = app.Db.CreateMetrics(runId, metrics)
 
 	if err != nil {
 		return c.RenderJson(tirion.MessageReturnInsert{Error: fmt.Sprintf("%+v", err)})
@@ -143,8 +143,8 @@ func (c App) ProgramRunInsert(program string, run int) revel.Result {
 	}
 }
 
-func (c App) ProgramRunStop(program string, run int) revel.Result {
-	var err = app.Db.StopRun(run)
+func (c App) ProgramRunStop(programName string, runId int) revel.Result {
+	var err = app.Db.StopRun(runId)
 
 	if err != nil {
 		return c.RenderJson(tirion.MessageReturnStop{Error: fmt.Sprintf("%+v", err)})
@@ -153,7 +153,7 @@ func (c App) ProgramRunStop(program string, run int) revel.Result {
 	}
 }
 
-func (c App) ProgramRunTag(program string, run int) revel.Result {
+func (c App) ProgramRunTag(programName string, runId int) revel.Result {
 	var t, err = strconv.ParseInt(c.Params.Get("time"), 10, 64)
 
 	var tag = tirion.Tag{
@@ -161,7 +161,7 @@ func (c App) ProgramRunTag(program string, run int) revel.Result {
 		Time: time.Unix(0, t),
 	}
 
-	err = app.Db.CreateTag(run, &tag)
+	err = app.Db.CreateTag(runId, &tag)
 
 	if err != nil {
 		return c.RenderJson(tirion.MessageReturnStop{Error: fmt.Sprintf("%+v", err)})

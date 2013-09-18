@@ -1,7 +1,7 @@
 {{set . "title" "Run"}}
 {{template "header.html" .}}
 
-<h1>Run {{.run.Id}} of {{.program}}</h1>
+<h1>Run {{.run.Id}} of {{.programName}}</h1>
 
 <div id="graph"></div>
 
@@ -12,7 +12,7 @@
 			names = [{{range $index, $r := .run.Metrics}}{{if ne $index 0}}, {{end}}{{$r.Name}}{{end}}];
 
 		$.each(names, function(i, name) {
-			var url = '/program/{{.program}}/run/{{.run.Id}}/metric/' + name;
+			var url = '/program/{{.programName}}/run/{{.run.Id}}/metric/' + name;
 
 			$.getJSON(url, function(data) {
 				series[i] = {
