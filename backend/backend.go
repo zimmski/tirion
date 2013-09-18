@@ -11,7 +11,7 @@ type Backend interface {
 
 	SearchPrograms() ([]tirion.Program, error)
 
-	FindRun(runId int) (*tirion.Run, error)
+	FindRun(programName string, runId int) (*tirion.Run, error)
 	SearchRuns(programName string) ([]tirion.Run, error)
 	StartRun(run *tirion.Run) error
 	StopRun(runId int) error

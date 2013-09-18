@@ -32,24 +32,32 @@ func (c App) ProgramIndex(program string) revel.Result {
 		panic(err)
 	}
 
+	if len(runs) == 0 {
+		return c.NotFound("Program \"%s\" does not exists", program)
+	}
+
 	return c.Render(program, runs)
 }
 
 func (c App) ProgramRunIndex(program string, runId int) revel.Result {
-	run, err := app.Db.FindRun(runId)
+	run, err := app.Db.FindRun(program, runId)
 
 	if err != nil {
 		panic(err)
+	} else if run == nil {
+		return c.NotFound("Run %d of program \"%s\" does not exists", runId, program)
 	}
 
 	return c.Render(program, run)
 }
 
 func (c App) ProgramRunMetric(program string, runId int, metricName string) revel.Result {
-	run, err := app.Db.FindRun(runId)
+	run, err := app.Db.FindRun(program, runId)
 
 	if err != nil {
 		panic(err)
+	} else if run == nil {
+		return c.NotFound("Run %d of program \"%s\" does not exists", runId, program)
 	}
 
 	metric, err := app.Db.SearchMetricOfRun(run, metricName)

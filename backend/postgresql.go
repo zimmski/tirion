@@ -78,21 +78,25 @@ func (p *Postgresql) SearchPrograms() ([]tirion.Program, error) {
 	return programs, nil
 }
 
-func (p *Postgresql) FindRun(runId int) (*tirion.Run, error) {
+func (p *Postgresql) FindRun(programName string, runId int) (*tirion.Run, error) {
 	tx, err := p.Db.Begin()
 
 	if err != nil {
 		return nil, err
 	}
 
-	row := tx.QueryRow("SELECT id, name, sub_name, interval, metrics, prog, prog_arguments, extract(epoch from start), extract(epoch from stop) FROM run WHERE id = $1", runId)
+	row := tx.QueryRow("SELECT id, name, sub_name, interval, metrics, prog, prog_arguments, extract(epoch from start), extract(epoch from stop) FROM run WHERE name = $1 and id = $2", programName, runId)
 
 	var run = tirion.Run{}
 	var metrics, start string
 	var stop *string
 
 	if err := row.Scan(&run.Id, &run.Name, &run.SubName, &run.Interval, &metrics, &run.Prog, &run.ProgArguments, &start, &stop); err != nil {
-		return nil, err
+		if err == sql.ErrNoRows {
+			return nil, nil
+		} else {
+			return nil, err
+		}
 	}
 
 	json.Unmarshal([]byte(metrics), &run.Metrics)
