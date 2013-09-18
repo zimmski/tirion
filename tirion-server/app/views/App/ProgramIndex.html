@@ -19,8 +19,8 @@
 			<td><a href="/program/{{.Name}}/run/{{.Id}}">{{.Name}}</a></td>
 			<td>{{.SubName}}</td>
 			<td>{{.Interval}}</td>
-			<td>{{.Start}}</td>
-			<td>{{if .Stop}}{{.Stop}}{{end}}</td>
+			<td>{{datetime .Start}}</td>
+			<td>{{if .Stop}}{{datetime .Stop}}{{end}}</td>
 			<td>{{if .Stop}}<span class="label label-success">Finished</span>{{else}}<span class="label label-warning">Running</span>{{end}}</td>
 		</tr>
 	{{end}}

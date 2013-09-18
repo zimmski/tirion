@@ -2,6 +2,7 @@ package app
 
 import (
 	"runtime"
+	"time"
 
 	"github.com/robfig/revel"
 	"github.com/zimmski/tirion/backend"
@@ -30,5 +31,7 @@ func init() {
 		Db.Init()
 
 		revel.TemplateFuncs["ne"] = func(a, b interface{}) bool { return a != b }
+
+		time.Local = time.UTC
 	})
 }
