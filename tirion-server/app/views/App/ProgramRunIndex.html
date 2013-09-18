@@ -22,10 +22,11 @@
 						enabled: true,
 					},
 					url: url,
+					yAxis: i,
 				};
 
 				if (++loaded == names.length) {
-					createMultiChart('graph', series);
+					createCombinedMultiChart('graph', series);
 				}
 			});
 		});
