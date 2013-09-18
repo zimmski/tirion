@@ -1,0 +1,30 @@
+{{set . "title" "Runs"}}
+{{template "header.html" .}}
+
+<h1>Runs of {{.program}}</h1>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Sub name</th>
+			<th>Interval</th>
+			<th>Start</th>
+			<th>Stop</th>
+			<th>State</th>
+		</tr>
+	</thead>
+	<tbody>
+	{{range .runs}}
+		<tr>
+			<td><a href="/program/{{.Name}}/run/{{.Id}}">{{.Name}}</a></td>
+			<td>{{.SubName}}</td>
+			<td>{{.Interval}}</td>
+			<td>{{.Start}}</td>
+			<td>{{if .Stop}}{{.Stop}}{{end}}</td>
+			<td>{{if .Stop}}<span class="label label-success">Finished</span>{{else}}<span class="label label-warning">Running</span>{{end}}</td>
+		</tr>
+	{{end}}
+	</tbody>
+</table>
+
+{{template "footer.html" .}}

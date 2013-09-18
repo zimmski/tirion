@@ -1,0 +1,20 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+module:testrunner
+
+GET		/													App.Index
+GET		/program/:program									App.ProgramIndex
+POST		/program/:program/run/start							App.ProgramRunStart
+GET		/program/:program/run/:runId							App.ProgramRunIndex
+GET		/program/:program/run/:runId/metric/:metricName		App.ProgramRunMetric
+POST		/program/:program/run/:run/insert					App.ProgramRunInsert
+GET		/program/:program/run/:run/stop						App.ProgramRunStop
+POST		/program/:program/run/:run/tag						App.ProgramRunTag
+
+# Ignore favicon requests
+GET		/favicon.ico					404
+
+# Map static resources from the /app/public folder to the /public path
+GET		/public/*filepath			Static.Serve("public")

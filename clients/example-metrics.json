@@ -1,0 +1,30 @@
+[
+   {
+      "name" : "proc.stat.utime",
+      "type" : "int"
+   },
+   {
+      "name" : "a",
+      "type" : "int"
+   },
+   {
+      "name" : "b",
+      "type" : "int"
+   },
+   {
+      "name" : "c",
+      "type" : "float"
+   },
+   {
+      "name" : "d",
+      "type" : "float"
+   },
+   {
+      "name" : "proc.statm.data",
+      "type" : "int"
+   },
+   {
+      "name" : "proc.statm.resident",
+      "type" : "int"
+   }
+]

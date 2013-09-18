@@ -1,0 +1,20 @@
+{{set . "title" "Programs"}}
+{{template "header.html" .}}
+
+<h1>Programs</h1>
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>Name</th>
+		</tr>
+	</thead>
+	<tbody>
+	{{range .programs}}
+		<tr>
+			<td><a href="/program/{{.Name}}">{{.Name}}</a></td>
+		</tr>
+	{{end}}
+	</tbody>
+</table>
+
+{{template "footer.html" .}}

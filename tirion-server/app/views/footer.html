@@ -1,0 +1,12 @@
+		</div>
+	</div>
+	<div id="footer">
+		<div class="container">
+			<p class="text-muted credit">&copy; <a href="mailto:markus.zimmermann@nethead.at">markus.zimmermann@nethead.at</a> 2013</p>
+		</div>
+	</div>
+	{{if eq .RunMode "dev"}}
+		{{template "debug.html" .}}
+	{{end}}
+	</body>
+</html>

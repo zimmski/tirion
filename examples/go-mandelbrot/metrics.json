@@ -1,0 +1,30 @@
+[
+   {
+      "name" : "workers",
+      "type" : "int"
+   },
+   {
+      "name" : "size",
+      "type" : "int"
+   },
+   {
+      "name" : "sizeWorkedOn",
+      "type" : "int"
+   },
+   {
+      "name" : "values",
+      "type" : "int"
+   },
+   {
+      "name" : "proc.stat.utime",
+      "type" : "int"
+   },
+   {
+      "name" : "proc.statm.data",
+      "type" : "int"
+   },
+   {
+      "name" : "proc.statm.resident",
+      "type" : "int"
+   }
+]

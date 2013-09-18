@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{{.title}}</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="shortcut icon" type="image/x-icon" href="/public/img/favicon.ico">
+		<link rel="icon" type="image/x-icon" href="/public/img/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="/public/css/bootstrap-3.0.0/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="/public/css/style.css">
+		{{range .moreStyles}}
+			<link rel="stylesheet" type="text/css" href="/public/{{.}}">
+		{{end}}
+		<script src="/public/js/jquery-2.0.3.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/public/css/bootstrap-3.0.0/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/public/js/highstock-1.3.5.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/public/js/charts.js" type="text/javascript" charset="utf-8"></script>
+		{{range .moreScripts}}
+			<script src="/public/{{.}}" type="text/javascript" charset="utf-8"></script>
+		{{end}}
+	</head>
+	<body>
+		<div id="wrap">
+			<div class="navbar navbar-default navbar-fixed-top">
+				<div class="container">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<a class="navbar-brand" href="/">Tirion</a>
+					</div>
+					<div class="collapse navbar-collapse">
+						<ul class="nav navbar-nav">
+							{{if .program}}
+								<li><a href="/">Programs</a></li>
+								<li class="active"><a href="/program/{{.program}}">Runs</a></li>
+							{{else}}
+								<li class="active"><a href="/">Programs</a></li>
+							{{end}}
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="container">
