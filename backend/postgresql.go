@@ -446,17 +446,17 @@ func (p *Postgresql) CreateTag(runId int, tag *tirion.Tag) error {
 
 	return nil
 }
-func (p *Postgresql) SearchTagsOfRun(run *tirion.Run) ([]tirion.Tag, error) {
+
+func (p *Postgresql) SearchTagsOfRun(run *tirion.Run) ([]tirion.HighStockTag, error) {
 	tx, err := p.Db.Begin()
 
 	if err != nil {
 		return nil, err
 	}
 
-	tags := make([]tirion.Tag, 0)
-	var t string
+	tags := make([]tirion.HighStockTag, 0)
 
-	rows, err := tx.Query("SELECT extract(epoch from t), message FROM rt" + strconv.FormatInt(int64(run.Id), 10) + " ORDER BY t")
+	rows, err := tx.Query("SELECT EXTRACT(EPOCH FROM t) * 1000.0, message FROM rt" + strconv.FormatInt(int64(run.Id), 10) + " ORDER BY t")
 
 	if err != nil {
 		return nil, err
@@ -465,16 +465,19 @@ func (p *Postgresql) SearchTagsOfRun(run *tirion.Run) ([]tirion.Tag, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var tag = tirion.Tag{}
+		var tag = new(tirion.HighStockTag)
 
-		if err := rows.Scan(&t, &tag.Tag); err != nil {
+		var m string
+		var tt float64
+
+		if err := rows.Scan(&tt, &m); err != nil {
 			return nil, err
 		}
 
-		var tt, _ = strconv.ParseFloat(t, 64)
-		tag.Time = time.Unix(int64(tt), 0)
+		tag.X = int64(tt)
+		tag.Title = m
 
-		tags = append(tags, tag)
+		tags = append(tags, *tag)
 	}
 
 	if err := rows.Err(); err != nil {

@@ -334,26 +334,37 @@ function createCombinedMultiChart(id, series, options) {
 	var multiA = [];
 	var pushExtremes = true;
 
+	var step = 200;
 	var top = 0;
 
 	$.each(series, function(i, serie) {
 		cYAxis.push({
+	        height: step,
 			offset: 0,
 	        title: {
 	            text: serie.name
 	        },
-			top: top,
-	        height: 200
+			top: top
 	    });
 		cSeries.push(serie);
 
-		top += 200
+		top += step
 	});
+
+	if (options.flags) {
+		cSeries.push({
+	        type: 'flags',
+	        data: options.flags,
+			//onSeries: 'dataseries',
+	        shape: 'squarepin',
+			y: -(top - step / 4)
+	    })
+	}
 
 	var cChart = new Highcharts.StockChart({
 		chart: {
-			events : {
-				load : function() {
+			events: {
+				load: function() {
 					var chart = this;
 
 					if (options.live && (! options.isRunning || options.isRunning())) {

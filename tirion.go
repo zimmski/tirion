@@ -12,6 +12,11 @@ import (
 	"github.com/zimmski/tirion/shm"
 )
 
+type HighStockTag struct {
+	X     int64  `json:"x"`
+	Title string `json:"title"`
+}
+
 type Metric struct {
 	Name string
 	Type string

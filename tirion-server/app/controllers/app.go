@@ -169,3 +169,21 @@ func (c App) ProgramRunTag(programName string, runId int) revel.Result {
 		return c.RenderJson(tirion.MessageReturnStop{Error: ""})
 	}
 }
+
+func (c App) ProgramRunTags(programName string, runId int) revel.Result {
+	run, err := app.Db.FindRun(programName, runId)
+
+	if err != nil {
+		panic(err)
+	} else if run == nil {
+		return c.NotFound("Run %d of program \"%s\" does not exists", runId, programName)
+	}
+
+	tags, err := app.Db.SearchTagsOfRun(run)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return c.RenderJson(tags)
+}

@@ -7,9 +7,16 @@
 
 <script>
 	$(document).ready(function() {
-		var series = [],
+		var flags,
+			series = [],
 			loaded = 0,
 			names = [{{range $index, $r := .run.Metrics}}{{if ne $index 0}}, {{end}}{{$r.Name}}{{end}}];
+
+		$.getJSON('/program/{{.programName}}/run/{{.run.Id}}/tags', function(data) {
+			flags = data;
+
+			loaded++;
+		});
 
 		$.each(names, function(i, name) {
 			var url = '/program/{{.programName}}/run/{{.run.Id}}/metric/' + name;
@@ -25,8 +32,8 @@
 					yAxis: i,
 				};
 
-				if (++loaded == names.length) {
-					createCombinedMultiChart('graph', series);
+				if (++loaded == names.length + 1) {
+					createCombinedMultiChart('graph', series, { flags: flags });
 				}
 			});
 		});

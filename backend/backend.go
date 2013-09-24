@@ -21,7 +21,7 @@ type Backend interface {
 	SearchMetricsOfRun(run *tirion.Run) ([][]float32, error)
 
 	CreateTag(runId int, tag *tirion.Tag) error
-	SearchTagsOfRun(run *tirion.Run) ([]tirion.Tag, error)
+	SearchTagsOfRun(run *tirion.Run) ([]tirion.HighStockTag, error)
 }
 
 func NewBackend(name string) Backend {

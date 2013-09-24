@@ -12,6 +12,7 @@ GET		/program/:programName/run/:runId/metric/:metricName		App.ProgramRunMetric
 POST		/program/:programName/run/:runId/insert					App.ProgramRunInsert
 GET		/program/:programName/run/:runId/stop					App.ProgramRunStop
 POST		/program/:programName/run/:runId/tag						App.ProgramRunTag
+GET		/program/:programName/run/:runId/tags					App.ProgramRunTags
 
 # Ignore favicon requests
 GET		/favicon.ico					404
