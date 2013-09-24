@@ -65,7 +65,7 @@ func (p *Postgresql) SearchPrograms() ([]tirion.Program, error) {
 		programs = append(programs, program)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err := rows.Err(); err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 
@@ -162,7 +162,7 @@ func (p *Postgresql) SearchRuns(programName string) ([]tirion.Run, error) {
 		runs = append(runs, run)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err := rows.Err(); err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 
@@ -346,7 +346,7 @@ func (p *Postgresql) SearchMetricOfRun(run *tirion.Run, metricName string) ([][]
 		metrics = append(metrics, metric)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err := rows.Err(); err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 
@@ -402,7 +402,7 @@ func (p *Postgresql) SearchMetricsOfRun(run *tirion.Run) ([][]float32, error) {
 		metrics = append(metrics, metric)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err := rows.Err(); err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 
@@ -480,7 +480,7 @@ func (p *Postgresql) SearchTagsOfRun(run *tirion.Run) ([]tirion.HighStockTag, er
 		tags = append(tags, *tag)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err := rows.Err(); err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 
