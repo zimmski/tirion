@@ -7,7 +7,7 @@ import (
 )
 
 type Backend interface {
-	Init() error
+	Init(spec string) error
 
 	SearchPrograms() ([]tirion.Program, error)
 
@@ -28,6 +28,6 @@ func NewBackend(name string) Backend {
 	if name == "postgresql" {
 		return new(Postgresql)
 	} else {
-		panic(fmt.Sprintf("Unknown backend \"%s\""))
+		panic(fmt.Sprintf("Unknown backend \"%s\"", name))
 	}
 }

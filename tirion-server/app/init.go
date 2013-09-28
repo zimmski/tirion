@@ -27,8 +27,11 @@ func init() {
 	revel.OnAppStart(func() {
 		runtime.GOMAXPROCS(runtime.NumCPU())
 
-		Db = backend.NewBackend("postgresql")
-		Db.Init()
+		var dbDriver, _ = revel.Config.String("db.driver")
+		var dbSpec, _ = revel.Config.String("db.spec")
+
+		Db = backend.NewBackend(dbDriver)
+		Db.Init(dbSpec)
 
 		revel.TemplateFuncs["ne"] = func(a, b interface{}) bool { return a != b }
 

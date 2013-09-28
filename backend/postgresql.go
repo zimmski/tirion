@@ -18,10 +18,10 @@ type Postgresql struct {
 	Db *sql.DB
 }
 
-func (p *Postgresql) Init() error {
+func (p *Postgresql) Init(spec string) error {
 	var err error
 
-	p.Db, err = sql.Open("postgres", "user=zimmski dbname=tirion sslmode=disable")
+	p.Db, err = sql.Open("postgres", spec)
 
 	if err != nil {
 		panic(fmt.Sprintf("Cannot connect to database: %v", err))
