@@ -12,6 +12,8 @@ import (
 	"github.com/zimmski/tirion/shm"
 )
 
+const Version = "0.1"
+
 type HighStockTag struct {
 	X     int64  `json:"x"`
 	Title string `json:"title"`
