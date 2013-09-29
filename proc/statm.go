@@ -17,8 +17,13 @@ type ProcStatm struct {
 }
 
 var ProcStatmIndizes = map[string]int{
+	"proc.statm.size":     0,
 	"proc.statm.resident": 1,
+	"proc.statm.share":    2,
+	"proc.statm.text":     3,
+	"proc.statm.lib":      4,
 	"proc.statm.data":     5,
+	"proc.statm.dt":       6,
 }
 
 func readStatm(filename string) (string, error) {
