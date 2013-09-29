@@ -26,5 +26,9 @@
    {
       "name" : "proc.statm.resident",
       "type" : "int"
+   },
+   {
+      "name" : "proc.io.read_bytes",
+      "type" : "int"
    }
 ]

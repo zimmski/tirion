@@ -35,6 +35,7 @@ type TirionAgent struct {
 	program              ExecProgram
 	metrics              []Metric
 	metricsExternal      []int
+	metricsExternalIO    map[int]int
 	metricsExternalStat  map[int]int
 	metricsExternalStatm map[int]int
 	metricsInternal      []int
@@ -139,6 +140,7 @@ func (a *TirionAgent) Init() {
 
 	var metricNames = make(map[string]int)
 
+	a.metricsExternalIO = make(map[int]int)
 	a.metricsExternalStat = make(map[int]int)
 	a.metricsExternalStatm = make(map[int]int)
 
@@ -160,7 +162,9 @@ func (a *TirionAgent) Init() {
 
 			a.metricsExternal = append(a.metricsExternal, i)
 
-			if k, ok := proc.ProcStatIndizes[m.Name]; ok {
+			if k, ok := proc.ProcIOIndizes[m.Name]; ok {
+				a.metricsExternalIO[k] = i
+			} else if k, ok := proc.ProcStatIndizes[m.Name]; ok {
 				a.metricsExternalStat[k] = i
 			} else if k, ok := proc.ProcStatmIndizes[m.Name]; ok {
 				a.metricsExternalStatm[k] = i
@@ -466,6 +470,19 @@ func (a *TirionAgent) handleMetrics(c chan bool) {
 		// NOTE: we have to craete this metrics slice everytime because otherwise it would be just a pointer :-)
 		var metrics = make([]float32, len(a.metrics))
 		var now = time.Now()
+
+		if len(a.metricsExternalIO) > 0 {
+			pIO, err := proc.ReadIOArray(pidFolder + "io")
+
+			if err != nil {
+				a.sPanic(err)
+			}
+
+			for k, v := range a.metricsExternalIO {
+				f, _ := strconv.ParseFloat(pIO[k], 32)
+				metrics[v] = float32(f)
+			}
+		}
 
 		if len(a.metricsExternalStat) > 0 {
 			pStat, err := proc.ReadStatArray(pidFolder + "stat")
