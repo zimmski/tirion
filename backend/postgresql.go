@@ -85,13 +85,13 @@ func (p *Postgresql) FindRun(programName string, runId int) (*tirion.Run, error)
 		return nil, err
 	}
 
-	row := tx.QueryRow("SELECT id, name, sub_name, interval, metrics, prog, prog_arguments, extract(epoch from start), extract(epoch from stop) FROM run WHERE name = $1 and id = $2", programName, runId)
+	row := tx.QueryRow("SELECT id, name, sub_name, interval, metrics, metric_count, prog, prog_arguments, extract(epoch from start), extract(epoch from stop) FROM run WHERE name = $1 and id = $2", programName, runId)
 
 	var run = tirion.Run{}
 	var metrics, start string
 	var stop *string
 
-	if err := row.Scan(&run.Id, &run.Name, &run.SubName, &run.Interval, &metrics, &run.Prog, &run.ProgArguments, &start, &stop); err != nil {
+	if err := row.Scan(&run.Id, &run.Name, &run.SubName, &run.Interval, &metrics, &run.MetricCount, &run.Prog, &run.ProgArguments, &start, &stop); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		} else {
@@ -185,7 +185,7 @@ func (p *Postgresql) StartRun(run *tirion.Run) error {
 
 	var metrics, _ = json.Marshal(run.Metrics)
 
-	err = tx.QueryRow("INSERT INTO run(name, sub_name, interval, metrics, prog, prog_arguments, start) VALUES($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP) RETURNING id", run.Name, run.SubName, run.Interval, string(metrics), run.Prog, run.ProgArguments).Scan(&run.Id)
+	err = tx.QueryRow("INSERT INTO run(name, sub_name, interval, metrics, metric_count, prog, prog_arguments, start) VALUES($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP) RETURNING id", run.Name, run.SubName, run.Interval, string(metrics), len(run.Metrics), run.Prog, run.ProgArguments).Scan(&run.Id)
 
 	if err != nil {
 		return err
@@ -264,10 +264,17 @@ func (p *Postgresql) CreateMetrics(runId int, metrics []tirion.MessageData) erro
 
 	var run = tirion.Run{}
 
-	err = tx.QueryRow("SELECT id FROM run WHERE id = $1 AND stop IS NULL", runId).Scan(&run.Id)
+	err = tx.QueryRow("SELECT id, metric_count FROM run WHERE id = $1 AND stop IS NULL", runId).Scan(&run.Id, &run.MetricCount)
 
 	if err != nil {
 		return err
+	}
+
+	// check metrics data before insert to save roundtrips
+	for i, m := range metrics {
+		if len(m.Data) != run.MetricCount {
+			return errors.New(fmt.Sprintf("Metric count of %d is unequal to the run's metric count", i))
+		}
 	}
 
 	for _, m := range metrics {

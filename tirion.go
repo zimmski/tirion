@@ -39,6 +39,7 @@ type Run struct {
 	SubName       string
 	Interval      int
 	Metrics       []Metric
+	MetricCount   int
 	Prog          string
 	ProgArguments string
 	Start         *time.Time

@@ -13,6 +13,7 @@ CREATE TABLE run (
 	sub_name TEXT NOT NULL,
 	interval INT NOT NULL,
 	metrics TEXT NOT NULL,
+	metric_count INT NOT NULL,
 	prog TEXT NOT NULL,
 	prog_arguments TEXT NOT NULL,
 	start TIMESTAMP NOT NULL,
