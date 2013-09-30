@@ -164,9 +164,9 @@ func (c App) ProgramRunTag(programName string, runId int) revel.Result {
 	err = app.Db.CreateTag(runId, &tag)
 
 	if err != nil {
-		return c.RenderJson(tirion.MessageReturnStop{Error: fmt.Sprintf("%+v", err)})
+		return c.RenderJson(tirion.MessageReturnTag{Error: fmt.Sprintf("%+v", err)})
 	} else {
-		return c.RenderJson(tirion.MessageReturnStop{Error: ""})
+		return c.RenderJson(tirion.MessageReturnTag{Error: ""})
 	}
 }
 
