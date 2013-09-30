@@ -1,7 +1,7 @@
 PROG = c-client
 BB = $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client
 LIBS = -lm -lpthread
-CC = gcc
+CC = clang
 CFLAGS = -Wall -Wextra -W -g
 
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
