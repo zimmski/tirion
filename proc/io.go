@@ -1,7 +1,6 @@
 package proc
 
 import (
-	"fmt"
 	"io/ioutil"
 	"strconv"
 	"strings"

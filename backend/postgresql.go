@@ -121,6 +121,7 @@ func (p *Postgresql) FindRun(programName string, runId int) (*tirion.Run, error)
 
 	return &run, nil
 }
+
 func (p *Postgresql) SearchRuns(programName string) ([]tirion.Run, error) {
 	tx, err := p.Db.Begin()
 
@@ -174,6 +175,7 @@ func (p *Postgresql) SearchRuns(programName string) ([]tirion.Run, error) {
 
 	return runs, nil
 }
+
 func (p *Postgresql) StartRun(run *tirion.Run) error {
 	tx, err := p.Db.Begin()
 
@@ -222,6 +224,7 @@ func (p *Postgresql) StartRun(run *tirion.Run) error {
 
 	return nil
 }
+
 func (p *Postgresql) StopRun(runId int) error {
 	tx, err := p.Db.Begin()
 
@@ -229,15 +232,13 @@ func (p *Postgresql) StopRun(runId int) error {
 		return err
 	}
 
-	rows, err := tx.Query("SELECT id FROM run WHERE id = $1", runId)
+	var run = tirion.Run{}
+
+	err = tx.QueryRow("SELECT id FROM run WHERE id = $1 AND stop IS NULL", runId).Scan(&run.Id)
 
 	if err != nil {
-		panic(err)
-	} else if !rows.Next() {
-		panic(errors.New("Cannot find run"))
+		return err
 	}
-
-	defer rows.Close()
 
 	_, err = tx.Exec("UPDATE run SET stop = CURRENT_TIMESTAMP WHERE id = $1", runId)
 
@@ -261,15 +262,13 @@ func (p *Postgresql) CreateMetrics(runId int, metrics []tirion.MessageData) erro
 		return err
 	}
 
-	rows, err := tx.Query("SELECT id FROM run WHERE id = $1", runId)
+	var run = tirion.Run{}
+
+	err = tx.QueryRow("SELECT id FROM run WHERE id = $1 AND stop IS NULL", runId).Scan(&run.Id)
 
 	if err != nil {
-		panic(err)
-	} else if !rows.Next() {
-		panic(errors.New("Cannot find run"))
+		return err
 	}
-
-	defer rows.Close()
 
 	for _, m := range metrics {
 		var ffff bytes.Buffer
@@ -297,6 +296,7 @@ func (p *Postgresql) CreateMetrics(runId int, metrics []tirion.MessageData) erro
 
 	return nil
 }
+
 func (p *Postgresql) SearchMetricOfRun(run *tirion.Run, metricName string) ([][]interface{}, error) {
 	var found = false
 
@@ -358,6 +358,7 @@ func (p *Postgresql) SearchMetricOfRun(run *tirion.Run, metricName string) ([][]
 
 	return metrics, nil
 }
+
 func (p *Postgresql) SearchMetricsOfRun(run *tirion.Run) ([][]float32, error) {
 	tx, err := p.Db.Begin()
 
@@ -422,15 +423,13 @@ func (p *Postgresql) CreateTag(runId int, tag *tirion.Tag) error {
 		return err
 	}
 
-	rows, err := tx.Query("SELECT id FROM run WHERE id = $1", runId)
+	var run = tirion.Run{}
+
+	err = tx.QueryRow("SELECT id FROM run WHERE id = $1 AND stop IS NULL", runId).Scan(&run.Id)
 
 	if err != nil {
-		panic(err)
-	} else if !rows.Next() {
-		panic(errors.New("Cannot find run"))
+		return err
 	}
-
-	defer rows.Close()
 
 	_, err = tx.Exec("INSERT INTO rt"+strconv.FormatInt(int64(runId), 10)+"(t, message) VALUES(TO_TIMESTAMP($1), $2)", float64(tag.Time.UnixNano())/1000000000.0, tag.Tag)
 
