@@ -27,6 +27,7 @@ int tirionSocketSend(Tirion *tirion, const char *msg);
 typedef struct TirionPrivateStruct {
 	int fd;
 	TirionShm shm;
+	int metricCount;
 	char *socket;
 	pthread_t tHandleCommands;
 } TirionPrivate;
@@ -88,6 +89,7 @@ int tirionInit(Tirion *tirion) {
 		return TIRION_ERROR_METRIC_COUNT;
 	}
 
+	tirion->p->metricCount = metricCount;
 	tirionV(tirion, "Received metric count %d", metricCount);
 
 	tirionV(tirion, "Open shared memory");
@@ -197,6 +199,10 @@ int tirionShmClose(Tirion *tirion) {
 }
 
 float tirionShmGet(Tirion *tirion, int i) {
+	if (i < 0 || i >= tirion->p->metricCount) {
+		return 0.0f;
+	}
+
 	return tirion->p->shm.addr[i];
 }
 
@@ -221,10 +227,18 @@ int tirionShmRead(Tirion *tirion) {
 }
 
 void tirionShmSet(Tirion *tirion, int i, float v) {
+	if (i < 0 || i >= tirion->p->metricCount) {
+		return;
+	}
+
 	tirion->p->shm.addr[i] = v;
 }
 
 float tirionAdd(Tirion *tirion, int i, float v) {
+	if (i < 0 || i >= tirion->p->metricCount) {
+		return 0.0f;
+	}
+
 	return tirion->p->shm.addr[i] = (tirion->p->shm.addr[i] + v);
 }
 
@@ -237,6 +251,10 @@ float tirionInc(Tirion *tirion, int i) {
 }
 
 float tirionSub(Tirion *tirion, int i, float v) {
+	if (i < 0 || i >= tirion->p->metricCount) {
+		return 0.0f;
+	}
+
 	return tirion->p->shm.addr[i] = (tirion->p->shm.addr[i] - v);
 }
 

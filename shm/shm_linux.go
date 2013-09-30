@@ -60,6 +60,10 @@ func (shm *Shm) Data() []float32 {
 }
 
 func (shm *Shm) Get(i int) float32 {
+	if i < 0 || i >= shm.count {
+		return 0.0
+	}
+
 	var v C.float = C.shmGet(shm.addr, C.int(i))
 
 	return float32(v)
@@ -77,21 +81,41 @@ func (shm *Shm) Read() error {
 }
 
 func (shm *Shm) Set(i int, v float32) float32 {
+	if i < 0 || i >= shm.count {
+		return 0.0
+	}
+
 	return float32(C.shmSet(shm.addr, C.int(i), C.float(v)))
 }
 
 func (shm *Shm) Add(i int, v float32) float32 {
+	if i < 0 || i >= shm.count {
+		return 0.0
+	}
+
 	return float32(C.shmAdd(shm.addr, C.int(i), C.float(v)))
 }
 
 func (shm *Shm) Dec(i int) float32 {
+	if i < 0 || i >= shm.count {
+		return 0.0
+	}
+
 	return float32(C.shmDec(shm.addr, C.int(i)))
 }
 
 func (shm *Shm) Inc(i int) float32 {
+	if i < 0 || i >= shm.count {
+		return 0.0
+	}
+
 	return float32(C.shmInc(shm.addr, C.int(i)))
 }
 
 func (shm *Shm) Sub(i int, v float32) float32 {
-	return float32(C.shmAdd(shm.addr, C.int(i), C.float(v)))
+	if i < 0 || i >= shm.count {
+		return 0.0
+	}
+
+	return float32(C.shmSub(shm.addr, C.int(i), C.float(v)))
 }
