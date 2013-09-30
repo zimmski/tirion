@@ -582,7 +582,9 @@ func (a *TirionAgent) Run() {
 		a.V("Requested tirion protocol version v%s", matchClientVersion[1])
 		a.V("Using tirion protocol version v" + Version)
 
-		err = a.initShm("/tmp", true, len(a.metricsInternal))
+		var shmPath = "/proc/" + strconv.FormatInt(int64(a.program.pid), 10)
+
+		err = a.initShm(shmPath, true, len(a.metricsInternal))
 
 		if err != nil {
 			// TODO better error handling, most of the time the shared memory does already exists
@@ -591,8 +593,8 @@ func (a *TirionAgent) Run() {
 
 		defer a.shm.Close()
 
-		a.V("Send metric count %d", len(a.metricsInternal))
-		a.send(fmt.Sprintf("%d", len(a.metricsInternal)))
+		a.V("Send metric count %d and shm path %s", len(a.metricsInternal), shmPath)
+		a.send(fmt.Sprintf("%d\t%s", len(a.metricsInternal), shmPath))
 	}
 
 	a.Running = true

@@ -1,9 +1,11 @@
 package tirion
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -44,17 +46,32 @@ func (c *TirionClient) Init() error {
 
 		switch err {
 		case nil:
-			var metricCount, err = strconv.Atoi(m)
+			var t = strings.SplitN(m, "\t", 2)
 
-			if err != nil {
-				c.E("Did not receive metric count")
+			if len(t) == 1 || t[1] == "" {
+				err := errors.New("Did not receive correct metric count and shm path")
+
+				c.E(err.Error())
 
 				return err
 			}
 
-			c.V("Received metric count %d", metricCount)
+			var metricCount, err = strconv.Atoi(t[0])
+			var shmPath = t[1]
 
-			err = c.initShm("/tmp", false, metricCount)
+			if err != nil {
+				c.E("Did not receive correct metric count")
+
+				return err
+			} else if _, err := os.Stat(shmPath); os.IsNotExist(err) {
+				c.E("Did not receive correct shm path")
+
+				return err
+			}
+
+			c.V("Received metric count %d and shm path %s", metricCount, shmPath)
+
+			err = c.initShm(shmPath, false, metricCount)
 
 			if err != nil {
 				c.E("Cannot initialize shared memory")

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <sys/shm.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <unistd.h>
@@ -29,12 +30,14 @@ typedef struct TirionPrivateStruct {
 	TirionShm shm;
 	int metricCount;
 	char *socket;
-	pthread_t tHandleCommands;
+	pthread_t *tHandleCommands;
 } TirionPrivate;
 
 Tirion *tirionNew(const char *socket, bool verbose) {
 	Tirion *tirion = malloc(sizeof(Tirion));
 	tirion->p = malloc(sizeof(TirionPrivate));
+	tirion->p->shm.id = -1;
+	tirion->p->tHandleCommands = NULL;
 
 	tirion->p->socket = strdup(socket);
 	tirion->verbose = verbose;
@@ -80,20 +83,29 @@ int tirionInit(Tirion *tirion) {
 		return err;
 	}
 
+	char *tMetricCount = strtok(buf, "\t");
+	char *tShmPath = strtok(NULL, "\t");
+
+	struct stat statBuffer;
+
 	char *endptr;
-	int metricCount = strtol(buf, &endptr, 10);
+	int metricCount = strtol(tMetricCount, &endptr, 10);
 
 	if (metricCount <= 0 || (errno == ERANGE && (metricCount == INT_MAX || metricCount == INT_MIN)) || (errno != 0 && metricCount == 0)) {
-		tirionE(tirion, "Did not receive metric count");
+		tirionE(tirion, "Did not receive correct metric count");
 
 		return TIRION_ERROR_METRIC_COUNT;
+	} else if (tShmPath == NULL || strlen(tShmPath) == 0 || stat(tShmPath, &statBuffer) != 0) {
+		tirionE(tirion, "Did not receive correct shm path");
+
+		return TIRION_ERROR_SHM_PATH;
 	}
 
 	tirion->p->metricCount = metricCount;
-	tirionV(tirion, "Received metric count %d", metricCount);
+	tirionV(tirion, "Received metric count %d and shm path %s", metricCount, tShmPath);
 
 	tirionV(tirion, "Open shared memory");
-	if ((err = tirionShmInit(tirion, "/tmp", metricCount)) != TIRION_OK) {
+	if ((err = tirionShmInit(tirion, tShmPath, metricCount)) != TIRION_OK) {
 		return err;
 	}
 
@@ -104,7 +116,9 @@ int tirionInit(Tirion *tirion) {
 
 	tirion->running = true;
 
-	int rHandleCommands = pthread_create(&tirion->p->tHandleCommands, NULL, tirionThreadHandleCommands, (void*) tirion);
+	tirion->p->tHandleCommands = malloc(sizeof(pthread_t));
+
+	int rHandleCommands = pthread_create(tirion->p->tHandleCommands, NULL, tirionThreadHandleCommands, (void*) tirion);
 	if (rHandleCommands != 0) {
 		tirionE(tirion, "Failed creating HandleCommands thread");
 
@@ -127,10 +141,14 @@ int tirionClose(Tirion *tirion) {
 
 		return TIRION_ERROR_SOCKET_SHUTDOWN;
 	}
-	if (pthread_join(tirion->p->tHandleCommands, NULL) != 0) {
-		tirionE(tirion, "Cannot join HandleCommands thread");
+	if (tirion->p->tHandleCommands != NULL) {
+		if (pthread_join(*tirion->p->tHandleCommands, NULL) != 0) {
+			tirionE(tirion, "Cannot join HandleCommands thread");
 
-		return TIRION_ERROR_THREAD_JOIN;
+			return TIRION_ERROR_THREAD_JOIN;
+		}
+
+		free(tirion->p->tHandleCommands);
 	}
 
 	return TIRION_OK;
@@ -189,7 +207,7 @@ int tirionShmInit(Tirion *tirion, const char *filename, int count) {
 }
 
 int tirionShmClose(Tirion *tirion) {
-	if (shmdt(tirion->p->shm.addr) == -1) {
+	if (tirion->p->shm.id > 0 && shmdt(tirion->p->shm.addr) == -1) {
 		tirionE(tirion, "Cannot detach shm");
 
 		return TIRION_ERROR_SHM_DETACH;
