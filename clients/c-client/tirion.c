@@ -25,13 +25,13 @@ void tirionShmSet(Tirion *tirion, int i, float v);
 int tirionSocketReceive(Tirion *tirion, char *buf, int size);
 int tirionSocketSend(Tirion *tirion, const char *msg);
 
-typedef struct TirionPrivateStruct {
+struct TirionPrivateStruct {
 	int fd;
 	TirionShm shm;
 	int metricCount;
 	char *socket;
 	pthread_t *tHandleCommands;
-} TirionPrivate;
+};
 
 Tirion *tirionNew(const char *socket, bool verbose) {
 	Tirion *tirion = malloc(sizeof(Tirion));
