@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "tirion.h"
@@ -68,8 +69,9 @@ int main (int argc, char **argv) {
 			break;
 		}
 	}
-	if (flagHelp || flagErrors > 0) {
-		printf("Usage of go-client:\n");
+	if (strcmp(flagSocket, "") == 0 || flagHelp || flagErrors > 0) {
+		printf("Tirion C example client v%s\n", TIRION_VERSION);
+		printf("usage: %s [options]\n", argv[0]);
 		printf("  -h false: Show this help\n");
 		printf("  -r 5: Runtime of the example client in seconds\n");
 		printf("  -s \"/tmp/tirion.sock\": Unix socket path for client<-->agent communication\n");
@@ -103,6 +105,8 @@ int main (int argc, char **argv) {
 
 			pthread_join(tAfter, NULL);
 		}
+	} else {
+		printf("ERROR: Cannot initialize Tirion\n");
 	}
 
 	tirionClose(tirion);

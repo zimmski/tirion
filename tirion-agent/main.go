@@ -40,7 +40,7 @@ func main() {
 	flag.Parse()
 
 	if (flagPid == -1 && flagExec == "") || flagMetricsFilename == "" || flagHelp {
-		fmt.Printf("tirion agent v%s\n", tirion.Version)
+		fmt.Printf("Tirion agent v%s\n", tirion.Version)
 		fmt.Printf("usage:\n")
 		fmt.Printf("\t%s -pid <pid> -metrics-filename <json file> [other options]\n", os.Args[0])
 		fmt.Printf("\t%s -exec <program> -metrics-filename <json file> [other options]\n", os.Args[0])

@@ -23,8 +23,8 @@ func main() {
 
 	flag.Parse()
 
-	if flagHelp {
-		fmt.Printf("tirion go example client v%s\n", tirion.Version)
+	if flagSocket == "" || flagHelp {
+		fmt.Printf("Tirion go example client v%s\n", tirion.Version)
 		fmt.Printf("usage: %s [options]\n", os.Args[0])
 		fmt.Printf("options\n")
 		flag.PrintDefaults()
