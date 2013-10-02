@@ -1,10 +1,10 @@
 # tirion-agent
 
-The tirion-agent is the connective link between the client (your application) and the tirion-server which saves all run data like metrics and tags. If you use the precompiled Tirion binaries you can use the agent right away otherwise you have to [build Tirion](/README.md#how-to-build-tirion) first. This README focuses on how you can use the tirion-agent and not how it works, have a look at [“How does Tirion work?”](/README.md#how-does-tirion-work) if you want to know more.
+The tirion-agent is the connective link between the client (your application) and the tirion-server which saves all run data like metrics and tags. If you use the precompiled Tirion binaries you can use the agent right away otherwise you have to [build Tirion](/#how-to-build-tirion) first. This README focuses on how you can use the tirion-agent and not how it works, have a look at [“How does Tirion work?”](/#how-does-tirion-work) if you want to know more.
 
 ## CLI arguments
 
-```bash
+```
   -exec="": Execute this command
   -exec-arguments="": Arguments for the command
   -help=false: Show this help

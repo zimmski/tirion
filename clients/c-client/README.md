@@ -8,9 +8,9 @@ After that, you have to instantiate a client object with the function <code>tiri
 
 To initialize the client object <code>tirionInit(Tirion *tirion)</code> must be called with the object itself. If the function returns the constant TIRION_OK, the initialization was successful and the object can be used to set and modify internal metrics and send tags.
 
-Internal metric indices are defined via a [metric file](/README.md#metric-file) which is fed to the agent.
+Internal metric indices are defined via a [metric file](/#metric-file) which is fed to the agent.
 
-The following functions can be used to interact with metrics and tags. Have a look at the [API](#API) section for a more complete documentation.
+The following functions can be used to interact with metrics and tags. Have a look at the [API](#api) section for a more complete documentation.
 
 * <code>tirionAdd(Tirion *tirion, int i, float v)</code>
 * <code>tirionDec(Tirion *tirion, int i)</code>
@@ -25,10 +25,10 @@ Have a look at the [example program](#example-usage) for a more complete example
 ```c
 #include "tirion.h"
 ...
-Tirion *t = tirionNew(“/tmp/tirion.socket”, true);
+Tirion *t = tirionNew("/tmp/tirion.socket", true);
 
 if (tirionInit(t) == TIRION_OK) {
-	tirionTag(t, "start loop”);
+	tirionTag(t, "start loop");
 
 	int i = 0;
 	for (; i < 10; i++) {
@@ -36,7 +36,7 @@ if (tirionInit(t) == TIRION_OK) {
 		tirionInc(t, 1);
 	}
 
-	tirionTag(t, "end loop”);
+	tirionTag(t, "end loop");
 }
 
 tirionClose(t);
@@ -45,7 +45,7 @@ tirionDestroy(t);
 
 ## API
 
-Please have a look at [tirion.h](/clients/c-client/tirion.h) for a complete API overview of Tirion’s c client library.
+Please have a look at [tirion.h](/clients/c-client/tirion.h) for a complete API overview of Tirion's c client library.
 
 ## Example usage
 

@@ -1,10 +1,10 @@
 # tirion-server
 
-The tirion-server is a HTTP server using the [revel framework](http://robfig.github.io/revel/) who receives data from agents and serves clients for displaying and analysing this data. If you use the precompiled Tirion binaries you can use the server nearly right away otherwise you have to [build Tirion](/README.md#how-to-build-tirion) first or [start the server without deploying](#non-deploy-start) it. This README focuses on how to configure and use the tirion-server and not how it works, have a look at [“How does Tirion work?”](/README.md#how-does-tirion-work) if you want to know more.
+The tirion-server is a HTTP server using the [revel framework](http://robfig.github.io/revel/) who receives data from agents and serves clients for displaying and analysing this data. If you use the precompiled Tirion binaries you can use the server nearly right away otherwise you have to [build Tirion](/#how-to-build-tirion) first or [start the server without deploying](#run-the-tirion-server) it. This README focuses on how to configure and use the tirion-server and not how it works, have a look at [“How does Tirion work?”](/#how-does-tirion-work) if you want to know more.
 
 ## Configure tirion-server
 
-The tirion-server requires a working backend to save run data. Currently only a PostgreSQL backend is implemented but others can be easily added by implementing the [Backend interface](/backend/backend.go). For example adding a MySQL backend would only require copying the PostgreSQL, changing the Go driver and adapting the SQL statements.The PostgreSQL backend requires a running PostgreSQL server, a user and a database.
+The tirion-server requires a working backend to save run data. Currently only a PostgreSQL backend is implemented but others can be easily added by implementing the [Backend](/backend/backend.go) interface. For example adding a MySQL backend would only require copying the PostgreSQL, changing the Go driver and adapting the SQL statements.The PostgreSQL backend requires a running PostgreSQL server, a user and a database.
 
 To initialize the database, run the following command and make sure that all statements executed without errors.
 

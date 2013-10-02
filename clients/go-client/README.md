@@ -18,9 +18,9 @@ After that, you have to instantiate a client object with the function <code>NewT
 
 To initialize the client object <code>Init()</code> must be called with the object itself. If the function returns no error, the initialization was successful and the object can be used to set and modify internal metrics and send tags.
 
-Internal metric indices are defined via a [metric file](/README.md#metric-file) which is fed to the agent.
+Internal metric indices are defined via a [metric file](/#metric-file) which is fed to the agent.
 
-The following functions can be used on the object to interact with metrics and tags. Have a look at the [API](#API) section for a more complete documentation.
+The following functions can be used on the object to interact with metrics and tags. Have a look at the [API](#api) section for a more complete documentation.
 
 * <code>Add(i int, v float32)</code>
 * <code>Dec(i int)</code>
@@ -35,17 +35,17 @@ Have a look at the [example program](#example-usage) for a more complete example
 ```go
 import "github.com/zimmski/tirion"
 ...
-t := tirion.NewTirionClient(“/tmp/tirion.socket”, true)
+t := tirion.NewTirionClient("/tmp/tirion.socket", true)
 
 if t.Init() == nil {
-	t.Tag("start loop”)
+	t.Tag("start loop")
 
 	for i := 0; i < 10; i++ {
 		t.Add(2, 0.5);
 		t.Inc(1);
 	}
 
-	t.Tag("end loop”)
+	t.Tag("end loop")
 }
 
 t.Close()
@@ -54,7 +54,7 @@ t.Destroy()
 
 ## API
 
-Please have a look at [client.go](/client.go) for a complete API overview of Tirion’s Go client library.
+Please have a look at [client.go](/client.go) for a complete API overview of Tirion's Go client library.
 
 ## Example usage
 
