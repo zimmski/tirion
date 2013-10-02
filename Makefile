@@ -1,5 +1,5 @@
 .PHONY: all c-client examples fmt go-client tirion-agent vet
-all: c-client go-client tirion-agent
+all: tirion-agent
 c-client:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client
 go-client:
