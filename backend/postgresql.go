@@ -18,6 +18,10 @@ type Postgresql struct {
 	Db *sql.DB
 }
 
+func NewBackendPostgresql() Backend {
+	return new(Postgresql)
+}
+
 func (p *Postgresql) Init(spec string) error {
 	var err error
 

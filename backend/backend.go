@@ -26,7 +26,7 @@ type Backend interface {
 
 func NewBackend(name string) Backend {
 	if name == "postgresql" {
-		return new(Postgresql)
+		return NewBackendPostgresql()
 	} else {
 		panic(fmt.Sprintf("Unknown backend \"%s\"", name))
 	}
