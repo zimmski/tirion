@@ -21,7 +21,7 @@ import (
 )
 
 type ExecProgram struct {
-	pid           int
+	pid           int32
 	exec          string
 	execArguments []string
 }
@@ -30,19 +30,19 @@ type TirionAgent struct {
 	Tirion
 	chMessages           chan interface{}
 	cmd                  *exec.Cmd
-	interval             int
+	interval             int32
 	l                    net.Listener
 	program              ExecProgram
 	metrics              []Metric
-	metricsExternal      []int
-	metricsExternalIO    map[int]int
-	metricsExternalStat  map[int]int
-	metricsExternalStatm map[int]int
-	metricsInternal      []int
+	metricsExternal      []int32
+	metricsExternalIO    map[int32]int32
+	metricsExternalStat  map[int32]int32
+	metricsExternalStatm map[int32]int32
+	metricsInternal      []int32
 	metricsFilename      string
 	name                 string
-	run                  int
-	sendInterval         int
+	run                  int32
+	sendInterval         int32
 	server               string
 	serverConn           net.Conn
 	serverClient         *httputil.ClientConn
@@ -50,7 +50,7 @@ type TirionAgent struct {
 	writerCSV            *csv.Writer
 }
 
-func NewTirionAgent(name string, subName string, server string, sendInterval int, pid int, metricsFilename string, exec string, execArguments []string, interval int, socket string, verbose bool) *TirionAgent {
+func NewTirionAgent(name string, subName string, server string, sendInterval int32, pid int32, metricsFilename string, exec string, execArguments []string, interval int32, socket string, verbose bool) *TirionAgent {
 	return &TirionAgent{
 		Tirion: Tirion{
 			socket:    socket,
@@ -138,29 +138,29 @@ func (a *TirionAgent) Init() {
 		a.sPanic(err.Error())
 	}
 
-	a.metricsExternalIO = make(map[int]int)
-	a.metricsExternalStat = make(map[int]int)
-	a.metricsExternalStatm = make(map[int]int)
+	a.metricsExternalIO = make(map[int32]int32)
+	a.metricsExternalStat = make(map[int32]int32)
+	a.metricsExternalStatm = make(map[int32]int32)
 
 	for i, m := range a.metrics {
 		if strings.HasPrefix(m.Name, "proc") {
 			a.V("External metric %+v", m)
 
-			a.metricsExternal = append(a.metricsExternal, i)
+			a.metricsExternal = append(a.metricsExternal, int32(i))
 
 			if k, ok := proc.ProcIOIndizes[m.Name]; ok {
-				a.metricsExternalIO[k] = i
+				a.metricsExternalIO[int32(k)] = int32(i)
 			} else if k, ok := proc.ProcStatIndizes[m.Name]; ok {
-				a.metricsExternalStat[k] = i
+				a.metricsExternalStat[int32(k)] = int32(i)
 			} else if k, ok := proc.ProcStatmIndizes[m.Name]; ok {
-				a.metricsExternalStatm[k] = i
+				a.metricsExternalStatm[int32(k)] = int32(i)
 			} else {
 				a.sPanic(fmt.Sprintf("Unknown metric \"%s\"", m.Name))
 			}
 		} else {
 			a.V("Internal metric %+v", m)
 
-			a.metricsInternal = append(a.metricsInternal, i)
+			a.metricsInternal = append(a.metricsInternal, int32(i))
 		}
 	}
 
@@ -527,7 +527,7 @@ func (a *TirionAgent) Run() {
 
 		defer a.closeProgram()
 
-		a.program.pid = a.cmd.Process.Pid
+		a.program.pid = int32(a.cmd.Process.Pid)
 	}
 
 	a.V("Monitor program with PID %d", a.program.pid)
@@ -570,7 +570,7 @@ func (a *TirionAgent) Run() {
 
 		var shmPath = "/proc/" + strconv.FormatInt(int64(a.program.pid), 10)
 
-		err = a.initShm(shmPath, true, len(a.metricsInternal))
+		err = a.initShm(shmPath, true, int32(len(a.metricsInternal)))
 
 		if err != nil {
 			// TODO better error handling, most of the time the shared memory does already exists

@@ -16,19 +16,19 @@
 
 void *tirionThreadHandleCommands(void* arg);
 
-int tirionShmInit(Tirion *tirion, const char *filename, int count);
-int tirionShmClose(Tirion *tirion);
-float tirionShmGet(Tirion *tirion, int i);
-int tirionShmRead(Tirion *tirion);
-void tirionShmSet(Tirion *tirion, int i, float v);
+long tirionShmInit(Tirion *tirion, const char *filename, long count);
+long tirionShmClose(Tirion *tirion);
+float tirionShmGet(Tirion *tirion, long i);
+long tirionShmRead(Tirion *tirion);
+void tirionShmSet(Tirion *tirion, long i, float v);
 
-int tirionSocketReceive(Tirion *tirion, char *buf, int size);
-int tirionSocketSend(Tirion *tirion, const char *msg);
+long tirionSocketReceive(Tirion *tirion, char *buf, long size);
+long tirionSocketSend(Tirion *tirion, const char *msg);
 
 struct TirionPrivateStruct {
-	int fd;
+	long fd;
 	TirionShm shm;
-	int metricCount;
+	long metricCount;
 	char *socket;
 	pthread_t *tHandleCommands;
 };
@@ -47,8 +47,8 @@ Tirion *tirionNew(const char *socket, bool verbose) {
 	return tirion;
 }
 
-int tirionInit(Tirion *tirion) {
-	int err;
+long tirionInit(Tirion *tirion) {
+	long err;
 
 	// TODO should we create a sighandler to set tirion->running = false?
 
@@ -89,9 +89,9 @@ int tirionInit(Tirion *tirion) {
 	struct stat statBuffer;
 
 	char *endptr;
-	int metricCount = strtol(tMetricCount, &endptr, 10);
+	long metricCount = strtol(tMetricCount, &endptr, 10);
 
-	if (metricCount <= 0 || (errno == ERANGE && (metricCount == INT_MAX || metricCount == INT_MIN)) || (errno != 0 && metricCount == 0)) {
+	if (metricCount <= 0 || (errno == ERANGE && (metricCount == LONG_MAX || metricCount == LONG_MIN)) || (errno != 0 && metricCount == 0)) {
 		tirionE(tirion, "Did not receive correct metric count");
 
 		return TIRION_ERROR_METRIC_COUNT;
@@ -118,7 +118,7 @@ int tirionInit(Tirion *tirion) {
 
 	tirion->p->tHandleCommands = malloc(sizeof(pthread_t));
 
-	int rHandleCommands = pthread_create(tirion->p->tHandleCommands, NULL, tirionThreadHandleCommands, (void*) tirion);
+	long rHandleCommands = pthread_create(tirion->p->tHandleCommands, NULL, tirionThreadHandleCommands, (void*) tirion);
 	if (rHandleCommands != 0) {
 		tirionE(tirion, "Failed creating HandleCommands thread");
 
@@ -128,8 +128,8 @@ int tirionInit(Tirion *tirion) {
 	return TIRION_OK;
 }
 
-int tirionClose(Tirion *tirion) {
-	int err;
+long tirionClose(Tirion *tirion) {
+	long err;
 
 	tirion->running = false;
 
@@ -185,7 +185,7 @@ void *tirionThreadHandleCommands(void *arg) {
 	return NULL;
 }
 
-int tirionShmInit(Tirion *tirion, const char *filename, int count) {
+long tirionShmInit(Tirion *tirion, const char *filename, long count) {
 	key_t key = ftok(filename, 0x03);
 
 	if (key == -1) {
@@ -206,7 +206,7 @@ int tirionShmInit(Tirion *tirion, const char *filename, int count) {
 	return TIRION_OK;
 }
 
-int tirionShmClose(Tirion *tirion) {
+long tirionShmClose(Tirion *tirion) {
 	if (tirion->p->shm.id > 0 && shmdt(tirion->p->shm.addr) == -1) {
 		tirionE(tirion, "Cannot detach shm");
 
@@ -216,7 +216,7 @@ int tirionShmClose(Tirion *tirion) {
 	return TIRION_OK;
 }
 
-float tirionShmGet(Tirion *tirion, int i) {
+float tirionShmGet(Tirion *tirion, long i) {
 	if (i < 0 || i >= tirion->p->metricCount) {
 		return 0.0f;
 	}
@@ -224,7 +224,7 @@ float tirionShmGet(Tirion *tirion, int i) {
 	return tirion->p->shm.addr[i];
 }
 
-int tirionShmRead(Tirion *tirion) {
+long tirionShmRead(Tirion *tirion) {
 	if (tirion->p->shm.id <= 0) {
 		tirionE(tirion, "Shm is not initialized");
 
@@ -244,7 +244,7 @@ int tirionShmRead(Tirion *tirion) {
 	return TIRION_OK;
 }
 
-void tirionShmSet(Tirion *tirion, int i, float v) {
+void tirionShmSet(Tirion *tirion, long i, float v) {
 	if (i < 0 || i >= tirion->p->metricCount) {
 		return;
 	}
@@ -252,7 +252,7 @@ void tirionShmSet(Tirion *tirion, int i, float v) {
 	tirion->p->shm.addr[i] = v;
 }
 
-float tirionAdd(Tirion *tirion, int i, float v) {
+float tirionAdd(Tirion *tirion, long i, float v) {
 	if (i < 0 || i >= tirion->p->metricCount) {
 		return 0.0f;
 	}
@@ -260,15 +260,15 @@ float tirionAdd(Tirion *tirion, int i, float v) {
 	return tirion->p->shm.addr[i] = (tirion->p->shm.addr[i] + v);
 }
 
-float tirionDec(Tirion *tirion, int i) {
+float tirionDec(Tirion *tirion, long i) {
 	return tirionSub(tirion, i, 1.0);
 }
 
-float tirionInc(Tirion *tirion, int i) {
+float tirionInc(Tirion *tirion, long i) {
 	return tirionAdd(tirion, i, 1.0);
 }
 
-float tirionSub(Tirion *tirion, int i, float v) {
+float tirionSub(Tirion *tirion, long i, float v) {
 	if (i < 0 || i >= tirion->p->metricCount) {
 		return 0.0f;
 	}
@@ -276,7 +276,7 @@ float tirionSub(Tirion *tirion, int i, float v) {
 	return tirion->p->shm.addr[i] = (tirion->p->shm.addr[i] - v);
 }
 
-int tirionTag(Tirion *tirion, const char *format, ...) {
+long tirionTag(Tirion *tirion, const char *format, ...) {
 	va_list args;
 
 	char buf[TIRION_BUFFER_SIZE];
@@ -290,8 +290,8 @@ int tirionTag(Tirion *tirion, const char *format, ...) {
 	return tirionSocketSend(tirion, buf);
 }
 
-int tirionSocketReceive(Tirion *tirion, char *buf, int size) {
-	int rc = recv(tirion->p->fd, buf, size, 0);
+long tirionSocketReceive(Tirion *tirion, char *buf, long size) {
+	long rc = recv(tirion->p->fd, buf, size, 0);
 
 	if (rc <= 0) {
 		if (rc == 0) {
@@ -305,7 +305,7 @@ int tirionSocketReceive(Tirion *tirion, char *buf, int size) {
 
 	buf[rc] = '\0';
 
-	int sc = strlen(buf);
+	long sc = strlen(buf);
 
 	if (buf[sc - 1] == '\n') {
 		buf[sc - 1] = '\0';
@@ -314,8 +314,8 @@ int tirionSocketReceive(Tirion *tirion, char *buf, int size) {
 	return TIRION_OK;
 }
 
-int tirionSocketSend(Tirion *tirion, const char *msg) {
-	int wc = send(tirion->p->fd, msg, strlen(msg), 0);
+long tirionSocketSend(Tirion *tirion, const char *msg) {
+	long wc = send(tirion->p->fd, msg, strlen(msg), 0);
 
 	if (wc <= 0) {
 		tirionE(tirion, "Unix socket send error");

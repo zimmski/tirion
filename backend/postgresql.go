@@ -82,7 +82,7 @@ func (p *Postgresql) SearchPrograms() ([]tirion.Program, error) {
 	return programs, nil
 }
 
-func (p *Postgresql) FindRun(programName string, runId int) (*tirion.Run, error) {
+func (p *Postgresql) FindRun(programName string, runId int32) (*tirion.Run, error) {
 	tx, err := p.Db.Begin()
 
 	if err != nil {
@@ -229,7 +229,7 @@ func (p *Postgresql) StartRun(run *tirion.Run) error {
 	return nil
 }
 
-func (p *Postgresql) StopRun(runId int) error {
+func (p *Postgresql) StopRun(runId int32) error {
 	tx, err := p.Db.Begin()
 
 	if err != nil {
@@ -259,7 +259,7 @@ func (p *Postgresql) StopRun(runId int) error {
 	return nil
 }
 
-func (p *Postgresql) CreateMetrics(runId int, metrics []tirion.MessageData) error {
+func (p *Postgresql) CreateMetrics(runId int32, metrics []tirion.MessageData) error {
 	tx, err := p.Db.Begin()
 
 	if err != nil {
@@ -276,7 +276,7 @@ func (p *Postgresql) CreateMetrics(runId int, metrics []tirion.MessageData) erro
 
 	// check metrics data before insert to save roundtrips
 	for i, m := range metrics {
-		if len(m.Data) != run.MetricCount {
+		if int32(len(m.Data)) != run.MetricCount {
 			return errors.New(fmt.Sprintf("Metric count of %d is unequal to the run's metric count", i))
 		}
 	}
@@ -427,7 +427,7 @@ func (p *Postgresql) SearchMetricsOfRun(run *tirion.Run) ([][]float32, error) {
 	return metrics, nil
 }
 
-func (p *Postgresql) CreateTag(runId int, tag *tirion.Tag) error {
+func (p *Postgresql) CreateTag(runId int32, tag *tirion.Tag) error {
 	tx, err := p.Db.Begin()
 
 	if err != nil {

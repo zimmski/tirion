@@ -25,10 +25,10 @@ enum {
 };
 
 typedef struct TirionShmStruct {
-	int id;
+	long id;
 	bool create;
 	float *addr;
-	int count;
+	long count;
 } TirionShm;
 
 typedef struct TirionPrivateStruct TirionPrivate;
@@ -41,16 +41,16 @@ typedef struct TirionStruct {
 
 
 Tirion *tirionNew(const char *socket, bool verbose);
-int tirionInit(Tirion *tirion);
-int tirionClose(Tirion *tirion);
+long tirionInit(Tirion *tirion);
+long tirionClose(Tirion *tirion);
 void tirionDestroy(Tirion *tirion);
 
-float tirionAdd(Tirion *tirion, int i, float v);
-float tirionDec(Tirion *tirion, int i);
-float tirionInc(Tirion *tirion, int i);
-float tirionSub(Tirion *tirion, int i, float v);
+float tirionAdd(Tirion *tirion, long i, float v);
+float tirionDec(Tirion *tirion, long i);
+float tirionInc(Tirion *tirion, long i);
+float tirionSub(Tirion *tirion, long i, float v);
 
-int tirionTag(Tirion *tirion, const char *format, ...);
+long tirionTag(Tirion *tirion, const char *format, ...);
 
 void tirionD(const Tirion *tirion, const char *format, ...);
 void tirionE(const Tirion *tirion, const char *format, ...);

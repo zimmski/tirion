@@ -71,7 +71,7 @@ func (c *TirionClient) Init() error {
 
 			c.V("Received metric count %d and shm path %s", metricCount, shmPath)
 
-			err = c.initShm(shmPath, false, metricCount)
+			err = c.initShm(shmPath, false, int32(metricCount))
 
 			if err != nil {
 				c.E("Cannot initialize shared memory")
@@ -134,19 +134,19 @@ func (c *TirionClient) handleCommands() {
 	c.V("Stop listening to commands")
 }
 
-func (c *TirionClient) Add(i int, v float32) float32 {
+func (c *TirionClient) Add(i int32, v float32) float32 {
 	return c.shm.Add(i, v)
 }
 
-func (c *TirionClient) Dec(i int) float32 {
+func (c *TirionClient) Dec(i int32) float32 {
 	return c.shm.Dec(i)
 }
 
-func (c *TirionClient) Inc(i int) float32 {
+func (c *TirionClient) Inc(i int32) float32 {
 	return c.shm.Inc(i)
 }
 
-func (c *TirionClient) Sub(i int, v float32) float32 {
+func (c *TirionClient) Sub(i int32, v float32) float32 {
 	return c.shm.Sub(i, v)
 }
 

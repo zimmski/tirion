@@ -18,7 +18,7 @@ type MessageReturnInsert struct {
 }
 
 type MessageReturnStart struct {
-	Run   int
+	Run   int32
 	Error string
 }
 

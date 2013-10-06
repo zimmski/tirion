@@ -12,25 +12,25 @@ import (
 )
 
 type Shm struct {
-	id     int
+	id     int32
 	create bool
 	addr   *C.float
-	count  int
+	count  int32
 }
 
-func NewShm(filename string, create bool, count int) (*Shm, error) {
+func NewShm(filename string, create bool, count int32) (*Shm, error) {
 	f := C.CString(filename)
 	defer C.free(unsafe.Pointer(f))
 
-	var c C.int
+	var c C.char
 
 	if create {
-		c = C.int(1)
+		c = C.char(1)
 	} else {
-		c = C.int(0)
+		c = C.char(0)
 	}
 
-	id := int(C.shmOpen(f, c, C.int(count)))
+	id := int32(C.shmOpen(f, c, C.long(count)))
 
 	if id == -1 {
 		return nil, errors.New("Shm open error")
@@ -43,7 +43,7 @@ func (shm *Shm) Close() error {
 	C.shmDetach(shm.addr)
 
 	if shm.create {
-		if C.shmClose(C.int(shm.id)) != 0 {
+		if C.shmClose(C.long(shm.id)) != 0 {
 			return errors.New("Shm close error")
 		}
 	}
@@ -54,17 +54,17 @@ func (shm *Shm) Close() error {
 func (shm *Shm) Data() []float32 {
 	a := make([]float32, shm.count)
 
-	C.shmCopy(shm.addr, (*C.float)(unsafe.Pointer(&a[0])), C.int(shm.count))
+	C.shmCopy(shm.addr, (*C.float)(unsafe.Pointer(&a[0])), C.long(shm.count))
 
 	return a
 }
 
-func (shm *Shm) Get(i int) float32 {
+func (shm *Shm) Get(i int32) float32 {
 	if i < 0 || i >= shm.count {
 		return 0.0
 	}
 
-	var v C.float = C.shmGet(shm.addr, C.int(i))
+	var v C.float = C.shmGet(shm.addr, C.long(i))
 
 	return float32(v)
 }
@@ -75,47 +75,47 @@ func (shm *Shm) Read() error {
 	}
 
 	// TODO map the shared memory directly to a go structure so we can use it via index directly. well, how?!
-	shm.addr = C.shmAttach(C.int(shm.id))
+	shm.addr = C.shmAttach(C.long(shm.id))
 
 	return nil
 }
 
-func (shm *Shm) Set(i int, v float32) float32 {
+func (shm *Shm) Set(i int32, v float32) float32 {
 	if i < 0 || i >= shm.count {
 		return 0.0
 	}
 
-	return float32(C.shmSet(shm.addr, C.int(i), C.float(v)))
+	return float32(C.shmSet(shm.addr, C.long(i), C.float(v)))
 }
 
-func (shm *Shm) Add(i int, v float32) float32 {
+func (shm *Shm) Add(i int32, v float32) float32 {
 	if i < 0 || i >= shm.count {
 		return 0.0
 	}
 
-	return float32(C.shmAdd(shm.addr, C.int(i), C.float(v)))
+	return float32(C.shmAdd(shm.addr, C.long(i), C.float(v)))
 }
 
-func (shm *Shm) Dec(i int) float32 {
+func (shm *Shm) Dec(i int32) float32 {
 	if i < 0 || i >= shm.count {
 		return 0.0
 	}
 
-	return float32(C.shmDec(shm.addr, C.int(i)))
+	return float32(C.shmDec(shm.addr, C.long(i)))
 }
 
-func (shm *Shm) Inc(i int) float32 {
+func (shm *Shm) Inc(i int32) float32 {
 	if i < 0 || i >= shm.count {
 		return 0.0
 	}
 
-	return float32(C.shmInc(shm.addr, C.int(i)))
+	return float32(C.shmInc(shm.addr, C.long(i)))
 }
 
-func (shm *Shm) Sub(i int, v float32) float32 {
+func (shm *Shm) Sub(i int32, v float32) float32 {
 	if i < 0 || i >= shm.count {
 		return 0.0
 	}
 
-	return float32(C.shmSub(shm.addr, C.int(i), C.float(v)))
+	return float32(C.shmSub(shm.addr, C.long(i), C.float(v)))
 }

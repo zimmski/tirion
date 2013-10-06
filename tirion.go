@@ -35,12 +35,12 @@ type Program struct {
 }
 
 type Run struct {
-	Id            int
+	Id            int32
 	Name          string
 	SubName       string
-	Interval      int
+	Interval      int32
 	Metrics       []Metric
-	MetricCount   int
+	MetricCount   int32
 	Prog          string
 	ProgArguments string
 	Start         *time.Time
@@ -66,7 +66,7 @@ func CheckMetrics(metrics []Metric) error {
 		return errors.New("No metrics defined")
 	}
 
-	var metricNames = make(map[string]int)
+	var metricNames = make(map[string]int32)
 
 	for i, m := range metrics {
 		if m.Name == "" {
@@ -79,13 +79,13 @@ func CheckMetrics(metrics []Metric) error {
 			return errors.New(fmt.Sprintf("Unknown metric type \"%s\" for metric[%d]", m.Type, i))
 		}
 
-		metricNames[m.Name] = i
+		metricNames[m.Name] = int32(i)
 	}
 
 	return nil
 }
 
-func (t *Tirion) initShm(filename string, create bool, count int) error {
+func (t *Tirion) initShm(filename string, create bool, count int32) error {
 	var err error
 
 	t.V("Open shared memory")
