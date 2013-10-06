@@ -1,6 +1,7 @@
 package tirion
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -58,6 +59,30 @@ type Tirion struct {
 	socket    string
 	verbose   bool
 	logPrefix string
+}
+
+func CheckMetrics(metrics []Metric) error {
+	if len(metrics) == 0 {
+		return errors.New("No metrics defined")
+	}
+
+	var metricNames = make(map[string]int)
+
+	for i, m := range metrics {
+		if m.Name == "" {
+			return errors.New(fmt.Sprintf("No name defined for metric[%d]", i))
+		} else if v, ok := metricNames[m.Name]; ok {
+			return errors.New(fmt.Sprintf("Name \"%s\" of metric[%d] alreay used for metric[%d]", m.Name, i, v))
+		} else if m.Type == "" {
+			return errors.New(fmt.Sprintf("No type defined for metric[%d]", i))
+		} else if _, ok := MetricTypes[m.Type]; !ok {
+			return errors.New(fmt.Sprintf("Unknown metric type \"%s\" for metric[%d]", m.Type, i))
+		}
+
+		metricNames[m.Name] = i
+	}
+
+	return nil
 }
 
 func (t *Tirion) initShm(filename string, create bool, count int) error {

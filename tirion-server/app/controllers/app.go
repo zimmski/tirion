@@ -96,24 +96,8 @@ func (c App) ProgramRunStart(programName string) revel.Result {
 		return c.RenderJson(tirion.MessageReturnStart{Error: fmt.Sprintf("Parse metrics file: %v", err)})
 	}
 
-	if len(run.Metrics) == 0 {
-		return c.RenderJson(tirion.MessageReturnStart{Error: fmt.Sprintf("No metrics defined")})
-	}
-
-	var metricNames = make(map[string]int)
-
-	for i, m := range run.Metrics {
-		if m.Name == "" {
-			panic(fmt.Sprintf("No name defined for metric[%d]", i))
-		} else if v, ok := metricNames[m.Name]; ok {
-			panic(fmt.Sprintf("Name \"%s\" of metric[%d] alreay used for metric[%d]", m.Name, i, v))
-		} else if m.Type == "" {
-			panic(fmt.Sprintf("No type defined for metric[%d]", i))
-		} else if _, ok := tirion.MetricTypes[m.Type]; !ok {
-			panic(fmt.Sprintf("Unknown metric type \"%s\" for metric[%d]", m.Type, i))
-		}
-
-		metricNames[m.Name] = i
+	if err := tirion.CheckMetrics(run.Metrics); err != nil {
+		return c.RenderJson(tirion.MessageReturnStart{Error: err.Error()})
 	}
 
 	err = app.Db.StartRun(&run)

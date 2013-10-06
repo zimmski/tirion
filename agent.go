@@ -134,29 +134,15 @@ func (a *TirionAgent) Init() {
 		a.sPanic(fmt.Sprintf("Parse metrics file: %v", err))
 	}
 
-	if len(a.metrics) == 0 {
-		a.sPanic("No metrics defined")
+	if err := CheckMetrics(a.metrics); err != nil {
+		a.sPanic(err.Error())
 	}
-
-	var metricNames = make(map[string]int)
 
 	a.metricsExternalIO = make(map[int]int)
 	a.metricsExternalStat = make(map[int]int)
 	a.metricsExternalStatm = make(map[int]int)
 
 	for i, m := range a.metrics {
-		if m.Name == "" {
-			a.sPanic(fmt.Sprintf("No name defined for metric[%d]", i))
-		} else if v, ok := metricNames[m.Name]; ok {
-			a.sPanic(fmt.Sprintf("Name \"%s\" of metric[%d] alreay used for metric[%d]", m.Name, i, v))
-		} else if m.Type == "" {
-			a.sPanic(fmt.Sprintf("No type defined for metric[%d]", i))
-		} else if _, ok := MetricTypes[m.Type]; !ok {
-			a.sPanic(fmt.Sprintf("Unknown metric type \"%s\" for metric[%d]", m.Type, i))
-		}
-
-		metricNames[m.Name] = i
-
 		if strings.HasPrefix(m.Name, "proc") {
 			a.V("External metric %+v", m)
 
