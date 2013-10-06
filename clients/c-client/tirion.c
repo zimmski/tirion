@@ -288,7 +288,9 @@ long tirionTag(Tirion *tirion, const char *format, ...) {
 	vsnprintf(&buf[1], TIRION_TAG_SIZE, format, args);
 	va_end(args);
 
-	for (char *c = &buf[1]; *c; c++) {
+	char *c = &buf[1];
+
+	for (; *c; c++) {
 		if (*c == '\n') {
 			*c = ' ';
 		}

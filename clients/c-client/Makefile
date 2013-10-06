@@ -7,7 +7,7 @@ CFLAGS = -Wall -Wextra -W -g
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 HEADERS = $(wildcard *.h)
 
-.PHONY: all clean
+.PHONY: all gcc clean
 .PRECIOUS: $(OBJECTS)
 
 all: $(PROG)
@@ -22,3 +22,7 @@ clean:
 	echo $(BB)
 	-rm -f $(BB)/*.o
 	-rm -f $(GOPATH)/bin/$(PROG)
+
+gcc: CC = gcc
+gcc: all
+
