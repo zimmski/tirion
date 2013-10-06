@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"regexp"
 	"strings"
 	"syscall"
 	"time"
@@ -69,11 +70,16 @@ func CheckMetrics(metrics []Metric) error {
 		return errors.New(fmt.Sprintf("Maximum of %d metrics allowed", math.MaxInt32))
 	}
 
+	var metricNameRegex = regexp.MustCompile("[^a-zA-Z0-9.-_]")
 	var metricNames = make(map[string]int32)
 
 	for i, m := range metrics {
 		if m.Name == "" {
 			return errors.New(fmt.Sprintf("No name defined for metric[%d]", i))
+		} else if len(m.Name) > 256 {
+			return errors.New(fmt.Sprintf("Name of metric[%d] exceeds maximum of 256 characters", i))
+		} else if metricNameRegex.MatchString(m.Name) {
+			return errors.New(fmt.Sprintf("Name  of metric[%d] uses illegal characters. Only a-z, A-Z, 0-9, ., - and _ are allowed!", i))
 		} else if v, ok := metricNames[m.Name]; ok {
 			return errors.New(fmt.Sprintf("Name \"%s\" of metric[%d] alreay used for metric[%d]", m.Name, i, v))
 		} else if m.Type == "" {
