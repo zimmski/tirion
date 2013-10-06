@@ -99,8 +99,31 @@ func (c *TirionClient) Init() error {
 	return nil
 }
 
-// TODO add Close function like in the C client
-// TODO add Destroy function like in the C client
+func (c *TirionClient) Close() error {
+	c.Running = false
+
+	if c.shm != nil {
+		if err := c.shm.Close(); err != nil {
+			return err
+		}
+
+		c.shm = nil
+	}
+
+	if c.fd != nil {
+		if err := c.fd.Close(); err != nil {
+			return err
+		}
+
+		c.fd = nil
+	}
+
+	return nil
+}
+
+func (c *TirionClient) Destroy() error {
+	return nil
+}
 
 func (c *TirionClient) handleCommands() {
 	c.V("Start listening to commands")
@@ -122,9 +145,11 @@ func (c *TirionClient) handleCommands() {
 			c.Running = false
 		default:
 			if strings.HasSuffix(err.Error(), "use of closed network connection") {
-				c.V("Unix socket suddenly got closed")
+				if c.Running {
+					c.V("Unix socket suddenly got closed")
 
-				c.Running = false
+					c.Running = false
+				}
 			} else {
 				panic(err)
 			}

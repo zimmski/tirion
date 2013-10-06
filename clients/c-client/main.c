@@ -21,7 +21,7 @@ void *threadAfter(void *ptr) {
 
 	tirionD(args->tirion, "Program ran for %d seconds, this is enough data.", args->runtime);
 
-	args->tirion->running = false;
+	tirionClose(args->tirion);
 
 	return NULL;
 }

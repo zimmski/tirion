@@ -41,7 +41,7 @@ func main() {
 	time.AfterFunc(time.Second*time.Duration(flagRuntime), func() {
 		c.D("Program ran for %d seconds, this is enough data.", flagRuntime)
 
-		c.Running = false
+		c.Close()
 	})
 
 	for c.Running {
@@ -57,7 +57,11 @@ func main() {
 		}
 	}
 
+	c.Close()
+
 	c.V("Stopped")
+
+	c.Destroy()
 
 	return
 }

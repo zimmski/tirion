@@ -150,6 +150,8 @@ long tirionClose(Tirion *tirion) {
 		}
 
 		free(tirion->p->tHandleCommands);
+
+		tirion->p->tHandleCommands = NULL;
 	}
 
 	return TIRION_OK;
@@ -213,6 +215,8 @@ long tirionShmClose(Tirion *tirion) {
 
 		return TIRION_ERROR_SHM_DETACH;
 	}
+
+	tirion->p->shm.id = 0;
 
 	return TIRION_OK;
 }
@@ -304,7 +308,7 @@ long tirionSocketReceive(Tirion *tirion, char *buf, long size) {
 
 	if (rc <= 0) {
 		if (rc == 0) {
-			tirionE(tirion, "Unix socket got closed with EOF");
+			tirionV(tirion, "Unix socket got closed with EOF");
 		} else {
 			tirionE(tirion, "Unix socket receive error");
 		}
