@@ -3,6 +3,7 @@ package tirion
 import (
 	"errors"
 	"fmt"
+	"math"
 	"net"
 	"os"
 	"os/signal"
@@ -64,6 +65,8 @@ type Tirion struct {
 func CheckMetrics(metrics []Metric) error {
 	if len(metrics) == 0 {
 		return errors.New("No metrics defined")
+	} else if len(metrics) >= math.MaxInt32 {
+		return errors.New(fmt.Sprintf("Maximum of %d metrics allowed", math.MaxInt32))
 	}
 
 	var metricNames = make(map[string]int32)

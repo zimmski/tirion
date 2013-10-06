@@ -152,7 +152,7 @@ The following internal metric types are currently supported:
 
 ### Metric file
 
-A metric file is just a simple text file with a JSON structure which is fed to the tirion-agent that monitors the given application. The JSON structure consists of an array of [external](#external-metrics) and [internal](#internal-metrics) metrics. Only internal metrics have to follow a specific order which must suit the given client. External metrics can be defined in any order. There is a limit of 2^32 metrics per metrics file. Each metric must have a unique name and a type. This also means that an external metric can only be used once in a metric file. Please have a look at currently available [external metrics](#external-metrics) and the definition of [internal metrics](#internal-metrics).
+A metric file is just a simple text file with a JSON structure which is fed to the tirion-agent that monitors the given application. The JSON structure consists of an array of [external](#external-metrics) and [internal](#internal-metrics) metrics. Only internal metrics have to follow a specific order which must suit the given client. External metrics can be defined in any order. There is a limit of 2^32-1 metrics per metrics file. Each metric must have a unique name and a type. This also means that an external metric can only be used once in a metric file. Please have a look at currently available [external metrics](#external-metrics) and the definition of [internal metrics](#internal-metrics).
 
 For example:
 
