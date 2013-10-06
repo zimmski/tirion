@@ -461,7 +461,9 @@ func (a *TirionAgent) handleMetrics(c chan bool) {
 			pIO, err := proc.ReadIOArray(pidFolder + "io")
 
 			if err != nil {
-				a.sPanic(err)
+				a.E("read io: " + err.Error())
+
+				break
 			}
 
 			for k, v := range a.metricsExternalIO {
@@ -474,7 +476,9 @@ func (a *TirionAgent) handleMetrics(c chan bool) {
 			pStat, err := proc.ReadStatArray(pidFolder + "stat")
 
 			if err != nil {
-				a.sPanic(err)
+				a.E("read stat: " + err.Error())
+
+				break
 			}
 
 			for k, v := range a.metricsExternalStat {
@@ -487,7 +491,9 @@ func (a *TirionAgent) handleMetrics(c chan bool) {
 			pStatm, err := proc.ReadStatmArray(pidFolder + "statm")
 
 			if err != nil {
-				a.sPanic(err)
+				a.E("read statm: " + err.Error())
+
+				break
 			}
 
 			for k, v := range a.metricsExternalStatm {
