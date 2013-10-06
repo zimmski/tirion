@@ -189,7 +189,7 @@ Defines the three external metrics <code>proc.stat.utime</code>, <code>proc.stat
 
 ### Tags
 
-Tags are markers in the timeline of client execution and can be issued by the client itself. In comparison to internal metrics, tags can never get lost. A tag's only attribute is the message, which has the restrictions of at most 512 characters and it can not consist of newlines. Clients will replace newlines with spaces to make the handling of tags more user-friendly.
+Tags are markers in the timeline of client execution and can be issued by the client itself. Tags, in comparison to internal metrics, can never get lost. A tag's only attribute is the message, which has the restrictions of at most 512 characters and it can not consist of newlines. Clients, agents and servers cut the message and replace newlines with spaces to make the handling of tags more user-friendly.
 
 ### tirion-agent
 

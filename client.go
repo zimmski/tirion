@@ -151,5 +151,5 @@ func (c *TirionClient) Sub(i int32, v float32) float32 {
 }
 
 func (c *TirionClient) Tag(format string, a ...interface{}) {
-	c.send(fmt.Sprintf("t"+format, a...))
+	c.send(PrepareTag(fmt.Sprintf("t"+format, a...)))
 }

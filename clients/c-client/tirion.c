@@ -13,6 +13,7 @@
 #include "tirion.h"
 
 #define TIRION_BUFFER_SIZE 4096
+#define TIRION_TAG_SIZE 513
 
 void *tirionThreadHandleCommands(void* arg);
 
@@ -279,13 +280,19 @@ float tirionSub(Tirion *tirion, long i, float v) {
 long tirionTag(Tirion *tirion, const char *format, ...) {
 	va_list args;
 
-	char buf[TIRION_BUFFER_SIZE];
+	char buf[TIRION_TAG_SIZE];
 
 	buf[0] = 't';
 
 	va_start(args, format);
-	vsprintf(&buf[1], format, args);
+	vsnprintf(&buf[1], TIRION_TAG_SIZE, format, args);
 	va_end(args);
+
+	for (char *c = &buf[1]; *c; c++) {
+		if (*c == '\n') {
+			*c = ' ';
+		}
+	}
 
 	return tirionSocketSend(tirion, buf);
 }

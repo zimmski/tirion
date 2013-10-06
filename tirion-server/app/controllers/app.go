@@ -141,7 +141,7 @@ func (c App) ProgramRunTag(programName string, runId int32) revel.Result {
 	var t, err = strconv.ParseInt(c.Params.Get("time"), 10, 64)
 
 	var tag = tirion.Tag{
-		Tag:  c.Params.Get("tag"),
+		Tag:  tirion.PrepareTag(c.Params.Get("tag")),
 		Time: time.Unix(0, t),
 	}
 

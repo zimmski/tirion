@@ -266,7 +266,7 @@ func (a *TirionAgent) handleCommands(c chan bool) {
 
 			switch com {
 			case 't':
-				a.chMessages <- MessageTag{Message{time.Now()}, data[1:]}
+				a.chMessages <- MessageTag{Message{time.Now()}, PrepareTag(data)[1:]}
 			default:
 				a.E("Unknown command '%c'", com)
 			}

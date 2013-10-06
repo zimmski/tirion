@@ -17,6 +17,8 @@ import (
 
 const Version = "0.1"
 
+const TIRION_TAG_SIZE = 513
+
 type HighStockTag struct {
 	X     int64  `json:"x"`
 	Title string `json:"title"`
@@ -92,6 +94,14 @@ func CheckMetrics(metrics []Metric) error {
 	}
 
 	return nil
+}
+
+func PrepareTag(tag string) string {
+	if len(tag) > TIRION_TAG_SIZE {
+		tag = tag[:TIRION_TAG_SIZE]
+	}
+
+	return strings.Replace(tag, "\n", " ", -1)
 }
 
 func (t *Tirion) initShm(filename string, create bool, count int32) error {
