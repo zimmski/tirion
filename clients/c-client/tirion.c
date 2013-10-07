@@ -57,7 +57,7 @@ long tirionInit(Tirion *tirion) {
 
 	struct sockaddr_un addr;
 
-	if ( (tirion->p->fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+	if ((tirion->p->fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
 		tirionE(tirion, "socket create error");
 
 		return TIRION_ERROR_SOCKET_CREATE;

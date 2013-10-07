@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/zimmski/tirion"
@@ -24,10 +25,10 @@ type Backend interface {
 	SearchTagsOfRun(run *tirion.Run) ([]tirion.HighStockTag, error)
 }
 
-func NewBackend(name string) Backend {
+func NewBackend(name string) (Backend, error) {
 	if name == "postgresql" {
-		return NewBackendPostgresql()
+		return NewBackendPostgresql(), nil
 	} else {
-		panic(fmt.Sprintf("Unknown backend \"%s\"", name))
+		return nil, errors.New(fmt.Sprintf("Unknown backend \"%s\"", name))
 	}
 }

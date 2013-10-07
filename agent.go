@@ -169,7 +169,7 @@ func (a *TirionAgent) Init() {
 	if a.server != "" {
 		a.V("Open server connection to %s", a.server)
 
-		// TODO there is a bug in go 1.1.2. if net.Dial is fed an unexisting address, it will uncatchable a.sPanic. so we have to work around that
+		// TODO there is a bug in go 1.1.2. if net.Dial is fed an unexisting address, it will uncatchable panic. so we have to work around that
 		a.serverConn, err = net.Dial("tcp", a.server)
 
 		if err != nil {
@@ -314,7 +314,7 @@ func (a *TirionAgent) handleMessages(c chan bool) {
 	if a.writerCSV == nil {
 		var err error
 
-		tagRequest, err = http.NewRequest("POST", "/program/"+a.name+"/run/"+strconv.FormatInt(int64(a.run), 10)+"/tag", nil)
+		tagRequest, err = http.NewRequest("POST", fmt.Sprintf("/program/%s/run/%d/tag", a.name, a.run), nil)
 		tagRequestData = url.Values{"tag": nil, "time": nil}
 
 		if err != nil {
@@ -326,7 +326,7 @@ func (a *TirionAgent) handleMessages(c chan bool) {
 		metrics = make([]MessageData, 0, 100)
 		metricsQueue = make(chan MessageData, 1000)
 
-		metricsRequest, err = http.NewRequest("POST", "/program/"+a.name+"/run/"+strconv.FormatInt(int64(a.run), 10)+"/insert", nil)
+		metricsRequest, err = http.NewRequest("POST", fmt.Sprintf("/program/%s/run/%d/insert", a.name, a.run), nil)
 		metricsRequestData = url.Values{"metrics": nil}
 
 		if err != nil {
@@ -574,7 +574,7 @@ func (a *TirionAgent) Run() {
 		a.V("Requested tirion protocol version v%s", matchClientVersion[1])
 		a.V("Using tirion protocol version v" + Version)
 
-		var shmPath = "/proc/" + strconv.FormatInt(int64(a.program.pid), 10)
+		var shmPath = fmt.Sprintf("/proc/%d", a.program.pid)
 
 		err = a.initShm(shmPath, true, int32(len(a.metricsInternal)))
 
@@ -586,7 +586,9 @@ func (a *TirionAgent) Run() {
 		defer a.shm.Close()
 
 		a.V("Send metric count %d and shm path %s", len(a.metricsInternal), shmPath)
-		a.send(fmt.Sprintf("%d\t%s", len(a.metricsInternal), shmPath))
+		if err := a.send(fmt.Sprintf("%d\t%s", len(a.metricsInternal), shmPath)); err != nil {
+			a.sPanic(fmt.Sprintf("Send error: %v", err))
+		}
 	}
 
 	a.Running = true
@@ -614,7 +616,7 @@ func (a *TirionAgent) Run() {
 
 	a.V("Request stop of run")
 
-	stopRequest, err := http.NewRequest("GET", "/program/"+a.name+"/run/"+strconv.FormatInt(int64(a.run), 10)+"/stop", nil)
+	stopRequest, err := http.NewRequest("GET", fmt.Sprintf("/program/%s/run/%d/stop", a.name, a.run), nil)
 	var stopRequestResult MessageReturnStop
 
 	if err != nil {

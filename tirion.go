@@ -118,7 +118,7 @@ func (t *Tirion) initShm(filename string, create bool, count int32) error {
 	err = t.shm.Read()
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	return nil
@@ -149,12 +149,10 @@ func (t *Tirion) receive() (string, error) {
 	return strings.Trim(string(buf[0:nr]), "\n"), nil
 }
 
-func (t *Tirion) send(msg string) {
+func (t *Tirion) send(msg string) error {
 	_, err := t.fd.Write([]byte(msg + "\n"))
 
-	if err != nil {
-		panic(err)
-	}
+	return err
 }
 
 // TODO remove this or maybe we should put them in a logging package or use another logging package

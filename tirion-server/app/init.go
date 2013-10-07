@@ -25,12 +25,19 @@ func init() {
 		revel.ActionInvoker,           // Invoke the action.
 	}
 	revel.OnAppStart(func() {
+		var err error
+
 		runtime.GOMAXPROCS(runtime.NumCPU())
 
 		var dbDriver, _ = revel.Config.String("db.driver")
 		var dbSpec, _ = revel.Config.String("db.spec")
 
-		Db = backend.NewBackend(dbDriver)
+		Db, err = backend.NewBackend(dbDriver)
+
+		if err != nil {
+			panic(err)
+		}
+
 		Db.Init(dbSpec)
 
 		revel.TemplateFuncs["ne"] = func(a, b interface{}) bool { return a != b }

@@ -40,7 +40,11 @@ func (c *TirionClient) Init() error {
 		return err
 	} else {
 		c.V("Request tirion protocol version v%s", Version)
-		c.send("tirion v" + Version)
+		if err := c.send("tirion v" + Version); err != nil {
+			c.E(err.Error())
+
+			return err
+		}
 
 		m, err := c.receive()
 
@@ -147,12 +151,14 @@ func (c *TirionClient) handleCommands() {
 			if strings.HasSuffix(err.Error(), "use of closed network connection") {
 				if c.Running {
 					c.V("Unix socket suddenly got closed")
-
-					c.Running = false
 				}
 			} else {
-				panic(err)
+				c.E("%v", err)
 			}
+
+			c.Running = false
+
+			break
 		}
 	}
 

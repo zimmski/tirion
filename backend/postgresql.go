@@ -28,13 +28,13 @@ func (p *Postgresql) Init(spec string) error {
 	p.Db, err = sql.Open("postgres", spec)
 
 	if err != nil {
-		panic(fmt.Sprintf("Cannot connect to database: %v", err))
+		return errors.New(fmt.Sprintf("Cannot connect to database: %v", err))
 	}
 
 	err = p.Db.Ping()
 
 	if err != nil {
-		panic(fmt.Sprintf("Cannot ping database: %v", err))
+		return errors.New(fmt.Sprintf("Cannot ping database: %v", err))
 	}
 
 	p.Db.SetMaxIdleConns(100)
@@ -247,7 +247,7 @@ func (p *Postgresql) StopRun(runId int32) error {
 	_, err = tx.Exec("UPDATE run SET stop = CURRENT_TIMESTAMP WHERE id = $1", runId)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	err = tx.Commit()
@@ -445,7 +445,7 @@ func (p *Postgresql) CreateTag(runId int32, tag *tirion.Tag) error {
 	_, err = tx.Exec("INSERT INTO rt"+strconv.FormatInt(int64(runId), 10)+"(t, message) VALUES(TO_TIMESTAMP($1), $2)", float64(tag.Time.UnixNano())/1000000000.0, tag.Tag)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	err = tx.Commit()
