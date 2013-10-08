@@ -1,0 +1,22 @@
+[
+   {
+      "name" : "childs",
+      "type" : "int"
+   },
+   {
+      "name" : "allocated",
+      "type" : "int"
+   },
+   {
+      "name" : "proc.stat.utime",
+      "type" : "int"
+   },
+   {
+      "name" : "proc.statm.data",
+      "type" : "int"
+   },
+   {
+      "name" : "proc.statm.resident",
+      "type" : "int"
+   }
+]
