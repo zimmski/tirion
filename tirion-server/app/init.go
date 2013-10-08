@@ -24,10 +24,15 @@ func init() {
 		revel.InterceptorFilter,       // Run interceptors around the action.
 		revel.ActionInvoker,           // Invoke the action.
 	}
+
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	revel.TemplateFuncs["ne"] = func(a, b interface{}) bool { return a != b }
+
+	time.Local = time.UTC
+
 	revel.OnAppStart(func() {
 		var err error
-
-		runtime.GOMAXPROCS(runtime.NumCPU())
 
 		var dbDriver, _ = revel.Config.String("db.driver")
 		var dbSpec, _ = revel.Config.String("db.spec")
@@ -39,9 +44,5 @@ func init() {
 		}
 
 		Db.Init(dbSpec)
-
-		revel.TemplateFuncs["ne"] = func(a, b interface{}) bool { return a != b }
-
-		time.Local = time.UTC
 	})
 }
