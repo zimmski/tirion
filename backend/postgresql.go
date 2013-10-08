@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/jbarham/gopgsqldriver"
+	_ "github.com/lib/pq"
 	"github.com/zimmski/tirion"
 )
 
