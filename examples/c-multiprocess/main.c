@@ -28,22 +28,22 @@ long parseLongArgument() {
 int main (int argc, char **argv) {
 	int flagErrors = 0;
 
-	long flag_childs = 10;
+	long flagChilds = 10;
 	bool flagHelp = false;
-	long flag_mb_per_child = 1;
+	long flagMbPerChild = 1;
 
 	char c;
 
 	while ((c = getopt(argc, argv, ":hc:m:")) != -1) {
 		switch(c) {
 		case 'c':
-			flag_childs = parseLongArgument();
+			flagChilds = parseLongArgument();
 
-			if (flag_childs == -1) {
+			if (flagChilds == -1) {
 				printf("ERROR: child count is not a number\n");
 
 				flagErrors++;
-			} else if (flag_childs < 1) {
+			} else if (flagChilds < 1) {
 				printf("ERROR: child count must be greater than 0");
 
 				flagErrors++;
@@ -53,13 +53,13 @@ int main (int argc, char **argv) {
 			flagHelp = true;
 			break;
 		case 'm':
-			flag_mb_per_child = parseLongArgument();
+			flagMbPerChild = parseLongArgument();
 
-			if (flag_mb_per_child == -1) {
+			if (flagMbPerChild == -1) {
 				printf("ERROR: MB per child is not a number\n");
 
 				flagErrors++;
-			} else if (flag_mb_per_child < 1) {
+			} else if (flagMbPerChild < 1) {
 				printf("ERROR: MB per child must be greater than 0\n");
 
 				flagErrors++;
@@ -94,21 +94,23 @@ int main (int argc, char **argv) {
 	Tirion *tirion = tirionNew("/tmp/tirion.sock", true);
 
 	if (tirionInit(tirion) == TIRION_OK) {
-		pid_t* ids = malloc(sizeof(pid_t) * flag_childs);
+		pid_t* ids = malloc(sizeof(pid_t) * flagChilds);
+
+		int aSize = sizeof(char) * 1024 * 1024;
 
 		int i = 0;
-		for (; i < flag_childs; i++) {
+		for (; i < flagChilds; i++) {
 			ids[i] = fork();
 
 			if (ids[i] == 0) { // child
 				tirionV(tirion, "start child %d", i);
 				tirionInc(tirion, MetricChilds);
 
-				char **a = malloc(sizeof(char*) * flag_mb_per_child);
+				char **a = malloc(sizeof(char*) * flagMbPerChild);
 
 				int j = 0;
-				for (; j < flag_mb_per_child; j++) {
-					a[j] = malloc(sizeof(char) * 1024 * 1024);
+				for (; j < flagMbPerChild; j++) {
+					a[j] = malloc(aSize);
 
 					tirionV(tirion, "Child %d allocated another MB", i);
 					tirionInc(tirion, MetricAllocated);
@@ -116,7 +118,7 @@ int main (int argc, char **argv) {
 					usleep(100000); // sleep for 100ms
 				}
 
-				for (; j < flag_mb_per_child; j++) {
+				for (; j < flagMbPerChild; j++) {
 					free(a[j]);
 					tirionDec(tirion, MetricAllocated);
 				}
@@ -134,7 +136,7 @@ int main (int argc, char **argv) {
 			}
 		}
 
-		for (i = 0; i < flag_childs; i++) {
+		for (i = 0; i < flagChilds; i++) {
 			int status;
 			int w = waitpid(ids[i], &status, 0);
 
