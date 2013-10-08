@@ -48,17 +48,21 @@ func main() {
 		flag.PrintDefaults()
 		fmt.Printf("\n")
 
-		panic("Wrong arguments")
+		if !flagHelp {
+			fmt.Printf("ERROR: Wrong arguments\n")
+		}
+
+		os.Exit(1)
 	}
 
 	if flagName == "" && flagExec != "" {
 		flagName = flagExec
 	}
 	if flagInterval <= 0 {
-		panic("Argument -interval must be a positive integer")
+		panic("ERROR: Argument -interval must be a positive number")
 	}
 	if flagSendInterval <= 0 {
-		panic("Argument -send-interval must be a positive integer")
+		panic("ERROR: Argument -send-interval must be a positive number")
 	}
 
 	var execArguments []string

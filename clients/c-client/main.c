@@ -76,7 +76,10 @@ int main (int argc, char **argv) {
 		printf("  -r 5: Runtime of the example client in seconds\n");
 		printf("  -s \"/tmp/tirion.sock\": Unix socket path for client<-->agent communication\n");
 		printf("  -v: Verbose output of what is going on\n");
-		printf("Wrong arguments\n");
+
+		if (! flagHelp) {
+			printf("Wrong arguments\n");
+		}
 
 		return 1;
 	}

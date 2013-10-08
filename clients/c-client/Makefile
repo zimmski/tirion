@@ -26,3 +26,6 @@ clean:
 gcc: CC = gcc
 gcc: all
 
+lib: tirion.o
+	ar rcs libtirion.a tirion.o
+

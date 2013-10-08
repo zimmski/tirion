@@ -29,7 +29,11 @@ func main() {
 		fmt.Printf("options\n")
 		flag.PrintDefaults()
 
-		panic("Wrong arguments")
+		if !flagHelp {
+			fmt.Printf("ERROR: Wrong arguments")
+		}
+
+		os.Exit(1)
 	}
 
 	c := tirion.NewTirionClient(flagSocket, flagVerbose)

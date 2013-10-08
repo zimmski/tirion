@@ -453,7 +453,7 @@ func (a *TirionAgent) handleMetrics(c chan bool) {
 			break
 		}
 
-		// NOTE: we have to craete this metrics slice everytime because otherwise it would be just a pointer :-)
+		// NOTE: we have to create this metrics slice everytime because otherwise it would be just a pointer :-)
 		var metrics = make([]float32, len(a.metrics))
 		var now = time.Now()
 
