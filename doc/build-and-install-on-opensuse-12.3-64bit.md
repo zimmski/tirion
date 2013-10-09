@@ -74,7 +74,7 @@ make go-client
 
 This will compile the Tirion agent and the Go example client.
 
-### 5. Configure Tirion
+#### 5. Configure Tirion
 
 The Tirion server needs a configuration file and a initialized backend. Both can be done by issuing the following commands.
 
@@ -84,7 +84,7 @@ sed -i "s/user=zimmski dbname=tirion/user=$USER dbname=$USER'/" $GOPATH/src/gith
 psql < $GOPATH/src/github.com/zimmski/tirion/tirion-server/scripts/postgresql_ddl.sql
 ```
 
-### 6. Start Tirion
+#### 6. Start Tirion
 
 Please have a look at the [main README](/) for a more complete look at how you can run Tirion. As an example the following commands start the Tirion server in development mode and run the Go example client through the Tirion agent.
 
