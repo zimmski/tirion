@@ -46,8 +46,8 @@ This will fetch the whole code of the Tirion infrastructure but will currently o
 
 If you want a more in-depth on how to fetch, install and compile tirion please have look at one of these guides:
 
-* (Build and install Tirion on openSUSE 12.3 (64bit))[/doc/build-and-install-on-opensuse-12.3-64bit.md]
-* (Build and install Tirion on Ubuntu 13.04 (64bit))[/doc/build-and-install-on-ubuntu-13.04-64bit.md]
+* [Build and install Tirion on openSUSE 12.3 (64bit)](/doc/build-and-install-on-opensuse-12.3-64bit.md)
+* [Build and install Tirion on Ubuntu 13.04 (64bit)](/doc/build-and-install-on-ubuntu-13.04-64bit.md)
 
 ## How do I set up a Tirion infrastructure?
 
