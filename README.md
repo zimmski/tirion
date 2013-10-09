@@ -30,6 +30,7 @@ If you do not want to use the precompiled binaries, it depends on what part of T
 After installing Go you can download Tirion's dependencies by issuing the following commands in a fresh terminal:
 
 ```bash
+go get github.com/lib/pq
 go get github.com/robfig/revel
 ```
 
@@ -41,7 +42,12 @@ cd $GOPATH/src/github.com/zimmski/tirion
 make
 ```
 
-This will fetch the whole code of the Tirion infrastructure but will only compile the tirion-agent to <code>$GOBIN/tirion-agent</code>. As for the tirion-server you can deploy it by following the [revel documentation](http://robfig.github.io/revel/manual/deployment.html), which is the web framework that is used by the tirion-server, or you can have a look at the [README of the tirion-server](/tirion-server) for starting the server without deploying.
+This will fetch the whole code of the Tirion infrastructure but will currently only compile the tirion-agent to <code>$GOBIN/tirion-agent</code>. As for the tirion-server you can deploy it by following the [revel documentation](http://robfig.github.io/revel/manual/deployment.html), which is the web framework that is used by the tirion-server, or you can have a look at the [README of the tirion-server](/tirion-server) for starting the server without deploying.
+
+If you want a more in-depth on how to fetch, install and compile tirion please have look at one of these guides:
+
+* (Build and install Tirion on openSUSE 12.3 (64bit))[/doc/build-and-install-on-opensuse-12.3-64bit.md]
+* (Build and install Tirion on Ubuntu 13.04 (64bit))[/doc/build-and-install-on-ubuntu-13.04-64bit.md]
 
 ## How do I set up a Tirion infrastructure?
 
