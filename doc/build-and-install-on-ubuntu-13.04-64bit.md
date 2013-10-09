@@ -32,7 +32,7 @@ tar xvfz godeb-amd64.tar.gz
 ./godeb install 1.1.2
 ```
 
-For stability make sure that you use a stable version. 1.1.2 for example is known to work with Tirion. After installing Go a basic configuration is needed.
+For stability make sure that you use a stable version. 1.1.2 for example is known to work with Tirion. After installing, a basic configuration is needed.
 
 ```bash
 echo "export GOPATH=~/gocode" >> ~/.bashrc

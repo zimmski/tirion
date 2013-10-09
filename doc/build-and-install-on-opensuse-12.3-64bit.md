@@ -42,7 +42,7 @@ For easier use  add the go binary path to the bash path.
 echo "export PATH=$GOBIN:$PATH" >> ~/.bashrc
 ```
 
-After installing Go reopen your terminal to load the new bash configurations.
+After installing Go, reopen your terminal to load the new bash configurations.
 
 #### 3. Installing Tirion requirements
 

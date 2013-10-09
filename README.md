@@ -51,7 +51,9 @@ If you want a more in-depth on how to fetch, install and compile tirion please h
 
 ## How do I set up a Tirion infrastructure?
 
-If you do not use the precompiled binaries you have to [compile Tirion](#how-to-build-tirion) before you can set up an infrastructure. There are two components that need configuration. The tirion-server needs a server configuration and a working backend. Please have a look at the [README of the tirion-server](/tirion-server) on how to accomplish that. The client (your application) must have a fitting [metric-file](#metric-file) which is fed to the agent. That is all you need to set up a complete Tirion infrastructure!
+If you do not use the precompiled binaries you have to [compile Tirion](#how-to-build-tirion) before you can set up an infrastructure. There are two components that need configuration. The tirion-server needs a server configuration and a working backend. Please have a look at the [README of the tirion-server](/tirion-server) on how to accomplish that. The client (your application) must have a fitting [metric-file](#metric-file) which is fed to the agent.
+
+This is all you need to set up a complete Tirion infrastructure!
 
 ## How do I use Tirion?
 
