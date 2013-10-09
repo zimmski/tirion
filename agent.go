@@ -24,6 +24,7 @@ type ExecProgram struct {
 	pid           int32
 	exec          string
 	execArguments []string
+	limitTime     int32
 }
 
 type TirionAgent struct {
@@ -50,7 +51,7 @@ type TirionAgent struct {
 	writerCSV            *csv.Writer
 }
 
-func NewTirionAgent(name string, subName string, server string, sendInterval int32, pid int32, metricsFilename string, exec string, execArguments []string, interval int32, socket string, verbose bool) *TirionAgent {
+func NewTirionAgent(name string, subName string, server string, sendInterval int32, pid int32, metricsFilename string, exec string, execArguments []string, interval int32, socket string, verbose bool, limitTime int32) *TirionAgent {
 	return &TirionAgent{
 		Tirion: Tirion{
 			socket:    socket,
@@ -67,6 +68,7 @@ func NewTirionAgent(name string, subName string, server string, sendInterval int
 			pid:           pid,
 			exec:          exec,
 			execArguments: execArguments,
+			limitTime:     limitTime,
 		},
 	}
 }
@@ -534,6 +536,14 @@ func (a *TirionAgent) Run() {
 		defer a.closeProgram()
 
 		a.program.pid = int32(a.cmd.Process.Pid)
+
+		if a.program.limitTime > 0 {
+			time.AfterFunc(time.Duration(a.program.limitTime)*time.Second, func() {
+				a.V("Limit reached. Program ran for %d seconds. Let's kill it.", a.program.limitTime)
+
+				a.cmd.Process.Kill()
+			})
+		}
 	}
 
 	a.V("Monitor program with PID %d", a.program.pid)

@@ -15,6 +15,7 @@ func main() {
 	var flagExecArguments string
 	var flagHelp bool
 	var flagInterval int
+	var flagLimitTime int
 	var flagMetricsFilename string
 	var flagName string
 	var flagPid int
@@ -28,6 +29,7 @@ func main() {
 	flag.StringVar(&flagExec, "exec", "", "Execute this command")
 	flag.StringVar(&flagExecArguments, "exec-arguments", "", "Arguments for the command")
 	flag.IntVar(&flagInterval, "interval", 250, "How often metrics are fetched (in milliseconds)")
+	flag.IntVar(&flagLimitTime, "limit-time", 0, "Limit the runtime of the program (in seconds)")
 	flag.StringVar(&flagMetricsFilename, "metrics-filename", "", "Definition of needed program metrics")
 	flag.StringVar(&flagName, "name", "", "The name of this run (defaults to exec)")
 	flag.IntVar(&flagPid, "pid", -1, "PID of program which should be monitored")
@@ -64,6 +66,11 @@ func main() {
 	if flagSendInterval <= 0 {
 		panic("ERROR: Argument -send-interval must be a positive number")
 	}
+	if flagLimitTime < 0 {
+		panic("ERROR: Argument -limit-time must be a positive number")
+	} else if flagLimitTime > 0 && flagExec == "" {
+		panic("ERROR: -limit-time only works in combination with -exec")
+	}
 
 	var execArguments []string
 
@@ -83,6 +90,7 @@ func main() {
 		int32(flagInterval),
 		flagSocket,
 		flagVerbose,
+		int32(flagLimitTime),
 	)
 
 	a.Init()

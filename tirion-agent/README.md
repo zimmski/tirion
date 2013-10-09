@@ -9,6 +9,7 @@ The tirion-agent is the connective link between the client (your application) an
   -exec-arguments="": Arguments for the command
   -help=false: Show this help
   -interval=250: How often metrics are fetched (in milliseconds)
+  -limit-time=0: Limit the runtime of the program (in seconds)
   -metrics-filename="": Definition of needed program metrics
   -name="": The name of this run (defaults to exec)
   -pid=-1: PID of program which should be monitored
