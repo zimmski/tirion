@@ -15,7 +15,7 @@ examples:
 # Go coding conventions
 fmt:
 	gofmt -l -w -tabs=true $(GOPATH)/src/github.com/zimmski/tirion
-universe: all clients examples libs
+universe: libs clients all examples
 # Go static analysis
 vet:
 	go tool vet -all=true -v=true $(GOPATH)/src/github.com/zimmski/tirion
