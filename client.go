@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"syscall"
 )
 
 type TirionClient struct {
@@ -28,6 +29,12 @@ func (c *TirionClient) Init() error {
 	var err error
 
 	c.initSigHandler()
+
+	if r, err := syscall.Setsid(); r == -1 {
+		c.E("Cannot set new session and group id of process: %v")
+
+		return err
+	}
 
 	c.V("Open unix socket to %s", c.socket)
 	c.fd, err = net.Dial("unix", c.socket)

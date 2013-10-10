@@ -15,6 +15,8 @@ func main() {
 	var flagExecArguments string
 	var flagHelp bool
 	var flagInterval int
+	var flagLimitMemory int
+	var flagLimitMemoryInterval int
 	var flagLimitTime int
 	var flagMetricsFilename string
 	var flagName string
@@ -29,6 +31,8 @@ func main() {
 	flag.StringVar(&flagExec, "exec", "", "Execute this command")
 	flag.StringVar(&flagExecArguments, "exec-arguments", "", "Arguments for the command")
 	flag.IntVar(&flagInterval, "interval", 250, "How often metrics are fetched (in milliseconds)")
+	flag.IntVar(&flagLimitMemory, "limit-memory", 0, "Limit the memory of the program and its children (in MB)")
+	flag.IntVar(&flagLimitMemoryInterval, "limit-memory-interval", 5, "Interval for checking the memory limit (in milliseconds)")
 	flag.IntVar(&flagLimitTime, "limit-time", 0, "Limit the runtime of the program (in seconds)")
 	flag.StringVar(&flagMetricsFilename, "metrics-filename", "", "Definition of needed program metrics")
 	flag.StringVar(&flagName, "name", "", "The name of this run (defaults to exec)")
@@ -71,6 +75,14 @@ func main() {
 	} else if flagLimitTime > 0 && flagExec == "" {
 		panic("ERROR: -limit-time only works in combination with -exec")
 	}
+	if flagLimitMemory < 0 {
+		panic("ERROR: Argument -limit-memory must be a positive number")
+	} else if flagLimitMemory > 0 && flagExec == "" {
+		panic("ERROR: -limit-memory only works in combination with -exec")
+	}
+	if flagLimitMemoryInterval <= 0 {
+		panic("ERROR: Argument -limit-memory-interval must be a positive number")
+	}
 
 	var execArguments []string
 
@@ -90,6 +102,8 @@ func main() {
 		int32(flagInterval),
 		flagSocket,
 		flagVerbose,
+		int64(flagLimitMemory),
+		int32(flagLimitMemoryInterval),
 		int32(flagLimitTime),
 	)
 

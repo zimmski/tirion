@@ -15,16 +15,19 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/zimmski/tirion/proc"
 )
 
 type ExecProgram struct {
-	pid           int32
-	exec          string
-	execArguments []string
-	limitTime     int32
+	pid                 int32
+	exec                string
+	execArguments       []string
+	limitMemory         int64
+	limitMemoryInterval int32
+	limitTime           int32
 }
 
 type TirionAgent struct {
@@ -52,7 +55,7 @@ type TirionAgent struct {
 	writerCSV            *csv.Writer
 }
 
-func NewTirionAgent(name string, subName string, server string, sendInterval int32, pid int32, metricsFilename string, exec string, execArguments []string, interval int32, socket string, verbose bool, limitTime int32) *TirionAgent {
+func NewTirionAgent(name string, subName string, server string, sendInterval int32, pid int32, metricsFilename string, exec string, execArguments []string, interval int32, socket string, verbose bool, limitMemory int64, limitMemoryInterval int32, limitTime int32) *TirionAgent {
 	return &TirionAgent{
 		Tirion: Tirion{
 			socket:    socket,
@@ -66,10 +69,12 @@ func NewTirionAgent(name string, subName string, server string, sendInterval int
 		interval:        interval,
 		metricsFilename: metricsFilename,
 		program: ExecProgram{
-			pid:           pid,
-			exec:          exec,
-			execArguments: execArguments,
-			limitTime:     limitTime,
+			pid:                 pid,
+			exec:                exec,
+			execArguments:       execArguments,
+			limitMemory:         limitMemory,
+			limitMemoryInterval: limitMemoryInterval,
+			limitTime:           limitTime,
 		},
 	}
 }
@@ -92,17 +97,13 @@ func (a *TirionAgent) closeServerConn() {
 func (a *TirionAgent) closeProgram() {
 	if a.cmd != nil {
 		if a.cmd.ProcessState == nil {
-			closeCmd := time.AfterFunc(2*time.Second, func() {
-				a.E("Timeout waiting for program to exit. Let's kill it.")
+			a.V("Program still running. Let's kill it.")
 
-				a.cmd.Process.Kill()
-			})
+			syscall.Kill(-1*int(a.program.pid), syscall.SIGKILL)
 
 			a.V("Wait for program to close")
 
 			a.cmd.Wait()
-
-			closeCmd.Stop()
 		} else {
 			a.V("Program already terminated")
 		}
@@ -536,11 +537,15 @@ func (a *TirionAgent) handleMetrics(c chan bool) {
 
 	a.V("Stop fetching metrics")
 
+	a.closeProgram()
+
 	c <- true
 }
 
 func (a *TirionAgent) Run() {
 	var err error
+
+	a.Running = true
 
 	if a.cmd != nil {
 		err := a.cmd.Start()
@@ -560,8 +565,38 @@ func (a *TirionAgent) Run() {
 			time.AfterFunc(time.Duration(a.program.limitTime)*time.Second, func() {
 				a.V("Limit reached. Program ran for %d seconds. Let's kill it.", a.program.limitTime)
 
-				a.cmd.Process.Kill()
+				a.closeProgram()
 			})
+		}
+		if a.program.limitMemory > 0 {
+			go func() {
+				t := time.Tick(time.Duration(a.program.limitMemoryInterval) * time.Millisecond)
+
+				for {
+					select {
+					case <-t:
+						var all, err = proc.ReadAll(int(a.program.pid))
+
+						if err != nil {
+							a.E("Cannot fetch memory for memory limit: %v", err)
+
+							a.closeProgram()
+
+							return
+						}
+
+						var c int64 = all.RSSize / 1024
+
+						if c > a.program.limitMemory {
+							a.V("Limit reached. Program has %d out of %d allowed MB of memory. Let's kill it.", c, a.program.limitMemory)
+
+							a.closeProgram()
+
+							return
+						}
+					}
+				}
+			}()
 		}
 	}
 
@@ -619,8 +654,6 @@ func (a *TirionAgent) Run() {
 			a.sPanic(fmt.Sprintf("Send error: %v", err))
 		}
 	}
-
-	a.Running = true
 
 	var chHandleCommands chan bool
 	var chHandleMessages = make(chan bool)

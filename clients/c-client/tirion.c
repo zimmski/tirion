@@ -53,6 +53,16 @@ long tirionInit(Tirion *tirion) {
 
 	// TODO should we create a sighandler to set tirion->running = false?
 
+	if (setsid() == -1) {
+		tirionE(tirion, "Cannot set new session and group id of process");
+
+		if (errno == EPERM) {
+			tirionE(tirion, "No rights");
+		}
+
+		return TIRION_ERROR_SET_SID;
+	}
+
 	tirionV(tirion, "Open unix socket to %s", tirion->p->socket);
 
 	struct sockaddr_un addr;
