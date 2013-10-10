@@ -18,5 +18,13 @@
    {
       "name" : "proc.statm.resident",
       "type" : "int"
+   },
+   {
+      "name" : "proc.all.rssize",
+      "type" : "int"
+   },
+   {
+      "name" : "proc.all.vsize",
+      "type" : "int"
    }
 ]

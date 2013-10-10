@@ -36,6 +36,7 @@ type TirionAgent struct {
 	program              ExecProgram
 	metrics              []Metric
 	metricsExternal      []int32
+	metricsExternalAll   map[int32]int32
 	metricsExternalIO    map[int32]int32
 	metricsExternalStat  map[int32]int32
 	metricsExternalStatm map[int32]int32
@@ -140,6 +141,7 @@ func (a *TirionAgent) Init() {
 		a.sPanic(err.Error())
 	}
 
+	a.metricsExternalAll = make(map[int32]int32)
 	a.metricsExternalIO = make(map[int32]int32)
 	a.metricsExternalStat = make(map[int32]int32)
 	a.metricsExternalStatm = make(map[int32]int32)
@@ -150,7 +152,9 @@ func (a *TirionAgent) Init() {
 
 			a.metricsExternal = append(a.metricsExternal, int32(i))
 
-			if k, ok := proc.ProcIOIndizes[m.Name]; ok {
+			if k, ok := proc.ProcAllIndizes[m.Name]; ok {
+				a.metricsExternalAll[int32(k)] = int32(i)
+			} else if k, ok := proc.ProcIOIndizes[m.Name]; ok {
 				a.metricsExternalIO[int32(k)] = int32(i)
 			} else if k, ok := proc.ProcStatIndizes[m.Name]; ok {
 				a.metricsExternalStat[int32(k)] = int32(i)
@@ -458,6 +462,21 @@ func (a *TirionAgent) handleMetrics(c chan bool) {
 		// NOTE: we have to create this metrics slice everytime because otherwise it would be just a pointer :-)
 		var metrics = make([]float32, len(a.metrics))
 		var now = time.Now()
+
+		if len(a.metricsExternalAll) > 0 {
+			pAll, err := proc.ReadAllArray(int(a.program.pid))
+
+			if err != nil {
+				a.E("read all: " + err.Error())
+
+				break
+			}
+
+			for k, v := range a.metricsExternalAll {
+				f, _ := strconv.ParseFloat(pAll[k], 32)
+				metrics[v] = float32(f)
+			}
+		}
 
 		if len(a.metricsExternalIO) > 0 {
 			pIO, err := proc.ReadIOArray(pidFolder + "io")
