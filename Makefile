@@ -10,6 +10,7 @@ libs:
 tirion-agent:
 	go install github.com/zimmski/tirion/tirion-agent
 examples:
+	make -C $(GOPATH)/src/github.com/zimmski/tirion/examples/c-multiprocess
 	go install github.com/zimmski/tirion/examples/go-mandelbrot
 # Go coding conventions
 fmt:
