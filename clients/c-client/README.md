@@ -2,7 +2,7 @@
 
 ## How do I use Tirion in my C application?
 
-To use the Tirion C client library just copy [tirion.c](/clients/c-client/tirion.c) and [tirion.h](/clients/c-client/tirion.h) into your project and include tirion.h in your source code.
+To use the Tirion C client library include the tirion.h header file in your source code and the tirion library file in your build. Both can be found in the precompiled binary archive. Otherwise you can just copy [tirion.c](/clients/c-client/tirion.c) and [tirion.h](/clients/c-client/tirion.h) into your project and include tirion.h in your source code.
 
 After that, you have to instantiate a client object with the function <code>tirionNew(const char *socket, bool verbose)</code>. The socket is needed for the client <-> agent communication. The verbose parameter states whether the library should print verbose output or not.
 

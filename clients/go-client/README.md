@@ -2,7 +2,7 @@
 
 ## How do I use Tirion in my Go application?
 
-To use the Tirion Go client library just fetch Tirion into your Go path
+To use the Tirion Go client library copy the package folder of the precompiled binary archive into your pkg folder or just fetch Tirion into your Go path.
 
 ```bash
 go get github.com/zimmski/tirion

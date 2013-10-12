@@ -5,8 +5,11 @@ c-client:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client
 go-client:
 	go install github.com/zimmski/tirion/clients/go-client
-libs:
+libs: c-lib go-lib
+c-lib:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client lib
+go-lib:
+	go install github.com/zimmski/tirion
 tirion-agent:
 	go install github.com/zimmski/tirion/tirion-agent
 examples:
