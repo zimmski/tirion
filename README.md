@@ -19,6 +19,12 @@ The application, which should be monitored, must include the language specific c
 
 An agent lives only for a single application run of the client and is therefore dependent on the lifetime of the application itself. There are two different modes to monitor an execution of an application which affects the control of the agent over the execution. Either the application is already running, which means that the agent has no control over the resource limits of the run, or the application is started by the agent which naturally grants it control over the underlying OS process. The data exchange of a client and its agent (note: a run of a client can have only one agent) occurs via two different media. The first media is a unix socket connection which is used to exchange metadata and commands. Metadata is for example the version of the socket, [tags](#tags) of the run and especially information on how metrics should be exchanged. The second media is used by the client to store current metrics and by the agent to fetch this data. This can be a posix shared memory object ([shm](http://pubs.opengroup.org/onlinepubs/007908799/xsh/shm_open.html)), a memory mapped file ([mmap](http://man7.org/linux/man-pages/man2/mmap.2.html)) or (currently not implemented) for example another socket connection or even the same unix socket for issuing commands. Shm and mmap have the big advantage that they are tremendously fast for writing and reading but impose the constraint on the agent that it has to occasionally read and copy that data. Therefore metric data can be lost. For instance, a short spike in a metric can be overseen. The agent aggregates bunches of metric and other meta data like tags and prints them to STDOUT or periodically sends them to a server.
 
+If the agent started the application it can restrict memory and time of the running process.
+* Memory is measured by accumulating all <code>Resident Set Size</code> (RSS) values of the running process, its child processes and their child processes recursively. If a limit is set, the agent will check periodically if it has been exceeded. This implies that the running program can exceed the limit temporarily until the next check is executed.
+* The runtime of the process is measured in real time. This implies that if a time limit is set, the running process and its child processes can use as much CPU sys+user time as possible.
+
+If a limit is set and exceeded, the running process and all its child processes will be killed by sending the <code>SIGKILL</code> signal to their process group id. This implies that all child processes must inherit and not modify the given parent process group id which is set by initializing the Tirion client object. As described by [this article](http://coldattic.info/shvedsky/pro/blogs/a-foo-walks-into-a-bar/posts/40) this method can be incomplete in some cases but efficient enough for Tirion's purpose.
+
 The Tirion server has two big tasks. One task is receiving and saving data of runs from many agents. The other is sending this data to clients who want to analyse and display it. For portability reasons and easier integration the server uses HTTP as its protocol with JSON for marshaling complex data structures. The configurable backend of the server is used to save run data permanently for instance into a database.
 
 ## How to build Tirion?
@@ -73,6 +79,18 @@ If you do not see your favourite language here and are eager to try out Tirion w
 External metrics of the client are recorded by the tirion-agent and consist mostly of data fetched via the proc filesystem. The following groups define each metric with a name and type which can be used in a metric file or other metric structure definition of Tirion. Please note that you do not need to use all metrics of a group, any at all or even any external metric for a correct metric file.
 
 #### Currently supported external metrics
+
+* proc.all
+
+	If the client is a multi-process program other external metric groups like <code>proc.io</code> and <code>proc.stat</code> state only metrics of the program’s process (parent) but not of the spawned child processes. <code>proc.all</code> metrics are accumulated values of all processes of the running program. This does not only include the parent process and the parent's child processes but also the child processes of these child processes recursively.
+
+	* proc.all.rssize int64
+
+		<code>proc.all.rssize</code> is the accumulated <code>Resident Set Size</code> (RSS, the memory size (in KByte) of all pages in real memory) of all processes of the running program.
+
+	* proc.all.vsize int64
+
+		<code>proc.all.vsize</code> is the accumulated <code>Virtual Memory Size</code> (VSS, the memory size (in KByte) of all pages in real memory as well as swapped and allocated but not yet used memory) of all processes of the running program.
 
 * proc.io (see the [proc man page](http://man7.org/linux/man-pages/man5/proc.5.html) header <code>/proc/[pid]/io</code> for a description of each metric)
 	* proc.io.cancelled_write_bytes int
@@ -137,10 +155,15 @@ External metrics of the client are recorded by the tirion-agent and consist most
 
 #### Important external metrics
 
-* proc.stat.num_threads - how many threads are currently used
-* proc.stat.utime - the user space time of the process
-* proc.statm.data - the amount of data pages of the process
-* proc.statm.resident - the amount of resident pages of the process
+* proc.stat.num_threads - How many threads are currently used
+* proc.stat.utime - The user space time of the process
+* proc.statm.data - The amount of data pages of the process
+* proc.statm.resident - The amount of resident pages of the process
+
+If a multi-process program is monitored the following metrics are important as well.
+
+* proc.all.rssize - Accumulated resident set size of all processes in KByte
+* proc.all.vsize - Accumulated virtual memory size of all processes in KByte
 
 ### Internal metrics
 

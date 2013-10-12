@@ -43,9 +43,13 @@ tirionClose(t);
 tirionDestroy(t);
 ```
 
+## Multi-process applications
+
+Due to the [architecture of Tirion's agent](/#how-does-tirion-work) it is very important that the initialization of the Tirion object must occur before forking new child processes. Otherwise, they would not inherit the group id of the parent process which is needed for [restricting](/tirion-agent#limits) and completely killing the monitored process.
+
 ## API
 
-Please have a look at [tirion.h](/clients/c-client/tirion.h) for a complete API overview of Tirion's c client library.
+Please have a look at [tirion.h](/clients/c-client/tirion.h) for a complete API overview of Tirion's C client library.
 
 ## Example usage
 

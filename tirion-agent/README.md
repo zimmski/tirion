@@ -31,6 +31,8 @@ Usage:
 
 If no <code>-server</code> argument is used, the agent will write all data to STDOUT formatted as CSV.
 
+The arguments <code>-limit-memory</code> and <code>-limit-time</code> can only be used with <code>-exec</code> as the agent must have control over the monitored program.
+
 ## Example arguments
 
 * Monitor the process with the PID 2342 using the metrics file in folder/metrics.json
@@ -44,3 +46,16 @@ If no <code>-server</code> argument is used, the agent will write all data to ST
 
 * Execute the program [c-client](/clients/c-client) with the arguments “-v” and “-r 5” while fetching metrics every 10 milliseconds and sending metrics every other second to a server
 	<pre><code>tirion-agent -exec c-client -exec-arguments “-v -r 5” -metrics-filename folder/metrics.json -server "localhost:9000" -send-interval</code></pre>
+
+## Limits
+
+All limit arguments restrict the running process of the monitored program by some metric. If a limit is reached, the process is instantaneously killed by sending a <code>SIGKILL</code> signal to the process’s group id which also kills all child processes of the parent process.
+
+* <code>-limit-memory</code>
+
+    Limits the monitored process by the accumulated <code>Resident Set Size</code> (RSS) of the parent and child processes. The interval time of the check can be adapted by the argument <code>-limit-memory-interval</code>. This implies that the monitored processes can in fact disobey the given limit until the check reoccurs.
+
+* <code>-limit-time</code>
+
+    Limits the monitored process by the runtime measured in real seconds. This means that the agent does not oversee the CPU time of the process nor any other CPU related metric.
+

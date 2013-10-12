@@ -79,7 +79,7 @@ int main (int argc, char **argv) {
 		}
 	}
 	if (flagHelp || flagErrors > 0) {
-		printf("Tirion multi process example client v%s\n", TIRION_VERSION);
+		printf("Tirion multi-process example client v%s\n", TIRION_VERSION);
 		printf("usage: %s [options]\n", argv[0]);
 		printf("  -c 10: Children count\n");
 		printf("  -h false: Show this help\n");
