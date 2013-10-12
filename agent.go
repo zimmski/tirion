@@ -56,6 +56,10 @@ type TirionAgent struct {
 }
 
 func NewTirionAgent(name string, subName string, server string, sendInterval int32, pid int32, metricsFilename string, exec string, execArguments []string, interval int32, socket string, verbose bool, limitMemory int64, limitMemoryInterval int32, limitTime int32) *TirionAgent {
+	var rBadChars = regexp.MustCompile(`[\/]`)
+
+	name = rBadChars.ReplaceAllLiteralString(name, "-")
+
 	return &TirionAgent{
 		Tirion: Tirion{
 			socket:    socket,
