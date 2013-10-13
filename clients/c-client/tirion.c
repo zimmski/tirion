@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <limits.h>
+#include <pthread.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,10 +27,18 @@ void tirionShmSet(Tirion *tirion, long i, float v);
 long tirionSocketReceive(Tirion *tirion, char *buf, long size);
 long tirionSocketSend(Tirion *tirion, const char *msg);
 
+typedef struct TirionShmStruct {
+	float *addr;
+	bool create;
+	long count;
+	long id;
+} TirionShm;
+
 struct TirionPrivateStruct {
 	long fd;
-	TirionShm shm;
+	char *logPrefix;
 	long metricCount;
+	TirionShm shm;
 	char *socket;
 	pthread_t *tHandleCommands;
 };
@@ -43,7 +52,7 @@ Tirion *tirionNew(const char *socket, bool verbose) {
 	tirion->p->socket = strdup(socket);
 	tirion->verbose = verbose;
 
-	tirion->logPrefix = "[client]";
+	tirion->p->logPrefix = "[client]";
 
 	return tirion;
 }
@@ -364,7 +373,7 @@ void tirionD(const Tirion *tirion, const char *format, ...) {
 	vsprintf(buf, format, args);
 	va_end(args);
 
-	fprintf(stderr, "%s[debug] %s\n", tirion->logPrefix, buf);
+	fprintf(stderr, "%s[debug] %s\n", tirion->p->logPrefix, buf);
 }
 
 void tirionE(const Tirion *tirion, const char *format, ...) {
@@ -380,7 +389,7 @@ void tirionE(const Tirion *tirion, const char *format, ...) {
 	vsprintf(buf, format, args);
 	va_end(args);
 
-	fprintf(stderr, "%s[error] %s\n", tirion->logPrefix, buf);
+	fprintf(stderr, "%s[error] %s\n", tirion->p->logPrefix, buf);
 }
 
 void tirionV(const Tirion *tirion, const char *format, ...) {
@@ -396,5 +405,5 @@ void tirionV(const Tirion *tirion, const char *format, ...) {
 	vsprintf(buf, format, args);
 	va_end(args);
 
-	fprintf(stderr, "%s[verbose] %s\n", tirion->logPrefix, buf);
+	fprintf(stderr, "%s[verbose] %s\n", tirion->p->logPrefix, buf);
 }

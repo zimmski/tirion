@@ -1,7 +1,6 @@
 #ifndef tirion_h_INCLUDED
 #define tirion_h_INCLUDED
 
-#include <pthread.h>
 #include <stdbool.h>
 
 #define TIRION_VERSION "0.1"
@@ -25,18 +24,10 @@ enum {
 	TIRION_ERROR_THREAD_JOIN,
 };
 
-typedef struct TirionShmStruct {
-	long id;
-	bool create;
-	float *addr;
-	long count;
-} TirionShm;
-
 typedef struct TirionPrivateStruct TirionPrivate;
 typedef struct TirionStruct {
 	bool running;
 	bool verbose;
-	char *logPrefix;
 	TirionPrivate *p;
 } Tirion;
 
