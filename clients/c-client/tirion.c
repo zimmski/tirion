@@ -60,8 +60,6 @@ Tirion *tirionNew(const char *socket, bool verbose) {
 long tirionInit(Tirion *tirion) {
 	long err;
 
-	// TODO should we create a sighandler to set tirion->running = false?
-
 	if (setsid() == -1) {
 		tirionE(tirion, "Cannot set new session and group id of process");
 

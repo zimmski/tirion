@@ -28,8 +28,6 @@ func NewTirionClient(socket string, verbose bool) *TirionClient {
 func (c *TirionClient) Init() error {
 	var err error
 
-	c.initSigHandler()
-
 	if r, err := syscall.Setsid(); r == -1 {
 		c.E("Cannot set new session and group id of process: %v")
 
