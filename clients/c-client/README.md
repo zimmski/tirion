@@ -49,7 +49,7 @@ Due to the [architecture of Tirion's agent](/#how-does-tirion-work) it is very i
 
 ## API
 
-Please have a look at [tirion.h](/clients/c-client/tirion.h) for a complete API overview of Tirion's C client library.
+Please have a look at the [C API documentation](/clients/c-client/doc/html/tirion_8h.html) or [tirion.h](/clients/c-client/tirion.h) for a complete API overview of Tirion's C client library.
 
 ## Example usage
 
