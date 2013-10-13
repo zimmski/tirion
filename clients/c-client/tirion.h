@@ -17,7 +17,7 @@ enum {
 	TIRION_OK,                            /**< everything is ok */
 	TIRION_ERROR_METRIC_COUNT,            /**< did not receive a correct metric count */
 	TIRION_ERROR_SET_SID,                 /**< could not create a new process session and group id */
-	TIRION_ERROR_SHM_ATTACH,              /**< could not attache the shm */
+	TIRION_ERROR_SHM_ATTACH,              /**< could not attach the shm */
 	TIRION_ERROR_SHM_DETACH,              /**< could not detach the shm */
 	TIRION_ERROR_SHM_KEY,                 /**< could not create a shm key */
 	TIRION_ERROR_SHM_INIT,                /**< could not initialized the shm */
@@ -26,7 +26,7 @@ enum {
 	TIRION_ERROR_SOCKET_CONNECT,          /**< the socket for the agent communication could not connect */
 	TIRION_ERROR_SOCKET_CREATE,           /**< the socket for the agent communication could not be created */
 	TIRION_ERROR_SOCKET_RECEIVE,          /**< could not receive a message over the socket */
-	TIRION_ERROR_SOCKET_SHUTDOWN,         /**< could not shutdown the socket for the agent communication */
+	TIRION_ERROR_SOCKET_SHUTDOWN,         /**< could not shut down the socket for the agent communication */
 	TIRION_ERROR_SOCKET_SEND,             /**< could not send a message over the socket */
 	TIRION_ERROR_THREAD_HANDLE_COMMANDS,  /**< could not create the handle commands pthread */
 	TIRION_ERROR_THREAD_JOIN,             /**< could not join a pthread with the parent process */
@@ -67,7 +67,7 @@ Tirion *tirionNew(const char *socket, bool verbose);
  *    - TIRION_OK everything is ok
  *    - TIRION_ERROR_METRIC_COUNT did not receive a correct metric count
  *    - TIRION_ERROR_SET_SID could not create a new process session and group id
- *    - TIRION_ERROR_SHM_ATTACH could not attache the shm
+ *    - TIRION_ERROR_SHM_ATTACH could not attach the shm
  *    - TIRION_ERROR_SHM_KEY could not create a shm key
  *    - TIRION_ERROR_SHM_INIT could not initialized the shm
  *    - TIRION_ERROR_SHM_NO_INIT the shm cannot be used uninitialized
@@ -88,7 +88,7 @@ long tirionInit(Tirion *tirion);
  * @return error code
  *    - TIRION_OK everything is ok
  *    - TIRION_ERROR_SHM_DETACH could not detach the shm
- *    - TIRION_ERROR_SOCKET_SHUTDOWN could not shutdown the socket for the agent communication
+ *    - TIRION_ERROR_SOCKET_SHUTDOWN could not shut down the socket for the agent communication
  *    - TIRION_ERROR_THREAD_JOIN could not join a pthread with the parent process
  */
 long tirionClose(Tirion *tirion);
