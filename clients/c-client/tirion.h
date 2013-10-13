@@ -1,6 +1,11 @@
 #ifndef tirion_h_INCLUDED
 #define tirion_h_INCLUDED
 
+/**
+ * @file   tirion.h
+ * @brief  The public API of Tirion's C client library
+ */
+
 #include <stdbool.h>
 
 /**

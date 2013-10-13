@@ -7,7 +7,7 @@ CFLAGS = -Wall -Wextra -W -g
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 HEADERS = $(wildcard *.h)
 
-.PHONY: all gcc clean
+.PHONY: all doc gcc clean
 .PRECIOUS: $(OBJECTS)
 
 all: $(PROG)
@@ -17,6 +17,10 @@ all: $(PROG)
 
 $(PROG): $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) $(LIBS) -o $(GOPATH)/bin/$@
+
+doc:
+	cd $(BB)/doc ;\
+        doxygen doxygen.conf
 
 clean:
 	echo $(BB)
