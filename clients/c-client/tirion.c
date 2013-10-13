@@ -174,10 +174,12 @@ long tirionClose(Tirion *tirion) {
 	return TIRION_OK;
 }
 
-void tirionDestroy(Tirion *tirion) {
+long tirionDestroy(Tirion *tirion) {
 	free(tirion->p->socket);
 	free(tirion->p);
 	free(tirion);
+
+	return TIRION_OK;
 }
 
 void *tirionThreadHandleCommands(void *arg) {
