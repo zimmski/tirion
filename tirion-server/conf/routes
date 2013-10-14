@@ -2,8 +2,6 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-module:testrunner
-
 GET		/														App.Index
 GET		/program/:programName									App.ProgramIndex
 POST		/program/:programName/run/start							App.ProgramRunStart

@@ -31,8 +31,6 @@ mode.dev=true
 results.pretty=true
 watch=true
 
-module.testrunner = github.com/robfig/revel/modules/testrunner
-
 log.trace.output = off
 log.info.output  = stderr
 log.warn.output  = stderr
@@ -42,8 +40,6 @@ log.error.output = stderr
 mode.dev=false
 results.pretty=false
 watch=false
-
-module.testrunner =
 
 log.trace.output = off
 log.info.output  = off

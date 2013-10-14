@@ -1,5 +1,15 @@
 .PHONY: all c-client c-doc c-lib clients docs examples fmt go-doc go-client g-lib tirion-agent vet
 all: tirion-agent
+clean:
+	go clean github.com/zimmski/tirion
+	go clean github.com/zimmski/tirion/tirion-agent
+	go clean github.com/zimmski/tirion/tirion-server
+
+	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client clean
+	go clean github.com/zimmski/tirion/clients/go-client
+
+	make -C $(GOPATH)/src/github.com/zimmski/tirion/examples/c-multiprocess clean
+	go clean github.com/zimmski/tirion/examples/go-mandelbrot
 clients: c-client go-client
 c-client:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client
@@ -21,6 +31,10 @@ examples:
 # Go coding conventions
 fmt:
 	gofmt -l -w -tabs=true $(GOPATH)/src/github.com/zimmski/tirion
+package: clean
+package:
+	GOOS=linux GOARCH=amd64 sh $(GOPATH)/src/github.com/zimmski/tirion/scripts/package.sh
+	GOOS=linux GOARCH=386 sh $(GOPATH)/src/github.com/zimmski/tirion/scripts/package.sh
 universe: libs clients docs all examples
 # Go static analysis
 vet:
