@@ -83,7 +83,6 @@ func NewTirionAgent(name string, subName string, server string, sendInterval int
 	}
 }
 
-// TODO this is kind of ugly. find a better way to clean up
 func (a *TirionAgent) Close() {
 	a.closeProgram()
 	a.closeSocket()
@@ -647,7 +646,6 @@ func (a *TirionAgent) Run() {
 		err = a.initShm(shmPath, true, int32(len(a.metricsInternal)))
 
 		if err != nil {
-			// TODO better error handling, most of the time the shared memory does already exists
 			a.sPanic(fmt.Sprintf("Cannot open shared memory: %v", err))
 		}
 
@@ -709,11 +707,14 @@ func (a *TirionAgent) Run() {
 	a.V("Stopped run")
 }
 
-// TODO remove this somehow
 func (a *TirionAgent) sPanic(err interface{}) {
+	/**
+	 * TODO
+	 * This whole function is needed because otherwise the shm stays open.
+	 * There must be a better solution to this...
+	 */
+
 	if a.shm != nil {
-		// this is needed before a a.sPanic because otherwise the shm stays open
-		// there must be a better solution to this...
 		a.shm.Close()
 	}
 

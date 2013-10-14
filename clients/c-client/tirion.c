@@ -358,8 +358,6 @@ long tirionSocketSend(Tirion *tirion, const char *msg) {
 	return TIRION_OK;
 }
 
-// TODO remove this or maybe we should put them in a logging package or use another logging package
-
 void tirionD(const Tirion *tirion, const char *format, ...) {
 	if (! tirion->verbose) {
 		return;

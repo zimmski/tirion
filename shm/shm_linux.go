@@ -74,7 +74,12 @@ func (shm *Shm) Read() error {
 		return errors.New("No shm id defined")
 	}
 
-	// TODO map the shared memory directly to a go structure so we can use it via index directly. well, how?!
+	/**
+	 * TODO
+	 * Map the shared memory directly to a Go structure
+	 * this would make it possible to use indizes to access
+	 * the array elements.
+	 */
 	shm.addr = C.shmAttach(C.long(shm.id))
 
 	return nil

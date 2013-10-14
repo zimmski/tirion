@@ -155,8 +155,6 @@ func (t *Tirion) send(msg string) error {
 	return err
 }
 
-// TODO remove this or maybe we should put them in a logging package or use another logging package
-
 func (t *Tirion) D(format string, a ...interface{}) (n int, err error) {
 	if !t.verbose {
 		return
