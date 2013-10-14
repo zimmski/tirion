@@ -151,7 +151,7 @@ float tirionInc(Tirion *tirion, long i);
 float tirionSub(Tirion *tirion, long i, float v);
 
 /**
- * Send a tag to the socket
+ * Send a tag to the agent
  *
  * @param tirion the Tirion object
  * @param format the tag string that follows the same specifications as format in printf

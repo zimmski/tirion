@@ -15,29 +15,37 @@ import (
 	"github.com/zimmski/tirion/shm"
 )
 
+// Version of Tirion.
+// The version is also used to dictated the used
+// protocol between agent and client communication.
 const Version = "0.1"
 
-const TIRION_TAG_SIZE = 513
+const tirion_tag_size = 513
 
+// HighStockTag contains all data of a tag used with the HighStock library.
 type HighStockTag struct {
 	X     int64  `json:"x"`
 	Title string `json:"title"`
 }
 
+// Metric contains all data of a metric.
 type Metric struct {
 	Name string
 	Type string
 }
 
-var MetricTypes = map[string]bool{
+// metricTypes holds all useable metric types.
+var metricTypes = map[string]bool{
 	"int":   true,
 	"float": true,
 }
 
+// Program contains all data of a program.
 type Program struct {
 	Name string
 }
 
+// Run contains all data of a run.
 type Run struct {
 	Id            int32
 	Name          string
@@ -51,20 +59,23 @@ type Run struct {
 	Stop          *time.Time
 }
 
+// Tag contains all data of a tag.
 type Tag struct {
 	Time time.Time
 	Tag  string
 }
 
+// Tirion contains all common data of a Tirion object like TirionAgent and TirionClient.
 type Tirion struct {
 	fd        net.Conn
-	Running   bool
+	Running   bool // states if the given Tirion object is still running
 	shm       *shm.Shm
 	socket    string
 	verbose   bool
 	logPrefix string
 }
 
+// CheckMetrics validates a array of metrics.
 func CheckMetrics(metrics []Metric) error {
 	if len(metrics) == 0 {
 		return errors.New("No metrics defined")
@@ -86,7 +97,7 @@ func CheckMetrics(metrics []Metric) error {
 			return errors.New(fmt.Sprintf("Name \"%s\" of metric[%d] alreay used for metric[%d]", m.Name, i, v))
 		} else if m.Type == "" {
 			return errors.New(fmt.Sprintf("No type defined for metric[%d]", i))
-		} else if _, ok := MetricTypes[m.Type]; !ok {
+		} else if _, ok := metricTypes[m.Type]; !ok {
 			return errors.New(fmt.Sprintf("Unknown metric type \"%s\" for metric[%d]", m.Type, i))
 		}
 
@@ -96,9 +107,10 @@ func CheckMetrics(metrics []Metric) error {
 	return nil
 }
 
+// PrepareTag modifies a raw tag to a valid state.
 func PrepareTag(tag string) string {
-	if len(tag) > TIRION_TAG_SIZE {
-		tag = tag[:TIRION_TAG_SIZE]
+	if len(tag) > tirion_tag_size {
+		tag = tag[:tirion_tag_size]
 	}
 
 	return strings.Replace(tag, "\n", " ", -1)
@@ -155,6 +167,7 @@ func (t *Tirion) send(msg string) error {
 	return err
 }
 
+// D outputs a Tirion debug message.
 func (t *Tirion) D(format string, a ...interface{}) (n int, err error) {
 	if !t.verbose {
 		return
@@ -163,6 +176,7 @@ func (t *Tirion) D(format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(os.Stderr, t.logPrefix+"[debug] "+format+"\n", a...)
 }
 
+// E outputs a Tirion error message.
 func (t *Tirion) E(format string, a ...interface{}) (n int, err error) {
 	if !t.verbose {
 		return
@@ -171,6 +185,7 @@ func (t *Tirion) E(format string, a ...interface{}) (n int, err error) {
 	return fmt.Fprintf(os.Stderr, t.logPrefix+"[error] "+format+"\n", a...)
 }
 
+// V outputs a Tirion verbose message.
 func (t *Tirion) V(format string, a ...interface{}) (n int, err error) {
 	if !t.verbose {
 		return

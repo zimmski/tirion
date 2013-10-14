@@ -11,10 +11,12 @@ import (
 	"syscall"
 )
 
+// TirionClient contains the state of a client.
 type TirionClient struct {
 	Tirion
 }
 
+// NewTirionClient allocates a new TirionClient object
 func NewTirionClient(socket string, verbose bool) *TirionClient {
 	return &TirionClient{
 		Tirion{
@@ -25,6 +27,7 @@ func NewTirionClient(socket string, verbose bool) *TirionClient {
 	}
 }
 
+// Init initializes the client
 func (c *TirionClient) Init() error {
 	var err error
 
@@ -108,6 +111,7 @@ func (c *TirionClient) Init() error {
 	return nil
 }
 
+// Close uninitializes the client by closing all connections of the client.
 func (c *TirionClient) Close() error {
 	c.Running = false
 
@@ -130,6 +134,7 @@ func (c *TirionClient) Close() error {
 	return nil
 }
 
+// Destroy deallocates all data of the client.
 func (c *TirionClient) Destroy() error {
 	return nil
 }
@@ -170,22 +175,27 @@ func (c *TirionClient) handleCommands() {
 	c.V("Stop listening to commands")
 }
 
+// Add adds a value to a metric
 func (c *TirionClient) Add(i int32, v float32) float32 {
 	return c.shm.Add(i, v)
 }
 
+// Dec decrements a metric by 1.0
 func (c *TirionClient) Dec(i int32) float32 {
 	return c.shm.Dec(i)
 }
 
+// Inc increments a metric by 1.0
 func (c *TirionClient) Inc(i int32) float32 {
 	return c.shm.Inc(i)
 }
 
+// Sub subtracts a value of a metric
 func (c *TirionClient) Sub(i int32, v float32) float32 {
 	return c.shm.Sub(i, v)
 }
 
+// Tag sends a tag to the agent
 func (c *TirionClient) Tag(format string, a ...interface{}) {
 	c.send(PrepareTag(fmt.Sprintf("t"+format, a...)))
 }

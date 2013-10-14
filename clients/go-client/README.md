@@ -58,7 +58,7 @@ Due to the [architecture of Tirion's agent](/#how-does-tirion-work) it is very i
 
 ## API
 
-Please have a look at [client.go](/client.go) for a complete API overview of Tirion's Go client library.
+Please have a look at the [Go API documentation](http://godoc.org/github.com/zimmski/tirion) (especially the TirionClient section) or [client.go](/client.go) for a complete API overview of Tirion's Go client library.
 
 ## Example usage
 

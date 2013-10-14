@@ -21,7 +21,7 @@ import (
 	"github.com/zimmski/tirion/proc"
 )
 
-type ExecProgram struct {
+type execProgram struct {
 	pid                 int32
 	exec                string
 	execArguments       []string
@@ -30,13 +30,14 @@ type ExecProgram struct {
 	limitTime           int32
 }
 
+// TirionAgent contains the state of an agent.
 type TirionAgent struct {
 	Tirion
 	chMessages           chan interface{}
 	cmd                  *exec.Cmd
 	interval             int32
 	l                    net.Listener
-	program              ExecProgram
+	program              execProgram
 	metrics              []Metric
 	metricsExternal      []int32
 	metricsExternalAll   map[int32]int32
@@ -55,6 +56,7 @@ type TirionAgent struct {
 	writerCSV            *csv.Writer
 }
 
+// NewTirionAgent allocates a new TirionAgent object
 func NewTirionAgent(name string, subName string, server string, sendInterval int32, pid int32, metricsFilename string, exec string, execArguments []string, interval int32, socket string, verbose bool, limitMemory int64, limitMemoryInterval int32, limitTime int32) *TirionAgent {
 	var rBadChars = regexp.MustCompile(`[\/]`)
 
@@ -72,7 +74,7 @@ func NewTirionAgent(name string, subName string, server string, sendInterval int
 		sendInterval:    sendInterval,
 		interval:        interval,
 		metricsFilename: metricsFilename,
-		program: ExecProgram{
+		program: execProgram{
 			pid:                 pid,
 			exec:                exec,
 			execArguments:       execArguments,
@@ -83,6 +85,7 @@ func NewTirionAgent(name string, subName string, server string, sendInterval int
 	}
 }
 
+// Close uninitializes the agent by closing all connections and programs of the agent.
 func (a *TirionAgent) Close() {
 	a.closeProgram()
 	a.closeSocket()
@@ -124,6 +127,7 @@ func (a *TirionAgent) closeSocket() {
 	}
 }
 
+// Init initializes the agent
 func (a *TirionAgent) Init() {
 	a.initSigHandler()
 
@@ -545,6 +549,7 @@ func (a *TirionAgent) handleMetrics(c chan bool) {
 	c <- true
 }
 
+// Run starts all communication and programs of the agent.
 func (a *TirionAgent) Run() {
 	var err error
 
