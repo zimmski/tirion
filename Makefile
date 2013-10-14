@@ -1,6 +1,8 @@
 .PHONY: all c-client c-doc c-lib clients docs examples fmt go-doc go-client g-lib tirion-agent vet
 all: tirion-agent
 clean:
+	rm -fr $(GOPATH)/pkg/*/github.com/zimmski/tirion
+
 	go clean github.com/zimmski/tirion
 	go clean github.com/zimmski/tirion/tirion-agent
 	go clean github.com/zimmski/tirion/tirion-server
@@ -33,8 +35,13 @@ fmt:
 	gofmt -l -w -tabs=true $(GOPATH)/src/github.com/zimmski/tirion
 package: clean
 package:
-	GOOS=linux GOARCH=amd64 sh $(GOPATH)/src/github.com/zimmski/tirion/scripts/package.sh
-	GOOS=linux GOARCH=386 sh $(GOPATH)/src/github.com/zimmski/tirion/scripts/package.sh
+	# Currently Go does not allow crosscompiling of programs using cgo.
+	# We use cgo in /tirion/shm. So right now, we have to manually compile on
+	# different hosts :-(
+	#GOOS=linux GOARCH=amd64 sh $(GOPATH)/src/github.com/zimmski/tirion/scripts/package.sh
+	#GOOS=linux GOARCH=386 sh $(GOPATH)/src/github.com/zimmski/tirion/scripts/package.sh
+
+	GOOS=linux sh $(GOPATH)/src/github.com/zimmski/tirion/scripts/package.sh
 universe: libs clients docs all examples
 # Go static analysis
 vet:

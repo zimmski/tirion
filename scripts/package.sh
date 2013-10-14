@@ -30,6 +30,9 @@ cd $TMPOLD
 
 # compile requirements
 
+# this is drastic but needed as go clean does not remove packages of other go versions
+rm -r $GOPATH/pkg
+
 go clean github.com/lib/pq
 go install github.com/lib/pq
 go clean github.com/robfig/revel
@@ -77,6 +80,7 @@ rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/app/controllers
 rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/app/routes
 rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/app/tmp
 rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/app/init.go
+rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/conf/.gitignore
 rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/conf/app.conf
 rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/tests
 rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/README.md
