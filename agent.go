@@ -683,30 +683,32 @@ func (a *TirionAgent) Run() {
 
 	<-chHandleMessages
 
-	a.V("Request stop of run")
+	if a.serverClient != nil {
+		a.V("Request stop of run")
 
-	stopRequest, err := http.NewRequest("GET", fmt.Sprintf("/program/%s/run/%d/stop", a.name, a.run), nil)
-	var stopRequestResult MessageReturnStop
+		stopRequest, err := http.NewRequest("GET", fmt.Sprintf("/program/%s/run/%d/stop", a.name, a.run), nil)
+		var stopRequestResult MessageReturnStop
 
-	if err != nil {
-		a.sPanic(fmt.Sprintf("Cannot create stop request %v", err))
-	}
+		if err != nil {
+			a.sPanic(fmt.Sprintf("Cannot create stop request %v", err))
+		}
 
-	resp, err := a.serverClient.Do(stopRequest)
+		resp, err := a.serverClient.Do(stopRequest)
 
-	if err != nil {
-		a.sPanic(fmt.Sprintf("Cannot do stop request %v", err))
-	} else if resp.StatusCode != 200 {
-		a.sPanic(fmt.Sprintf("Stop request failed with status %v", resp.StatusCode))
-	}
+		if err != nil {
+			a.sPanic(fmt.Sprintf("Cannot do stop request %v", err))
+		} else if resp.StatusCode != 200 {
+			a.sPanic(fmt.Sprintf("Stop request failed with status %v", resp.StatusCode))
+		}
 
-	body, _ := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
+		body, _ := ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
 
-	json.Unmarshal(body, &stopRequestResult)
+		json.Unmarshal(body, &stopRequestResult)
 
-	if stopRequestResult.Error != "" {
-		a.sPanic(fmt.Sprintf("Stop request failed with error %v", stopRequestResult.Error))
+		if stopRequestResult.Error != "" {
+			a.sPanic(fmt.Sprintf("Stop request failed with error %v", stopRequestResult.Error))
+		}
 	}
 
 	a.V("Stopped run")
