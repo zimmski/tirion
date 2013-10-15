@@ -86,8 +86,6 @@ func (c App) ProgramRunStart(programName string) revel.Result {
 
 	if run.Name == "" {
 		return c.RenderJson(tirion.MessageReturnStart{Error: fmt.Sprintf("No name defined")})
-	} else if run.Prog == "" {
-		return c.RenderJson(tirion.MessageReturnStart{Error: fmt.Sprintf("No prog defined")})
 	}
 
 	err = json.Unmarshal([]byte(c.Params.Get("metrics")), &run.Metrics)
