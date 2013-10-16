@@ -49,20 +49,23 @@ Some packages are needed to successfully build Tirion and its requirements.
 sudo apt-get install clang gcc git make mercurial
 ```
 
-Tirion needs the Revel web framework as well as the backend driver. You can install both by issuing the following commands.
-
-```bash
-go get github.com/lib/pq
-go get github.com/robfig/revel
-go install github.com/robfig/revel/revel
-```
-
 #### 4. Build Tirion
 
-To fetch, install and compile Tirion just issue the following commands.
+To fetch Tirion issue the folloing command.
 
 ```bash
 go get github.com/zimmski/tirion
+```
+
+Tirion needs the Revel web framework as well as the backend driver. You can install both and all other dependencies by issuing the following command.
+
+```bash
+make -C $GOPATH/src/github.com/zimmski/tirion dependencies
+```
+
+To compile Tirion just issue the following commands.
+
+```bash
 cd $GOPATH/src/github.com/zimmski/tirion
 make tirion-agent
 make go-client

@@ -1,7 +1,7 @@
 .PHONY: all c-client c-doc c-lib clients docs examples fmt go-doc go-client g-lib tirion-agent vet
 all: tirion-agent
 clean:
-	rm -fr $(GOPATH)/pkg/*/github.com/zimmski/tirion
+	rm -fr $(GOPATH)/pkg/*/github.com/zimmski/tirion*
 
 	go clean github.com/zimmski/tirion
 	go clean github.com/zimmski/tirion/tirion-agent
@@ -17,6 +17,8 @@ c-client:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client
 go-client:
 	go install github.com/zimmski/tirion/clients/go-client
+dependencies:
+	sh $(GOPATH)/src/github.com/zimmski/tirion/scripts/dependencies.sh
 docs: c-doc
 c-doc:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client doc
