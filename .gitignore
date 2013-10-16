@@ -24,4 +24,5 @@ _testmain.go
 #tirion specific
 
 tirion-server.log
+tirion-*.zip
 
