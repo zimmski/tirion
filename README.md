@@ -29,15 +29,14 @@ The Tirion server has two big tasks. One task is receiving and saving data of ru
 
 ## How to build Tirion?
 
-Tirion provides precompiled 32 and 64 bit Linux binaries. Other platforms are currently not supported, but might work. The client and the server are not OS specific. The agent on the other hand uses the [proc filesystem](https://en.wikipedia.org/wiki/Procfs) which is only available on unix-like systems.
+Tirion provides [precompiled 32 and 64 bit Linux binaries](#how-do-i-use-the-precompiled-binaries). Other platforms are currently not supported, but might work. The client and the server are not OS specific. The agent on the other hand uses the [proc filesystem](https://en.wikipedia.org/wiki/Procfs) which is only available on unix-like systems.
 
-If you do not want to use the precompiled binaries, it depends on what part of Tirion you want to use. If you just want to include the client library into your application take a look at the [clients section](#client-libraries). If you want to run the agent and the server you have to install and configure Go first, as Tirion is mostly written in Go. Your distribution will most definitely have some packages or you can be brave and just install it yourself. Have a look at [the official documentation](http://golang.org/doc/install). Good luck!
+If you do not want to use the [precompiled binaries](#how-do-i-use-the-precompiled-binaries), it depends on what part of Tirion you want to use. If you just want to include the client library into your application take a look at the [clients section](#client-libraries). If you want to run the agent and the server you have to install and configure Go first, as Tirion is mostly written in Go. Your distribution will most definitely have some packages or you can be brave and just install it yourself. Have a look at [the official documentation](http://golang.org/doc/install). Good luck!
 
-After installing Go you can download Tirion's dependencies by issuing the following commands in a fresh terminal:
+After installing Go you can download Tirion's dependencies by issuing the following command in a fresh terminal:
 
 ```bash
-go get github.com/lib/pq
-go get github.com/robfig/revel
+make -C $GOPATH/src/github.com/zimmski/tirion dependencies
 ```
 
 After that you can fetch and install Tirion with the following commands:
@@ -50,16 +49,83 @@ make
 
 This will fetch the whole code of the Tirion infrastructure but will currently only compile the tirion-agent to <code>$GOBIN/tirion-agent</code>. As for the tirion-server you can deploy it by following the [revel documentation](http://robfig.github.io/revel/manual/deployment.html), which is the web framework that is used by the tirion-server, or you can have a look at the [README of the tirion-server](/tirion-server) for starting the server without deploying.
 
-If you want a more in-depth on how to fetch, install and compile tirion please have look at one of these guides:
+If you want a more in-depth description on how to fetch, install and compile tirion please have look at one of these guides:
 
 * [Build and install Tirion on openSUSE 12.3 (64bit)](/doc/build-and-install-on-opensuse-12.3-64bit.md)
 * [Build and install Tirion on Ubuntu 13.04 (64bit)](/doc/build-and-install-on-ubuntu-13.04-64bit.md)
 
+## Where are the precompiled binaries and how do I use them?
+
+You can find all precompiled binaries on the [release page](/releases). The binaries are packed into archives that contain the Tirion server + static data + UI, backend initialization + helper scripts, the Tirion agent and all client libraries + headers.
+
+After unpacking an archive you can find all binaries in the <code>bin</code> folder and all client related files like libraries and headers in the <code>lib</code> folder. <code>share</code> contains the server configuration, static files for the server and backend initialization + helper scripts. <code>share</code> is also the base folder of the Tirion server.
+
+For a more detailed guide on [how to set up a Tirion infrastructure](#how-do-i-set-up-a-tirion-infrastructure) please have a look at the [corresponding section](#how-do-i-set-up-a-tirion-infrastructure).
+
+The unpacked archive contains backend initialization scripts in the <code>share/scripts</code> folder. For example to initialize a PostgreSQL backend use the following command:
+
+```bash
+psql < share/scripts/postgresql_ddl.sql
+```
+
+Please note that this will initialize the Tirion backend to the default database of the current user.
+
+The Tirion server has its own configuration file that can be created by issuing the following command.
+
+```bash
+cp share/github.com/zimmski/tirion/tirion-server/conf/app.conf.sample share/github.com/zimmski/tirion/tirion-server/conf/app.conf
+```
+
+Next you have to adapt the configuration <code>share/github.com/zimmski/tirion/tirion-server/conf/app.conf</code> to your own infrastructure. Please have a look at [tirion-server README](/tirion-server#configure-tirion-server) for all important configuration parameters. For now just adapt <code>db.spec</code> which is the connection string of the backend.
+
+You can then start the Tirion server in development mode with the following command.
+
+```bash
+bin/tirion-server -importPath github.com/zimmski/tirion/tirion-server -srcPath share/
+```
+
+This will display logging information like errors directly into your terminal. To test the server open [http://localhost:9000](http://localhost:9000) with your local browser. This should display the Tirion UI home screen with an empty program list and there should be no errors nor warnings in your terminal. If everything is ok, you can interrupt the server and start a new server in production mode with the follow command:
+
+```bash
+bin/tirion-server -runMode prod -importPath github.com/zimmski/tirion/tirion-server -srcPath share/
+```
+
+This will redirect all logging to the log file <code>tirion-server.log</code>.
+
+Next we will test the Tirion agent communication with the server. Create the file <code>metrics.json</code> with the following content.
+
+```json
+[
+   {
+      "name" : "proc.stat.utime",
+      "type" : "int"
+   },
+   {
+      "name" : "proc.stat.stime",
+      "type" : "int"
+   },
+   {
+      "name" : "proc.statm.resident",
+      "type" : "int"
+   },
+   {
+      "name" : "proc.stat.num_threads",
+      "type" : "int"
+   }
+]
+```
+
+Then issue the following command for letting the program <code>md5sum</code> run through /dev/random for 10 seconds.
+
+```bash
+bin/tirion-agent -verbose -interval 50 -metrics-filename metrics.json -exec md5sum -exec-arguments "/dev/random" -server "localhost:9000" -limit-time 10
+```
+
+After the command has finished open up the Tirion UI at [http://localhost:9000](http://localhost:9000). The program <code>md5sum</code> is now displayed in the program list. A click on it will lead you to the program's run list. Click on the available run to inspect it. This should present you with four different metrics which were defined via the metrics file. <code>proc.stat.utime</code> should display a stair line. <code>proc.stat.stime</code> should be linearly growing.
+
 ## How do I set up a Tirion infrastructure?
 
-If you do not use the precompiled binaries you have to [compile Tirion](#how-to-build-tirion) before you can set up an infrastructure. There are two components that need configuration. The tirion-server needs a server configuration and a working backend. Please have a look at the [README of the tirion-server](/tirion-server) on how to accomplish that. The client (your application) must have a fitting [metric-file](#metric-file) which is fed to the agent.
-
-This is all you need to set up a complete Tirion infrastructure!
+If you do not use the [precompiled binaries](#how-do-i-use-the-precompiled-binaries) you have to [compile Tirion](#how-to-build-tirion) before you can set up the infrastructure. There are two components that need configuration. The tirion-server needs a server configuration and a working backend. Please have a look at the [README of the tirion-server](/tirion-server) for more information. The client (your application) must have a fitting [metric-file](#metric-file) which is fed to the agent.
 
 ## How do I use Tirion?
 
