@@ -105,7 +105,10 @@ func (a *TirionAgent) closeProgram() {
 		if a.cmd.ProcessState == nil {
 			a.V("Program still running. Let's kill it.")
 
+			// Kill the program's process group if there is one
 			syscall.Kill(-1*int(a.program.pid), syscall.SIGKILL)
+			// Kill the program via its pid if it does not use its own process group id
+			syscall.Kill(int(a.program.pid), syscall.SIGKILL)
 
 			a.V("Wait for program to close")
 
@@ -571,7 +574,7 @@ func (a *TirionAgent) Run() {
 
 		if a.program.limitTime > 0 {
 			time.AfterFunc(time.Duration(a.program.limitTime)*time.Second, func() {
-				a.V("Limit reached. Program ran for %d seconds. Let's kill it.", a.program.limitTime)
+				a.V("Limit reached. Program ran for %d seconds.", a.program.limitTime)
 
 				a.closeProgram()
 			})
@@ -596,7 +599,7 @@ func (a *TirionAgent) Run() {
 						var c int64 = all.RSSize / 1024
 
 						if c > a.program.limitMemory {
-							a.V("Limit reached. Program has %d out of %d allowed MB of memory. Let's kill it.", c, a.program.limitMemory)
+							a.V("Limit reached. Program has %d out of %d allowed MB of memory.", c, a.program.limitMemory)
 
 							a.closeProgram()
 
