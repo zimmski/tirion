@@ -76,7 +76,7 @@ The Tirion server has its own configuration file that can be created by issuing 
 cp share/github.com/zimmski/tirion/tirion-server/conf/app.conf.sample share/github.com/zimmski/tirion/tirion-server/conf/app.conf
 ```
 
-Next you have to adapt the configuration <code>share/github.com/zimmski/tirion/tirion-server/conf/app.conf</code> to your own infrastructure. Please have a look at [tirion-server README](/tirion-server#configure-tirion-server) for all important configuration parameters. For now just adapt <code>db.spec</code> which is the connection string of the backend.
+Next you have to adapt the configuration <code>share/github.com/zimmski/tirion/tirion-server/conf/app.conf</code> to your own infrastructure. Please have a look at [tirion-server README](/tirion-server#configure-tirion-server) for all important configuration parameters. For now just adapt <code>db.spec</code> which is the [connection string](/tirion-server#connection-string-of-backends)) of the backend.
 
 You can then start the Tirion server in development mode with the following command.
 

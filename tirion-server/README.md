@@ -1,6 +1,6 @@
 # tirion-server
 
-The tirion-server is a HTTP server using the [revel framework](http://robfig.github.io/revel/) who receives data from agents and serves clients for displaying and analysing this data. If you use the precompiled Tirion binaries you can use the server nearly right away otherwise you have to [build Tirion](/#how-to-build-tirion) first or [start the server without deploying](#run-the-tirion-server) it. This README focuses on how to configure and use the tirion-server and not how it works, have a look at [“How does Tirion work?”](/#how-does-tirion-work) if you want to know more.
+The tirion-server is a HTTP server using the [revel framework](http://robfig.github.io/revel/) who receives data from agents and serves clients for displaying and analysing this data. If you use the precompiled Tirion binaries you can use the server nearly right away otherwise you have to [build Tirion](/#how-to-build-tirion) first or [start the server without deploying](#run-the-tirion-server) it. This README focuses on how to configure and use the tirion-server and not how it works, have a look at ["How does Tirion work?"](/#how-does-tirion-work) if you want to know more.
 
 ## Configure tirion-server
 
@@ -21,10 +21,32 @@ cp <tirion-server path>/conf/app.conf.sample <tirion-server path>/conf/app.conf
 Now you can edit <tirion-server path>/conf/app.conf as you need. There are some important parameters you should change:
 
 * app.secret - Is the key for cryptographic functions and signing so make sure that no one gets hold of this key!
-* db.driver - Is the key of the backend you want to use e.g. “postgresql”.
-* db.spec - Is the connection string of the backend.
+* db.driver - Is the key of the backend you want to use e.g. "postgresql".
+* db.spec - Is the [connection string](#connection-string-of-backends) of the backend.
 
 Other parameters like the HTTP port and timeouts are revel specific and are specified in the [revel documentation](http://robfig.github.io/revel/manual/appconf.html).
+
+# Connection string of backends
+
+Connection strings of all backends are lists of name-value parameter pairs separated by one space. Name and value are separated by one equal sign "=". Values can be quoted with either a double " or single ' quotation mark.
+
+For example this is a valid connection string for the PostgreSQL backend: <code>user=zimmski dbname=tirion sslmode=disable</code>
+
+The following subsections will describe their distinct parameters.
+
+## PostgreSQL
+
+The PostgreSQL backend uses the Go package [<code>github.com/lib/pq</code>](https://github.com/lib/pq) therefore all valid parameters can also be found on the project’s page.
+
+- <code>user</code> The database user.
+- <code>password</code> The user’s password.
+- <code>dbname</code> The name of the database.
+- <code>host</code> The database server host to connect to. Values that start with "/" are for unix domain sockets. (default "localhost")
+- <code>port</code> The database server port. (default "5432")
+- <code>sslmode</code> Can be one of the following values.
+    - <code>disable</code> No SSL is used.
+    - <code>require</code> Use SSL and skip the verification.
+    - <code>verify-full</code> Use SSL and require verification. (default)
 
 ## Run the tirion-server
 

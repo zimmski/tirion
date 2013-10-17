@@ -32,7 +32,7 @@ All major components of Tirion are written in Go therefore an up to date version
 OpenSUSE provides a repository with up to date packages.
 
 ```bash
-sudo zypper ar -f “http://download.opensuse.org/repositories/devel:/languages:/go/openSUSE_12.3/” "devel language go"
+sudo zypper ar -f "http://download.opensuse.org/repositories/devel:/languages:/go/openSUSE_12.3/" "devel language go"
 sudo zypper install go
 ```
 
