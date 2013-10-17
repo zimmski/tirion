@@ -18,7 +18,7 @@ import (
 // Version of Tirion.
 // The version is also used to dictated the used
 // protocol between agent and client communication.
-const Version = "0.1"
+const Version = "0.2"
 
 const tirion_tag_size = 513
 
