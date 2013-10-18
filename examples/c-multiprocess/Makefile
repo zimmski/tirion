@@ -17,6 +17,7 @@ all: $(PROG)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(PROG): $(OBJECTS)
+	mkdir -p $(GOPATH)/bin
 	$(CC) $(CFLAGS) -L $(LD) $(OBJECTS) $(LIBS) -o $(GOPATH)/bin/$@
 
 clean:
