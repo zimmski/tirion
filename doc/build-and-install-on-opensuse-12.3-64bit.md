@@ -9,10 +9,10 @@ The Tirion server requires a working backend to save data of its clients. We wil
 ```bash
 sudo zypper install pidentd
 sudo chkconfig --add identd
-sudo service identd start
+sudo /sbin/service identd start
 sudo zypper install postgresql92 postgresql92-server
 sudo chkconfig --add postgresql
-sudo service postgresql start
+sudo /sbin/service postgresql start
 sudo sudo -u postgres createuser --superuser $USER
 createdb --owner $USER $USER
 ```
