@@ -397,32 +397,28 @@ func (a *TirionAgent) handleMessages(c chan bool) {
 		}()
 	}
 
-	for m := range a.chMessages {
-		switch m.(type) {
+	for message := range a.chMessages {
+		switch m := message.(type) {
 		case MessageData:
-			data, _ := m.(MessageData)
-
 			if a.writerCSV != nil {
-				for i, v := range data.Data {
+				for i, v := range m.Data {
 					arr[i] = strconv.FormatFloat(float64(v), 'f', 3, 32)
 				}
 
-				a.writerCSV.Write(append([]string{strconv.FormatInt(data.Time.UnixNano(), 10), ""}, arr...))
+				a.writerCSV.Write(append([]string{strconv.FormatInt(m.Time.UnixNano(), 10), ""}, arr...))
 				a.writerCSV.Flush()
 			} else {
-				metricsQueue <- data
+				metricsQueue <- m
 			}
 		case MessageTag:
-			tag, _ := m.(MessageTag)
-
 			if a.writerCSV != nil {
-				a.writerCSV.Write(append([]string{strconv.FormatInt(tag.Time.UnixNano(), 10), tag.Tag}, emptyMetric...))
+				a.writerCSV.Write(append([]string{strconv.FormatInt(m.Time.UnixNano(), 10), m.Tag}, emptyMetric...))
 				a.writerCSV.Flush()
 			} else {
-				a.D("Send tag to server %+v", tag)
+				a.D("Send tag to server %+v", m)
 
-				tagRequestData.Set("tag", tag.Tag)
-				tagRequestData.Set("time", strconv.FormatInt(tag.Time.UnixNano(), 10))
+				tagRequestData.Set("tag", m.Tag)
+				tagRequestData.Set("time", strconv.FormatInt(m.Time.UnixNano(), 10))
 
 				tagRequest.Body = ioutil.NopCloser(strings.NewReader(tagRequestData.Encode()))
 
