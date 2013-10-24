@@ -15,7 +15,7 @@ type App struct {
 	*revel.Controller
 }
 
-func (c App) Index() revel.Result {
+func (c *App) Index() revel.Result {
 	programs, err := app.Db.SearchPrograms()
 
 	if err != nil {
@@ -25,7 +25,7 @@ func (c App) Index() revel.Result {
 	return c.Render(programs)
 }
 
-func (c App) ProgramIndex(programName string) revel.Result {
+func (c *App) ProgramIndex(programName string) revel.Result {
 	runs, err := app.Db.SearchRuns(programName)
 
 	if err != nil {
@@ -39,7 +39,7 @@ func (c App) ProgramIndex(programName string) revel.Result {
 	return c.Render(programName, runs)
 }
 
-func (c App) ProgramRunIndex(programName string, runId int32) revel.Result {
+func (c *App) ProgramRunIndex(programName string, runId int32) revel.Result {
 	run, err := app.Db.FindRun(programName, runId)
 
 	if err != nil {
@@ -51,7 +51,7 @@ func (c App) ProgramRunIndex(programName string, runId int32) revel.Result {
 	return c.Render(programName, run)
 }
 
-func (c App) ProgramRunMetric(programName string, runId int32, metricName string) revel.Result {
+func (c *App) ProgramRunMetric(programName string, runId int32, metricName string) revel.Result {
 	run, err := app.Db.FindRun(programName, runId)
 
 	if err != nil {
@@ -69,7 +69,7 @@ func (c App) ProgramRunMetric(programName string, runId int32, metricName string
 	return c.RenderJson(metric)
 }
 
-func (c App) ProgramRunStart(programName string) revel.Result {
+func (c *App) ProgramRunStart(programName string) revel.Result {
 	var interval, err = strconv.ParseInt(c.Params.Get("interval"), 10, 32)
 
 	if err != nil {
@@ -107,7 +107,7 @@ func (c App) ProgramRunStart(programName string) revel.Result {
 	}
 }
 
-func (c App) ProgramRunInsert(programName string, runId int32) revel.Result {
+func (c *App) ProgramRunInsert(programName string, runId int32) revel.Result {
 	var metrics []tirion.MessageData
 
 	var err = json.Unmarshal([]byte(c.Params.Get("metrics")), &metrics)
@@ -125,7 +125,7 @@ func (c App) ProgramRunInsert(programName string, runId int32) revel.Result {
 	}
 }
 
-func (c App) ProgramRunStop(programName string, runId int32) revel.Result {
+func (c *App) ProgramRunStop(programName string, runId int32) revel.Result {
 	var err = app.Db.StopRun(runId)
 
 	if err != nil {
@@ -135,7 +135,7 @@ func (c App) ProgramRunStop(programName string, runId int32) revel.Result {
 	}
 }
 
-func (c App) ProgramRunTag(programName string, runId int32) revel.Result {
+func (c *App) ProgramRunTag(programName string, runId int32) revel.Result {
 	var t, err = strconv.ParseInt(c.Params.Get("time"), 10, 64)
 
 	var tag = tirion.Tag{
@@ -152,7 +152,7 @@ func (c App) ProgramRunTag(programName string, runId int32) revel.Result {
 	}
 }
 
-func (c App) ProgramRunTags(programName string, runId int32) revel.Result {
+func (c *App) ProgramRunTags(programName string, runId int32) revel.Result {
 	run, err := app.Db.FindRun(programName, runId)
 
 	if err != nil {
