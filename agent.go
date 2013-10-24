@@ -271,7 +271,7 @@ func (a *TirionAgent) Init() {
 	}
 }
 
-func (a *TirionAgent) handleCommands(c chan bool) {
+func (a *TirionAgent) handleCommands(c chan<- bool) {
 	a.V("Start listening to commands")
 
 	for a.Running {
@@ -308,7 +308,7 @@ func (a *TirionAgent) handleCommands(c chan bool) {
 	c <- true
 }
 
-func (a *TirionAgent) handleMessages(c chan bool) {
+func (a *TirionAgent) handleMessages(c chan<- bool) {
 	a.V("Start handling messages")
 
 	var arr = make([]string, len(a.metrics))
@@ -452,7 +452,7 @@ func (a *TirionAgent) handleMessages(c chan bool) {
 	c <- true
 }
 
-func (a *TirionAgent) handleMetrics(c chan bool) {
+func (a *TirionAgent) handleMetrics(c chan<- bool) {
 	pidFolder := fmt.Sprintf("/proc/%d/", a.program.pid)
 
 	a.V("Start fetching metrics")
