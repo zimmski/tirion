@@ -20,6 +20,9 @@ fi
 
 # compile go
 
+echo
+echo "Compile Go"
+
 TMPOLD="$(pwd)"
 
 cd $GOROOT/src
@@ -29,6 +32,9 @@ cd $GOROOT/src
 cd $TMPOLD
 
 # compile requirements
+
+echo
+echo "Compile requirements"
 
 # this is drastic but needed as go clean does not remove packages of other go versions
 rm -r $GOPATH/pkg
@@ -42,6 +48,9 @@ go install github.com/robfig/revel/revel
 
 # compile tirion
 
+echo
+echo "Compile Tirion"
+
 make -C $GOPATH/src/github.com/zimmski/tirion clean
 make -C $GOPATH/src/github.com/zimmski/tirion libs
 make -C $GOPATH/src/github.com/zimmski/tirion tirion-agent
@@ -50,9 +59,13 @@ make -C $GOPATH/src/github.com/zimmski/tirion tirion-agent
 
 TMPFOLDER="$(mktemp --directory)"
 
+echo
 echo "Build package in folder $TMPFOLDER"
 
 # lib
+
+echo
+echo "Compile Libs"
 
 mkdir $TMPFOLDER/lib
 
@@ -65,6 +78,9 @@ mkdir -p $TMPFOLDER/lib/go/pkg/${GOOS}_${GOARCH}/github.com/zimmski
 cp $GOPATH/pkg/${GOOS}_${GOARCH}/github.com/zimmski/tirion.a $TMPFOLDER/lib/go/pkg/${GOOS}_${GOARCH}/github.com/zimmski/tirion.a
 
 # server
+
+echo
+echo "Compile server"
 
 mkdir -p $TMPFOLDER/share
 revel build github.com/zimmski/tirion/tirion-server $TMPFOLDER/share
@@ -97,6 +113,10 @@ mv $TMPFOLDER/share/tirion-server $TMPFOLDER/bin/tirion-server
 chmod +x $TMPFOLDER/bin/*
 
 # zip
+
+echo
+echo "Pack archive"
+
 TMPOLD="$(pwd)"
 cd $TMPFOLDER
 ZIPNAME=$TMPOLD/tirion-$GOOS-$GOARCH.zip
@@ -106,5 +126,7 @@ cd $TMPOLD
 
 # cleanup
 
-# TODO uncomment
-#rm -r $TMPFOLDER
+echo
+echo "Cleanup"
+
+rm -r $TMPFOLDER
