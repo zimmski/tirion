@@ -45,6 +45,7 @@ func ReadAll(pid int) (*ProcAll, error) {
 	var pidS = strconv.FormatInt(int64(pid), 10)
 
 	var inParent = false
+	var parentDepth = ""
 
 	for _, i := range strings.Split(string(out), "\n") {
 		if i == "" {
@@ -55,7 +56,9 @@ func ReadAll(pid int) (*ProcAll, error) {
 
 		if o != nil {
 			if inParent || o[1] == pidS {
-				if inParent && o[2] == "" {
+				if !inParent {
+					parentDepth = o[2]
+				} else if o[2] == parentDepth {
 					// out of parent again
 
 					break
