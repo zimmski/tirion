@@ -31,7 +31,7 @@ The Tirion server has two big tasks. One task is receiving and saving data of ru
 
 Tirion provides [precompiled 32 and 64 bit Linux binaries](#how-do-i-use-the-precompiled-binaries). Other platforms are currently not supported, but might work. The client and the server are not OS specific. The agent on the other hand uses the [proc filesystem](https://en.wikipedia.org/wiki/Procfs) which is only available on unix-like systems.
 
-If you do not want to use the [precompiled binaries](#how-do-i-use-the-precompiled-binaries), it depends on what part of Tirion you want to use. If you just want to include the client library into your application take a look at the [clients section](#client-libraries). If you want to run the agent and the server you have to install and configure Go first, as Tirion is mostly written in Go. Your distribution will most definitely have some packages or you can be brave and just install it yourself. Have a look at [the official documentation](http://golang.org/doc/install). Good luck!
+If you do not want to use the [precompiled binaries](#how-do-i-use-the-precompiled-binaries), it depends on what part of Tirion you want to use. If you just want to include the client library into your application take a look at the [clients section](#client-libraries). If you want to run the agent and the server you have to install and configure Go first, as Tirion is mostly written in Go. At least version 1.2 must be used. Your distribution will most definitely have some packages or you can be brave and just install it yourself. Have a look at [the official documentation](http://golang.org/doc/install). Good luck!
 
 After installing Go you can download Tirion's dependencies by issuing the following command in a fresh terminal:
 

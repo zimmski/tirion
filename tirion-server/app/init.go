@@ -27,15 +27,12 @@ func init() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	revel.TemplateFuncs["ne"] = func(a, b interface{}) bool { return a != b }
-
 	time.Local = time.UTC
 
 	revel.OnAppStart(func() {
 		var err error
 
 		var dbDriver, _ = revel.Config.String("db.driver")
-		var dbSpec, _ = revel.Config.String("db.spec")
 
 		Db, err = backend.NewBackend(dbDriver)
 
@@ -43,6 +40,12 @@ func init() {
 			panic(err)
 		}
 
-		Db.Init(dbSpec)
+		var dbParams backend.BackendParameters
+
+		dbParams.Spec, _ = revel.Config.String("db.spec")
+		dbParams.MaxIdleConns, _ = revel.Config.Int("db.maxIdleConns")
+		dbParams.MaxOpenConns, _ = revel.Config.Int("db.maxOpenConns")
+
+		Db.Init(dbParams)
 	})
 }

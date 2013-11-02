@@ -8,7 +8,7 @@ import (
 )
 
 type Backend interface {
-	Init(spec string) error
+	Init(params BackendParameters) error
 
 	SearchPrograms() ([]tirion.Program, error)
 
@@ -23,6 +23,12 @@ type Backend interface {
 
 	CreateTag(runId int32, tag *tirion.Tag) error
 	SearchTagsOfRun(run *tirion.Run) ([]tirion.HighStockTag, error)
+}
+
+type BackendParameters struct {
+	Spec         string
+	MaxIdleConns int
+	MaxOpenConns int
 }
 
 func NewBackend(name string) (Backend, error) {

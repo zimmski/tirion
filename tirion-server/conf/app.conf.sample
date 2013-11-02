@@ -19,6 +19,8 @@ log.warn.prefix  = "WARN  "
 log.error.prefix = "ERROR "
 
 db.driver = "postgresql"
+db.maxIdleConns = 100
+db.maxOpenConns = 100
 db.spec = "user=zimmski dbname=tirion sslmode=disable"
 
 # The default language of this application.

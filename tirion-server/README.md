@@ -22,6 +22,8 @@ Now you can edit <tirion-server path>/conf/app.conf as you need. There are some 
 
 * app.secret - Is the key for cryptographic functions and signing so make sure that no one gets hold of this key!
 * db.driver - Is the key of the backend you want to use e.g. "postgresql".
+* db.maxIdleConns - Maximum idle db connections.
+* db.maxOpenConns - Maximum open db connections.
 * db.spec - Is the [connection string](#connection-string-of-backends) of the backend.
 
 Other parameters like the HTTP port and timeouts are revel specific and are specified in the [revel documentation](http://robfig.github.io/revel/manual/appconf.html).

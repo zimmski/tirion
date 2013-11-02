@@ -22,10 +22,10 @@ func NewBackendPostgresql() Backend {
 	return new(Postgresql)
 }
 
-func (p *Postgresql) Init(spec string) error {
+func (p *Postgresql) Init(params BackendParameters) error {
 	var err error
 
-	p.Db, err = sql.Open("postgres", spec)
+	p.Db, err = sql.Open("postgres", params.Spec)
 
 	if err != nil {
 		return errors.New(fmt.Sprintf("Cannot connect to database: %v", err))
@@ -37,7 +37,8 @@ func (p *Postgresql) Init(spec string) error {
 		return errors.New(fmt.Sprintf("Cannot ping database: %v", err))
 	}
 
-	p.Db.SetMaxIdleConns(100)
+	p.Db.SetMaxIdleConns(params.MaxIdleConns)
+	p.Db.SetMaxOpenConns(params.MaxOpenConns)
 
 	return nil
 }

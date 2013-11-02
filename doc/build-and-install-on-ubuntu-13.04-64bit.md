@@ -29,10 +29,10 @@ All major components of Tirion are written in Go therefore an up to date version
 ```bash
 wget https://godeb.s3.amazonaws.com/godeb-amd64.tar.gz
 tar xvfz godeb-amd64.tar.gz
-./godeb install 1.1.2
+./godeb install 1.2
 ```
 
-For stability make sure that you use a stable version. 1.1.2 for example is known to work with Tirion. After installing, a basic configuration is needed.
+After installing, a basic configuration is needed.
 
 ```bash
 echo "export GOPATH=~/gocode" >> ~/.bashrc
