@@ -13,7 +13,7 @@ Tirion consists of four components:
 * A server which receives and then saves data from many agents.
 * Clients who fetch data from a server to compare and analyse it.
 
-![alt text](/doc/Architecture.png "Tirion's architecture")
+![Tirion's architecture](/doc/Architecture.png "Tirion's architecture")
 
 The application, which should be monitored, must include the language specific client library. After the client object has been successfully initialized, it can be used to set and modify internal metrics of the application. These metrics are arbitrary definable by the programmers of the application.
 
@@ -298,7 +298,7 @@ Please have a look at the [README of the tirion-server](/tirion-server).
 
 ### UI
 
-Heavy WIP (TODO document this)
+Please have a look at the [README of the tirion-server UI](/tirion-server/tirion-server-ui.md)
 
 ## Can I make feature requests, report bugs and problems?
 

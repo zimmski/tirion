@@ -133,7 +133,7 @@ The tirion-server provides the following HTTP routes.
 
 - GET <code>/program/:programName/run/:runId</code>
 
-	Shows all statistics and information of a run.
+	Shows all information and all metrics (as graphs) of a run.
 
 	- URI parameters
 
