@@ -62,6 +62,240 @@ or production mode.
 revel run github.com/zimmski/tirion/tirion-server prod
 ```
 
-## Routes of the tirion-server
+## Routes of the tirion-server (server API)
 
-Heavy WIP (TODO document this)
+The tirion-server provides the following HTTP routes.
+
+- GET <code>/</code>
+
+	Shows all available programs of all runs.
+
+	- URI parameters
+
+		<code>none</code>
+
+	- Request parameters
+
+		<code>none</code>
+
+	- Output <code>HTML</code>
+
+- GET <code>/program/:programName</code>
+
+	Shows all finished and still ongoing runs of a program.
+
+	- URI parameters
+
+		<code>:programName</code> URI-cleaned program name
+
+	- Request parameters
+
+		<code>none</code>
+
+	- Output <code>HTML</code>
+
+	- Errors
+
+		- <code>404</code> if there is no program with the given program name
+
+- POST <code>/program/:programName/run/start</code>
+
+	Start a new run.
+
+	- URI parameters
+
+		- <code>:programName</code> URI-cleaned program name
+
+	- Request parameters
+
+		- <code>name</code> original program name (string)
+		- <code>sub_name</code> (optional) subname of the program or run (string)
+		- <code>interval</code> interval of this run for metric fetching (int64)
+		- <code>metrics</code> metrics of this run ([metric file](/#metric-file))
+		- <code>prog</code> program command (string)
+		- <code>prog_arguments</code> (optional) program command arguments (string)
+
+	- Output <code>JSON</code>
+
+		```json
+		{
+			"Run": "int32 # the ID of the started run",
+			"Error": "string # the error string if an error occured"
+		}
+		```
+
+	- Errors
+
+		- <code>404</code> if there is no program with the given program name
+		- <code>non-empty Error field</code> on various errors concerning the validation of the run parameters
+
+- GET <code>/program/:programName/run/:runId</code>
+
+	Shows all statistics and information of a run.
+
+	- URI parameters
+
+		- <code>:programName</code> URI-cleaned program name
+		- <code>:runId</code> ID of the run
+
+	- Request parameters
+
+		<code>none</code>
+
+	- Output <code>HTML</code>
+
+		- <code>404</code> if there is no program with the given program name
+		- <code>404</code> if there is no run with the given ID
+
+- GET <code>/program/:programName/run/:runId/metric/:metricName</code>
+
+	Returns all data of single metric of a given run.
+
+	- URI parameters
+
+		- <code>:programName</code> URI-cleaned program name
+		- <code>:runId</code> ID of the run
+
+	- Request parameters
+
+		<code>none</code>
+
+	- Output <code>JSON</code>
+
+		```json
+		[
+			[ <timestamp>, <value> ]
+			...
+		]
+		```
+
+	- Errors
+
+		- <code>404</code> if there is no program with the given program name
+		- <code>404</code> if there is no run with the given ID
+
+- POST <code>/program/:programName/run/:runId/insert</code>
+
+	Inserts rows of metric data for a given ongoing run.
+
+	- URI parameters
+
+		- <code>:programName</code> URI-cleaned program name
+		- <code>:runId</code> ID of the run
+
+	- Request parameters
+
+		- <code>metrics</code> rows of metric data
+
+			```json
+			[
+				{
+					"Time": "timestamp # time of the metric row",
+					"Data": [
+						<value>
+						...
+					]
+				}
+				...
+			]
+			```
+
+	- Output <code>JSON</code>
+
+		```json
+		{
+			"Error": "string # the error string if an error occured"
+		}
+		```
+
+	- Errors
+
+		- <code>404</code> if there is no program with the given program name
+		- <code>404</code> if there is no run with the given ID
+		- <code>non-empty Error field</code> on various errors concerning the validation of the metric values
+
+- GET <code>/program/:programName/run/:runId/stop</code>
+
+	Stops an ongoing run.
+
+	- URI parameters
+
+		- <code>:programName</code> URI-cleaned program name
+		- <code>:runId</code> ID of the run
+
+	- Request parameters
+
+		<code>none</code>
+
+	- Output <code>JSON</code>
+
+		```json
+		{
+			"Error": "string # the error string if an error occured"
+		}
+		```
+
+	- Errors
+
+		- <code>404</code> if there is no program with the given program name
+		- <code>404</code> if there is no run with the given ID
+		- <code>non-empty Error field</code> on various errors concerning stopping the program
+
+- POST <code>/program/:programName/run/:runId/tag</code>
+
+	Inserts a tag for a given ongoing run.
+
+	- URI parameters
+
+		- <code>:programName</code> URI-cleaned program name
+		- <code>:runId</code> ID of the run
+
+	- Request parameters
+
+		- <code>tag</code> the tag string (string)
+		- <code>time</code> the time of the tag (timestamp)
+
+	- Output <code>JSON</code>
+
+		```json
+		{
+			"Error": "string # the error string if an error occured"
+		}
+		```
+
+	- Errors
+
+		- <code>404</code> if there is no program with the given program name
+		- <code>404</code> if there is no run with the given ID
+		- <code>non-empty Error field</code> on various errors concerning the validation of the tag  values
+
+- GET <code>/program/:programName/run/:runId/tags</code>
+
+	Returns all tags of a given run.
+
+	- URI parameters
+
+		- <code>:programName</code> URI-cleaned program name
+		- <code>:runId</code> ID of the run
+
+	- Request parameters
+
+		<code>none</code>
+
+	- Output <code>JSON</code>
+
+			```json
+			[
+				{
+					"x": "timestamp # time of the tag",
+					"title": "string # tag string"
+				}
+				...
+			]
+			```
+
+	- Errors
+
+		- <code>404</code> if there is no program with the given program name
+		- <code>404</code> if there is no run with the given ID
+
