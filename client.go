@@ -16,7 +16,8 @@ import (
 // TirionClient contains the state of a client.
 type TirionClient struct {
 	Tirion
-	metricsCollector collector.Collector
+	metricsCollector         collector.Collector
+	PreferredMetricProtocoll string // which metric protocols should be tried first. default is "shm,mmap"
 }
 
 // NewTirionClient allocates a new TirionClient object
@@ -27,7 +28,8 @@ func NewTirionClient(socket string, verbose bool) *TirionClient {
 			verbose:   verbose,
 			logPrefix: "[client]",
 		},
-		metricsCollector: nil,
+		metricsCollector:         nil,
+		PreferredMetricProtocoll: "shm,mmap",
 	}
 }
 
@@ -52,7 +54,7 @@ func (c *TirionClient) Init() error {
 		return err
 	} else {
 		c.V("Request tirion protocol version v%s", Version)
-		if err := c.send("tirion v" + Version + "\tshm"); err != nil {
+		if err := c.send("tirion v" + Version + "\t" + c.PreferredMetricProtocoll); err != nil {
 			c.E(err.Error())
 
 			return err

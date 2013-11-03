@@ -75,8 +75,7 @@ func (shm *Shm) Read() error {
 	}
 
 	/**
-	 * TODO
-	 * Map the shared memory directly to a Go structure
+	 * TODO Map the address directly to a Go structure
 	 * this would make it possible to use indizes to access
 	 * the array elements.
 	 */

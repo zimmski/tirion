@@ -12,11 +12,13 @@ import (
 
 func main() {
 	var flagHelp bool
+	var flagMmap bool
 	var flagRuntime int
 	var flagSocket string
 	var flagVerbose bool
 
 	flag.BoolVar(&flagHelp, "help", false, "Show this help")
+	flag.BoolVar(&flagMmap, "mmap", false, "Use Mmap as metric protocol")
 	flag.IntVar(&flagRuntime, "runtime", 5, "Runtime of the example client in seconds")
 	flag.StringVar(&flagSocket, "socket", "/tmp/tirion.sock", "Unix socket path for client<-->agent communication")
 	flag.BoolVar(&flagVerbose, "verbose", false, "Verbose output of what is going on")
@@ -37,6 +39,10 @@ func main() {
 	}
 
 	c := tirion.NewTirionClient(flagSocket, flagVerbose)
+
+	if flagMmap {
+		c.PreferredMetricProtocoll = "mmap"
+	}
 
 	if err := c.Init(); err != nil {
 		panic(err)
