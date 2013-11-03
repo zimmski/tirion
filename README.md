@@ -11,7 +11,7 @@ Tirion consists of four components:
 * A client library which is included and used by an application.
 * An agent which receives and then aggregates data from exactly one client.
 * A server which receives and then saves data from many agents.
-* Clients who fetch data from a server to compare and analyse it.
+* Clients who fetch data from a server to compare and analyze it.
 
 ![Tirion's architecture](/doc/Architecture.png "Tirion's architecture")
 
@@ -25,7 +25,7 @@ If the agent started the application it can restrict memory and time of the runn
 
 If a limit is set and exceeded, the running process and all its child processes will be killed by sending the <code>SIGKILL</code> signal to their process group id. This implies that all child processes must inherit and not modify the given parent process group id which is set by initializing the Tirion client object. As described by [this article](http://coldattic.info/shvedsky/pro/blogs/a-foo-walks-into-a-bar/posts/40) this method can be incomplete in some cases but efficient enough for Tirion's purpose.
 
-The Tirion server has two big tasks. One task is receiving and saving data of runs from many agents. The other is sending this data to clients who want to analyse and display it. For portability reasons and easier integration the server uses HTTP as its protocol with JSON for marshaling complex data structures. The configurable backend of the server is used to save run data permanently for instance into a database.
+The Tirion server has two big tasks. One task is receiving and saving data of runs from many agents. The other is sending this data to clients who want to analyze and display it. For portability reasons and easier integration the server uses HTTP as its protocol with JSON for marshaling complex data structures. The configurable backend of the server is used to save run data permanently for instance into a database.
 
 ## How to build Tirion?
 
@@ -84,7 +84,7 @@ You can then start the Tirion server in development mode with the following comm
 bin/tirion-server -importPath github.com/zimmski/tirion/tirion-server -srcPath share/
 ```
 
-This will display logging information like errors directly into your terminal. To test the server open [http://localhost:9000](http://localhost:9000) with your local browser. This should display the Tirion UI home screen with an empty program list and there should be no errors nor warnings in your terminal. If everything is ok, you can interrupt the server and start a new server in production mode with the follow command:
+This will display logging information like errors directly into your terminal. To test the server open [http://localhost:9000](http://localhost:9000) with your local browser. This should display the Tirion UI home screen with an empty program list and there should be no errors nor warnings in your terminal. If everything is OK, you can interrupt the server and start a new server in production mode with the follow command:
 
 ```bash
 bin/tirion-server -runMode prod -importPath github.com/zimmski/tirion/tirion-server -srcPath share/
@@ -138,7 +138,7 @@ The following programming languages currently have a working client library. Ple
 * [C-client](/clients/c-client)
 * [Go-client](/clients/go-client)
 
-If you do not see your favourite language here and are eager to try out Tirion with your application, just submit an [issue via project the tracker](https://github.com/zimmski/tirion/issues/new) and I will see what I can do.
+If you do not see your favorite language here and are eager to try out Tirion with your application, just submit an [issue via project the tracker](https://github.com/zimmski/tirion/issues/new) and I will see what I can do.
 
 ### External metrics
 
