@@ -20,6 +20,8 @@ type Collector interface {
 
 func NewCollector(typ string) (Collector, error) {
 	switch typ {
+	case "mmap":
+		return new(CollectorMmap), nil
 	case "shm":
 		return new(CollectorShm), nil
 	default:
