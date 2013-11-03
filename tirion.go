@@ -11,8 +11,6 @@ import (
 	"strings"
 	"syscall"
 	"time"
-
-	"github.com/zimmski/tirion/shm"
 )
 
 // Version of Tirion.
@@ -69,7 +67,6 @@ type Tag struct {
 type Tirion struct {
 	fd        net.Conn
 	Running   bool // states if the given Tirion object is still running
-	shm       *shm.Shm
 	socket    string
 	verbose   bool
 	logPrefix string
@@ -114,26 +111,6 @@ func PrepareTag(tag string) string {
 	}
 
 	return strings.Replace(tag, "\n", " ", -1)
-}
-
-func (t *Tirion) initShm(filename string, create bool, count int32) error {
-	var err error
-
-	t.V("Open shared memory")
-	t.shm, err = shm.NewShm(filename, create, count)
-
-	if err != nil {
-		return err
-	}
-
-	t.V("Read shared memory")
-	err = t.shm.Read()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (t *Tirion) initSigHandler() {

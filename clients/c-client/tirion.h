@@ -21,6 +21,7 @@
 enum {
 	TIRION_OK,                            /**< everything is ok */
 	TIRION_ERROR_METRIC_COUNT,            /**< did not receive a correct metric count */
+	TIRION_ERROR_METRIC_URL,              /**< did not receive a correct metric protocol URL */
 	TIRION_ERROR_SET_SID,                 /**< could not create a new process session and group id */
 	TIRION_ERROR_SHM_ATTACH,              /**< could not attach the shm */
 	TIRION_ERROR_SHM_DETACH,              /**< could not detach the shm */
@@ -71,6 +72,7 @@ Tirion *tirionNew(const char *socket, bool verbose);
  * @return error code
  *    - TIRION_OK everything is ok
  *    - TIRION_ERROR_METRIC_COUNT did not receive a correct metric count
+ *    - TIRION_ERROR_METRIC_URL did not receive a correct metric protocol URL
  *    - TIRION_ERROR_SET_SID could not create a new process session and group id
  *    - TIRION_ERROR_SHM_ATTACH could not attach the shm
  *    - TIRION_ERROR_SHM_KEY could not create a shm key

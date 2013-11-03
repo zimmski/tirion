@@ -16,6 +16,8 @@
 #define TIRION_BUFFER_SIZE 4096
 #define TIRION_TAG_SIZE 513
 
+char defaultLogPrefix[] = "[client]";
+
 void *tirionThreadHandleCommands(void* arg);
 
 long tirionShmInit(Tirion *tirion, const char *filename, long count);
@@ -44,15 +46,15 @@ struct TirionPrivateStruct {
 };
 
 Tirion *tirionNew(const char *socket, bool verbose) {
-	Tirion *tirion = malloc(sizeof(Tirion));
-	tirion->p = malloc(sizeof(TirionPrivate));
+	Tirion *tirion = (Tirion*)malloc(sizeof(Tirion));
+	tirion->p = (TirionPrivate*)malloc(sizeof(TirionPrivate));
 	tirion->p->shm.id = -1;
 	tirion->p->tHandleCommands = NULL;
 
 	tirion->p->socket = strdup(socket);
 	tirion->verbose = verbose;
 
-	tirion->p->logPrefix = "[client]";
+	tirion->p->logPrefix = defaultLogPrefix;
 
 	return tirion;
 }
@@ -92,7 +94,7 @@ long tirionInit(Tirion *tirion) {
 	char buf[TIRION_BUFFER_SIZE];
 
 	tirionV(tirion, "Request tirion protocol version v%s", TIRION_VERSION);
-	sprintf(buf, "tirion v%s", TIRION_VERSION);
+	sprintf(buf, "tirion v%s\tshm", TIRION_VERSION);
 	if ((err = tirionSocketSend(tirion, buf)) != TIRION_OK) {
 		return err;
 	}
@@ -102,7 +104,15 @@ long tirionInit(Tirion *tirion) {
 	}
 
 	char *tMetricCount = strtok(buf, "\t");
-	char *tShmPath = strtok(NULL, "\t");
+	char *tMetricUrl = strtok(NULL, "\t");
+
+	if (strncmp(tMetricUrl, "shm://", 6) != 0) {
+		tirionE(tirion, "Did not receive correct metric protocol URL");
+
+		return TIRION_ERROR_METRIC_URL;
+	}
+
+	char *tShmPath = tMetricUrl + 6;
 
 	struct stat statBuffer;
 
@@ -134,7 +144,7 @@ long tirionInit(Tirion *tirion) {
 
 	tirion->running = true;
 
-	tirion->p->tHandleCommands = malloc(sizeof(pthread_t));
+	tirion->p->tHandleCommands = (pthread_t*)malloc(sizeof(pthread_t));
 
 	long rHandleCommands = pthread_create(tirion->p->tHandleCommands, NULL, tirionThreadHandleCommands, (void*) tirion);
 	if (rHandleCommands != 0) {

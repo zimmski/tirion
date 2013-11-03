@@ -5,25 +5,29 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"os"
+	"net/url"
 	"strconv"
 	"strings"
 	"syscall"
+
+	"github.com/zimmski/tirion/collector"
 )
 
 // TirionClient contains the state of a client.
 type TirionClient struct {
 	Tirion
+	metricsCollector collector.Collector
 }
 
 // NewTirionClient allocates a new TirionClient object
 func NewTirionClient(socket string, verbose bool) *TirionClient {
 	return &TirionClient{
-		Tirion{
+		Tirion: Tirion{
 			socket:    socket,
 			verbose:   verbose,
 			logPrefix: "[client]",
 		},
+		metricsCollector: nil,
 	}
 }
 
@@ -48,7 +52,7 @@ func (c *TirionClient) Init() error {
 		return err
 	} else {
 		c.V("Request tirion protocol version v%s", Version)
-		if err := c.send("tirion v" + Version); err != nil {
+		if err := c.send("tirion v" + Version + "\tshm"); err != nil {
 			c.E(err.Error())
 
 			return err
@@ -61,7 +65,7 @@ func (c *TirionClient) Init() error {
 			var t = strings.SplitN(m, "\t", 2)
 
 			if len(t) == 1 || t[1] == "" {
-				err := errors.New("Did not receive correct metric count and shm path")
+				err := errors.New("Did not receive correct metric count and protocol URL")
 
 				c.E(err.Error())
 
@@ -69,27 +73,40 @@ func (c *TirionClient) Init() error {
 			}
 
 			var metricCount, err = strconv.Atoi(t[0])
-			var shmPath = t[1]
 
 			if err != nil {
 				c.E("Did not receive correct metric count")
 
 				return err
-			} else if _, err := os.Stat(shmPath); os.IsNotExist(err) {
-				c.E("Did not receive correct shm path")
-
-				return err
 			}
 
-			c.V("Received metric count %d and shm path %s", metricCount, shmPath)
-
-			err = c.initShm(shmPath, false, int32(metricCount))
+			u, err := url.Parse(t[1])
 
 			if err != nil {
-				c.E("Cannot initialize shared memory")
+				c.E("Did not receive correct protocol URL")
 
 				return err
 			}
+
+			c.V("Received metric count %d and protocol URL %v", metricCount, u)
+
+			c.metricsCollector, err = collector.NewCollector(u.Scheme)
+
+			if err != nil {
+				c.E("Cannot create metric collector")
+
+				return err
+			}
+
+			err = c.metricsCollector.InitClient(u, int32(metricCount))
+
+			if err != nil {
+				c.E("Cannot initialize metrics collector")
+
+				return err
+			}
+
+			c.V("Initialized metric collector %s", u.Scheme)
 
 			c.Running = true
 
@@ -115,12 +132,12 @@ func (c *TirionClient) Init() error {
 func (c *TirionClient) Close() error {
 	c.Running = false
 
-	if c.shm != nil {
-		if err := c.shm.Close(); err != nil {
+	if c.metricsCollector != nil {
+		if err := c.metricsCollector.Close(); err != nil {
 			return err
 		}
 
-		c.shm = nil
+		c.metricsCollector = nil
 	}
 
 	if c.fd != nil {
@@ -177,22 +194,22 @@ func (c *TirionClient) handleCommands() {
 
 // Add adds a value to a metric
 func (c *TirionClient) Add(i int32, v float32) float32 {
-	return c.shm.Add(i, v)
+	return c.metricsCollector.Add(i, v)
 }
 
 // Dec decrements a metric by 1.0
 func (c *TirionClient) Dec(i int32) float32 {
-	return c.shm.Dec(i)
+	return c.metricsCollector.Dec(i)
 }
 
 // Inc increments a metric by 1.0
 func (c *TirionClient) Inc(i int32) float32 {
-	return c.shm.Inc(i)
+	return c.metricsCollector.Inc(i)
 }
 
 // Sub subtracts a value of a metric
 func (c *TirionClient) Sub(i int32, v float32) float32 {
-	return c.shm.Sub(i, v)
+	return c.metricsCollector.Sub(i, v)
 }
 
 // Tag sends a tag to the agent

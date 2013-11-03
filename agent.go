@@ -18,6 +18,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/zimmski/tirion/collector"
 	"github.com/zimmski/tirion/proc"
 )
 
@@ -39,6 +40,7 @@ type TirionAgent struct {
 	l                    net.Listener
 	program              execProgram
 	metrics              []Metric
+	metricsCollector     collector.Collector
 	metricsExternal      []int32
 	metricsExternalAll   map[int32]int32
 	metricsExternalIO    map[int32]int32
@@ -530,8 +532,8 @@ func (a *TirionAgent) handleMetrics(c chan<- bool) {
 			}
 		}
 
-		if a.shm != nil {
-			for i, v := range a.shm.Data() {
+		if a.metricsCollector != nil {
+			for i, v := range a.metricsCollector.Data() {
 				metrics[a.metricsInternal[i]] = v
 			}
 		}
@@ -636,7 +638,7 @@ func (a *TirionAgent) Run() {
 			a.sPanic(err)
 		}
 
-		var matchClientVersion = regexp.MustCompile("^tirion v([0-9.]+)$").FindStringSubmatch(clientVersion)
+		var matchClientVersion = regexp.MustCompile("^tirion v([0-9.]+)\t([a-z,]+)$").FindStringSubmatch(clientVersion)
 
 		if matchClientVersion == nil {
 			a.sPanic("Client did not send tirion protocol version")
@@ -645,18 +647,35 @@ func (a *TirionAgent) Run() {
 		a.V("Requested tirion protocol version v%s", matchClientVersion[1])
 		a.V("Using tirion protocol version v" + Version)
 
-		var shmPath = fmt.Sprintf("/proc/%d", a.program.pid)
+		var metricCount = len(a.metricsInternal)
+		var preferredProtocols = strings.Split(matchClientVersion[2], ",")
 
-		err = a.initShm(shmPath, true, int32(len(a.metricsInternal)))
+		a.V("Preferred metric protocols %v", preferredProtocols)
 
-		if err != nil {
-			a.sPanic(fmt.Sprintf("Cannot open shared memory: %v", err))
+		for _, v := range preferredProtocols {
+			a.metricsCollector, err = collector.NewCollector(v)
+
+			if err == nil {
+				break
+			}
 		}
 
-		defer a.shm.Close()
+		if err != nil {
+			a.sPanic(fmt.Sprintf("Cannot create metric collector: %v", err))
+		}
 
-		a.V("Send metric count %d and shm path %s", len(a.metricsInternal), shmPath)
-		if err := a.send(fmt.Sprintf("%d\t%s", len(a.metricsInternal), shmPath)); err != nil {
+		colUrl, err := a.metricsCollector.InitAgent(a.program.pid, int32(metricCount))
+
+		if err != nil {
+			a.sPanic(fmt.Sprintf("Cannot initialize metric collector: %v", err))
+		}
+
+		a.V("Initialized metric collector %s", colUrl.Scheme)
+
+		defer a.metricsCollector.Close()
+
+		a.V("Send metric count %d and metric protocol URL %s", metricCount, colUrl.String())
+		if err := a.send(fmt.Sprintf("%d\t%s", metricCount, colUrl.String())); err != nil {
 			a.sPanic(fmt.Sprintf("Send error: %v", err))
 		}
 	}
@@ -720,8 +739,8 @@ func (a *TirionAgent) sPanic(err interface{}) {
 	 * There must be a better solution to this...
 	 */
 
-	if a.shm != nil {
-		a.shm.Close()
+	if a.metricsCollector != nil {
+		a.metricsCollector.Close()
 	}
 
 	panic(err)
