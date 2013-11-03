@@ -36,7 +36,7 @@ float *mmapOpen(const char *filename, char create, long count) {
 		return NULL;
 	}
 
-	if ((addr = mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED, file, 0)) == (caddr_t) -1) {
+	if ((addr = mmap(0, size, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_LOCKED, file, 0)) == (caddr_t) -1) {
 		//printf("Cannot mmap the file\n");
 
 		return NULL;
