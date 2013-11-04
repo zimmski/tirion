@@ -9,18 +9,23 @@ import java.nio.channels.FileChannel;
 import java.util.concurrent.locks.*;
 
 public class Client {
+	public static String TIRION_VERSION = "0.2";
+	
 	private static int floatSize = 4;
 	private static String logPrefix = "[client]";
+	private static int tirionTagSize = 513;
 	
 	private int count;
 	private FloatBuffer metrics;
 	private Lock metricLock;
+	private boolean running;
 	private String socket;
 	private boolean verbose;
 	
 	public Client(String socket, boolean verbose) {
 		this.count = 0;
 		this.metrics = null;
+		this.running = false;
 		this.socket = socket;
 		this.verbose = verbose;
 	}
@@ -30,24 +35,24 @@ public class Client {
 		var err error
 
 		if r, err := syscall.Setsid(); r == -1 {
-			c.E("Cannot set new session and group id of process: %v")
+			this.e("Cannot set new session and group id of process: %v");
 
 			return err
 		}
 
-		c.V("Open unix socket to %s", c.socket)
+		this.v("Open unix socket to %s", c.socket)
 		c.fd, err = net.Dial("unix", c.socket)
 
 		if err != nil {
 			if strings.HasSuffix(err.Error(), "use of closed network connection") || strings.HasSuffix(err.Error(), "no such file or directory") {
-				c.E("Cannot open unix socket %s", c.socket)
+				this.e("Cannot open unix socket %s", c.socket);
 			}
 
 			return err
 		} else {
-			c.V("Request tirion protocol version v%s", Version)
+			this.v("Request tirion protocol version v%s", Version)
 			if err := c.send("tirion v" + Version + "\t" + c.PreferredMetricProtocoll); err != nil {
-				c.E(err.Error())
+				this.e(err.Error())
 
 				return err
 			}
@@ -59,9 +64,9 @@ public class Client {
 				var t = strings.SplitN(m, "\t", 2)
 
 				if len(t) == 1 || t[1] == "" {
-					err := errors.New("Did not receive correct metric count and protocol URL")
+					err := errors.New("Did not receive correct metric count and protocol URL");
 
-					c.E(err.Error())
+					this.e(err.Error())
 
 					return err
 				}
@@ -69,7 +74,7 @@ public class Client {
 				var metricCount, err = strconv.Atoi(t[0])
 
 				if err != nil {
-					c.E("Did not receive correct metric count")
+					this.e("Did not receive correct metric count");
 
 					return err
 				}
@@ -77,17 +82,17 @@ public class Client {
 				u, err := url.Parse(t[1])
 
 				if err != nil {
-					c.E("Did not receive correct protocol URL")
+					this.e("Did not receive correct protocol URL");
 
 					return err
 				}
 
-				c.V("Received metric count %d and protocol URL %v", metricCount, u)
+				this.v("Received metric count %d and protocol URL %v", metricCount, u)
 
 				c.metricsCollector, err = collector.NewCollector(u.Scheme)
 
 				if err != nil {
-					c.E("Cannot create metric collector")
+					this.e("Cannot create metric collector");
 
 					return err
 				}
@@ -99,24 +104,24 @@ public class Client {
 				err = c.metricsCollector.InitClient(u, int32(metricCount))
 
 				if err != nil {
-					c.E("Cannot initialize metrics collector")
+					this.e("Cannot initialize metrics collector");
 
 					return err
 				}
 
-				c.V("Initialized metric collector %s", u.Scheme)
+				this.v("Initialized metric collector %s", u.Scheme);
 
-				c.Running = true
+				this.running = true;
 
 				// we want to handle commands not in the main thread
 				go c.handleCommands()
 			case io.EOF:
-				c.V("Unix socket got closed with EOF")
+				this.v("Unix socket got closed with EOF");
 
 				return err
 			default:
 				if strings.HasSuffix(err.Error(), "use of closed network connection") {
-					c.V("Unix socket suddenly got closed")
+					this.v("Unix socket suddenly got closed");
 				}
 
 				return err
@@ -128,28 +133,9 @@ public class Client {
 
 	// Close uninitializes the client by closing all connections of the client.
 	public void close() {
-		c.Running = false
+		this.running = false;
 
-		if c.metricsCollector != nil {
-			f := C.CString(c.filename)
-					defer C.free(unsafe.Pointer(f))
-
-					var cr C.char
-
-					if c.create {
-						cr = C.char(1)
-					} else {
-						cr = C.char(0)
-					}
-
-					if C.mmapClose(c.addr, f, cr, C.long(c.count)) != 0 {
-						return errors.New("Mmap close error")
-					}
-
-					return nil
-
-			c.metricsCollector = nil
-		}
+		this.mmapClose();
 
 		if c.fd != nil {
 			if err := c.fd.Close(); err != nil {
@@ -170,14 +156,16 @@ public class Client {
 			return 0.0f;
 		}
 		
-		float f;
+		float f = 0.0f;
 		
 		this.metricLock.lock();
 		
 		try {
-			f = this.metrics.get(i) + v;
-			
-			this.metrics.put(i, f);
+			if (this.metrics != null) {
+				f = this.metrics.get(i) + v;
+				
+				this.metrics.put(i, f);
+			}
 		} finally {
 			this.metricLock.unlock();
 		}
@@ -201,24 +189,30 @@ public class Client {
 			return 0.0f;
 		}
 
-		float f;
+		float f = 0.0f;
 		
 		this.metricLock.lock();
 		
 		try {
-			f = this.metrics.get(i) - v;
-			
-			this.metrics.put(i, f);
+			if (this.metrics != null) {
+				f = this.metrics.get(i) - v;
+				
+				this.metrics.put(i, f);
+			}
 		} finally {
 			this.metricLock.unlock();
 		}
 
 		return f;
 	}
+	
+	public boolean running() {
+		return this.running;
+	}
 
 	// Tag sends a tag to the agent
-	public tag(String format, Object... args) {
-		c.send(PrepareTag(String.format("t" + format, args)))
+	public void tag(String format, Object... args) {
+		this.send(this.prepareTag(String.format("t" + format, args)));
 	}
 	
 	// D outputs a Tirion debug message.
@@ -249,7 +243,7 @@ public class Client {
 	}
 
 	private void handleCommands() {
-		c.V("Start listening to commands")
+		this.v("Start listening to commands");
 	
 		for c.Running {
 			var data, err = c.receive()
@@ -260,19 +254,19 @@ public class Client {
 	
 				switch com {
 				default:
-					c.E("Unknown command '%c'", com)
+					this.e("Unknown command '%c'", com)
 				}
 			case io.EOF:
-				c.V("Unix socket got closed with EOF")
+				this.v("Unix socket got closed with EOF")
 	
 				c.Running = false
 			default:
 				if strings.HasSuffix(err.Error(), "use of closed network connection") {
 					if c.Running {
-						c.V("Unix socket suddenly got closed")
+						this.v("Unix socket suddenly got closed")
 					}
 				} else {
-					c.E("%v", err)
+					this.e("%v", err)
 				}
 	
 				c.Running = false
@@ -281,7 +275,7 @@ public class Client {
 			}
 		}
 	
-		c.V("Stop listening to commands")
+		this.v("Stop listening to commands")
 	}
 	
 	private void mmapOpen(String filename, int metricCount) throws IOException {
@@ -293,8 +287,45 @@ public class Client {
         
         //buffer.force();
         buffer.load();
-        
+
         this.metrics = buffer.asFloatBuffer();
+
+        file.close();
+	}
+	
+	private void mmapClose() {
+		this.metricLock.lock();
+		
+		try {
+			this.metrics = null;
+		} finally {
+			this.metricLock.unlock();
+		}
 	}
 
+	private String prepareTag(String tag) {
+		if (tag.length() > tirionTagSize) {
+			tag = tag.substring(0, tirionTagSize);
+		}
+
+		return tag.replace("\n", " ");
+	}
+	
+	private String receive() {
+		var buf = make([]byte, 4096)
+
+		nr, err := t.fd.Read(buf)
+
+		if err != nil {
+			return "", err
+		}
+
+		return strings.Trim(string(buf[0:nr]), "\n"), nil
+	}
+
+	private void send(String msg) {
+		_, err := t.fd.Write([]byte(msg + "\n"))
+
+		return err
+	}
 }

@@ -1,31 +1,13 @@
 package tirion;
 
-typedef struct threadAfterArgsStruct {
-	int runtime;
-	Tirion *tirion;
-} threadAfterArgs;
-
-void *threadAfter(void *ptr) {
-	threadAfterArgs *args = (threadAfterArgs*)ptr;
-
-	sleep(args->runtime);
-
-	tirionD(args->tirion, "Program ran for %d seconds, this is enough data.", args->runtime);
-
-	tirionClose(args->tirion);
-
-	return NULL;
-}
-
 public class main {
-	public static void main(String[] args) {
-		
+	public static void main(final String[] args) {
 		int flagErrors = 0;
 
-		bool flagHelp = false;
+		boolean flagHelp = false;
 		int flagRuntime = 5;
-		char *flagSocket = "/tmp/tirion.sock";
-		bool flagVerbose = false;
+		String flagSocket = "/tmp/tirion.sock";
+		boolean flagVerbose = false;
 
 		char c;
 		char *endptr;
@@ -62,9 +44,9 @@ public class main {
 				break;
 			}
 		}
-		if (strcmp(flagSocket, "") == 0 || flagHelp || flagErrors > 0) {
-			printf("Tirion C example client v%s\n", TIRION_VERSION);
-			printf("usage: %s [options]\n", argv[0]);
+		if (flagSocket.compareTo("") == 0 || flagHelp || flagErrors > 0) {
+			printf("Tirion C example client v%s\n", tirion.Client.TIRION_VERSION);
+			printf("usage: %s [options]\n", args[0]);
 			printf("  -h false: Show this help\n");
 			printf("  -r 5: Runtime of the example client in seconds\n");
 			printf("  -s \"/tmp/tirion.sock\": Unix socket path for client<-->agent communication\n");
@@ -76,42 +58,47 @@ public class main {
 
 			return 1;
 		}
+		
+		tirion.Client t = new tirion.Client(flagSocket, flagVerbose);
+		
+		try {
+			t.init();
+		} catch (Exception e) {
+			System.out.printf("ERROR: Cannot initialize Tirion " + e + "\n");
+			
+			System.exit(1);
+		}
+		
+		new java.util.Timer().schedule( 
+		        new java.util.TimerTask() {
+		            @Override
+		            public void run() {
+		                t.d("Program ran for %d seconds, this is enough data.", flagRuntime);
 
-		Tirion *tirion = tirionNew(flagSocket, flagVerbose);
+		            	t.close();
+		            }
+		        }, 
+		        1000 * flagRuntime 
+		);
 
-		if (tirionInit(tirion) == TIRION_OK) {
-			pthread_t tAfter;
-			threadAfterArgs tAfterArgs = { flagRuntime, tirion };
-			int rAfter = pthread_create(&tAfter, NULL, threadAfter, (void*) &tAfterArgs);
-			if (rAfter != 0) {
-				tirionE(tirion, "Failed creating After thread");
-			} else {
-				while (tirion->running) {
-					float r = tirionInc(tirion, 0);
-					tirionDec(tirion, 1);
-					tirionAdd(tirion, 2, 0.3);
-					tirionSub(tirion, 3, 0.3);
+		while (t.running()) {
+			float r = t.inc(0);
+			t.dec(1);
+			t.add(2, 0.3f);
+			t.sub(3, 0.3f);
 
-					usleep(10 * 1000);
+			Thread.sleep(10);
 
-					if (fmod(r, 20.0) == 0.0) {
-						tirionTag(tirion, "index 0 is %f", r);
-					}
-				}
-
-				pthread_join(tAfter, NULL);
+			if (r % 20.0f == 0.0f) {
+				t.tag("index 0 is %f", r);
 			}
-		} else {
-			printf("ERROR: Cannot initialize Tirion\n");
 		}
 
-		tirionClose(tirion);
+		t.close();
 
-		tirionV(tirion, "Stopped");
+		t.v("Stopped");
 
-		tirionDestroy(tirion);
-
-		return 0;
+		t.destroy();
 	}
 
 }
