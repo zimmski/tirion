@@ -1,31 +1,34 @@
 package tirion;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.LinkedList;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.etsy.net.*;
 
 public class Client {
-	public static String TIRION_VERSION = "0.2";
+	public static String TirionVersion = "0.2";
 
-	private static int floatSize = 4;
-	private static String logPrefix = "[client]";
-	private static int tirionTagSize = 513;
+	private static int FloatSize = 4;
+	private static String LogPrefix = "[client]";
+	private static int TirionBufferSize = 4096;
+	private static int TirionTagSize = 513;
 
 	private int count;
 	private Thread handleCommands;
 	private FloatBuffer metrics;
 	private Lock metricLock;
 	private UnixDomainSocketClient net;
-	private BufferedReader netIn;
+	private InputStream netIn;
+	LinkedList<String> netInQueue;
 	private OutputStream netOut;
 	private boolean running;
 	private String socket;
@@ -49,17 +52,20 @@ public class Client {
 		 * TODO find out how to do this in java... if r, err :=
 		 * syscall.Setsid(); r == -1 {
 		 * this.e("Cannot set new session and group id of process: %v");
-		 * 
+		 *
 		 * return err }
 		 */
 
 		this.v("Open unix socket to %s", this.socket);
 		this.net = new UnixDomainSocketClient(this.socket, JUDS.SOCK_STREAM);
-		this.netIn = new BufferedReader(new InputStreamReader(this.net.getInputStream()));
+		//this.netIn = new BufferedReader(new InputStreamReader(this.net.getInputStream()));
+		this.netIn = this.net.getInputStream();
 		this.netOut = this.net.getOutputStream();
 
-		this.v("Request tirion protocol version v%s", tirion.Client.TIRION_VERSION);
-		this.send("tirion v" + tirion.Client.TIRION_VERSION + "\tmmap");
+		this.netInQueue = new LinkedList<String>();
+
+		this.v("Request tirion protocol version v%s", tirion.Client.TirionVersion);
+		this.send("tirion v" + tirion.Client.TirionVersion + "\tmmap");
 
 		String[] t = this.receive().split("\t");
 
@@ -74,6 +80,8 @@ public class Client {
 
 			throw e;
 		}
+
+		this.metricLock = new ReentrantLock();
 
 		if (!t[1].startsWith("mmap://")) {
 			throw new Exception("Did not receive correct protocol URL");
@@ -95,13 +103,17 @@ public class Client {
 	}
 
 	// Close uninitializes the client by closing all connections of the client.
-	public void close() {
+	public void close() throws IOException {
 		this.running = false;
 
 		this.mmapClose();
 
 		if (this.net != null) {
+			this.netIn.close();
+			this.netOut.close();
 			this.net.close();
+
+			netInQueue.clear();
 
 			this.netIn = null;
 			this.netOut = null;
@@ -119,6 +131,8 @@ public class Client {
 
 	// Destroy deallocates all data of the client.
 	public void destroy() {
+		this.metricLock = null;
+		this.netInQueue = null;
 	}
 
 	// Add adds a value to a metric
@@ -192,8 +206,7 @@ public class Client {
 			return;
 		}
 
-		System.err.print(Client.logPrefix + "[debug] "
-				+ String.format(format, args) + "\n");
+		System.err.print(Client.LogPrefix + "[debug] " + String.format(format, args) + "\n");
 	}
 
 	// E outputs a Tirion error message.
@@ -202,8 +215,7 @@ public class Client {
 			return;
 		}
 
-		System.err.print(Client.logPrefix + "[error] "
-				+ String.format(format, args) + "\n");
+		System.err.print(Client.LogPrefix + "[error] " + String.format(format, args) + "\n");
 	}
 
 	// V outputs a Tirion verbose message.
@@ -212,15 +224,14 @@ public class Client {
 			return;
 		}
 
-		System.err.print(Client.logPrefix + "[verbose] "
-				+ String.format(format, args) + "\n");
+		System.err.print(Client.LogPrefix + "[verbose] " + String.format(format, args) + "\n");
 	}
 
 	private void mmapOpen(String filename) throws IOException {
 		RandomAccessFile file = new RandomAccessFile(filename, "rw");
-		MappedByteBuffer buffer = file.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, floatSize * this.count);
+		MappedByteBuffer buffer = file.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, FloatSize * this.count);
 
-		buffer.limit(floatSize * this.count);
+		buffer.limit(FloatSize * this.count);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);
 
 		// buffer.force();
@@ -242,15 +253,37 @@ public class Client {
 	}
 
 	private String prepareTag(String tag) {
-		if (tag.length() > tirionTagSize) {
-			tag = tag.substring(0, tirionTagSize);
+		if (tag.length() > TirionTagSize) {
+			tag = tag.substring(0, TirionTagSize);
 		}
 
 		return tag.replace("\n", " ");
 	}
 
-	private String receive() throws IOException {
-		return this.netIn.readLine();
+	private String receive() throws Exception {
+		if (this.netInQueue.size() != 0) {
+			return this.netInQueue.pop();
+		} else {
+			while (this.netInQueue.size() == 0) {
+				byte[] buf = new byte[Client.TirionBufferSize];
+
+				int ret = this.netIn.read(buf, 0, Client.TirionBufferSize - 1);
+
+				if (ret == -1) {
+					throw new Exception("End of the stream");
+				}
+
+				String s = new String(buf, 0, ret);
+
+				for (String i : s.split("\n")) {
+					if (i.compareTo("") != 0) {
+						this.netInQueue.push(i);
+					}
+				}
+			}
+
+			return this.netInQueue.pop();
+		}
 	}
 
 	private void send(String msg) throws IOException {
