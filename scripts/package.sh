@@ -77,6 +77,9 @@ mkdir -p $TMPFOLDER/lib/go
 mkdir -p $TMPFOLDER/lib/go/pkg/${GOOS}_${GOARCH}/github.com/zimmski
 cp $GOPATH/pkg/${GOOS}_${GOARCH}/github.com/zimmski/tirion.a $TMPFOLDER/lib/go/pkg/${GOOS}_${GOARCH}/github.com/zimmski/tirion.a
 
+mkdir -p $TMPFOLDER/lib/java
+cp $GOPATH/src/github.com/zimmski/tirion/clients/java-client/Tirion/bin/tirion.jar $TMPFOLDER/lib/java/tirion.jar
+
 # server
 
 echo
