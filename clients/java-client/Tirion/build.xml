@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="tirion">
+    <property environment="env"/>
+    <property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
+    <path id="tirion.classpath">
+        <pathelement location="build/classes"/>
+        <pathelement location="lib/commons-cli-1.2.jar"/>
+        <pathelement location="lib/juds-0.94.jar"/>
+    </path>
+    <target name="build" depends="client,doc,lib"/>
+    <target name="clean">
+        <delete dir="bin"/>
+        <delete dir="build/classes"/>
+        <delete dir="doc"/>
+    </target>
+    <target name="cleanall" depends="clean"/>
+    <target name="client" depends="init,compile">
+        <mkdir dir="bin"/>
+        <jar destfile="bin/java-client.jar">
+            <fileset dir="build/classes"/>
+            <zipgroupfileset dir="lib" includes="**/*.jar"/>
+            <manifest>
+              <attribute name="Main-Class" value="tirion.Main"/>
+            </manifest>
+        </jar>
+    </target>
+    <target name="compile" depends="init">
+        <javac destdir="build/classes" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="tirion.classpath"/>
+        </javac>
+    </target>
+    <target name="doc">
+        <mkdir dir="doc"/>
+        <javadoc access="public" author="true" destdir="doc" doctitle="Tirion's Java client library API" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="1.7" splitindex="true" use="true" version="true">
+            <classpath refid="tirion.classpath"/>
+            <sourcefiles>
+                <fileset dir="src">
+                    <include name="**/*.java"/>
+                    <exclude name="**/Main.java"/>
+                </fileset>
+            </sourcefiles>
+        </javadoc>
+    </target>
+    <target name="init">
+        <mkdir dir="build/classes"/>
+        <copy includeemptydirs="false" todir="build/classes">
+            <fileset dir="src">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="lib" depends="init,compile">
+        <mkdir dir="bin"/>
+        <jar destfile="bin/tirion.jar">
+            <fileset dir="build/classes">
+                <include name="**/*.class"/>
+                <exclude name="**/Main*"/>
+            </fileset>
+            <zipgroupfileset dir="lib" includes="**/*.jar"/>
+        </jar>
+    </target>
+</project>

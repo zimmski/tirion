@@ -1,1 +1,10 @@
-/bin
+*.class
+
+# Package Files #
+*.war
+*.ear
+
+# Project folders
+bin/
+build/
+
