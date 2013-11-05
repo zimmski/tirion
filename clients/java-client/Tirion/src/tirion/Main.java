@@ -97,7 +97,7 @@ public class Main {
 		);
 
 		while (t.running()) {
-			float r = t.inc(0);
+			final float r = t.inc(0);
 			t.dec(1);
 			t.add(2, 0.3f);
 			t.sub(3, 0.3f);

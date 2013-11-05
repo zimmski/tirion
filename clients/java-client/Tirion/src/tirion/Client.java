@@ -20,12 +20,12 @@ public class Client {
 	 * The version is also used in the communication with the agent and
 	 * dictates the whole communication protocol.
 	 */
-	public static String TirionVersion = "0.2";
+	public  final static String TirionVersion = "0.2";
 
-	private static int FloatSize = 4;
-	private static String LogPrefix = "[client]";
-	private static int TirionBufferSize = 4096;
-	private static int TirionTagSize = 513;
+	private final static int FloatSize = 4;
+	private final static String LogPrefix = "[client]";
+	private final static int TirionBufferSize = 4096;
+	private final static int TirionTagSize = 513;
 
 	private int count;
 	private Thread handleCommands;
@@ -74,7 +74,7 @@ public class Client {
 		this.v("Request tirion protocol version v%s", tirion.Client.TirionVersion);
 		this.send("tirion v" + tirion.Client.TirionVersion + "\tmmap");
 
-		String[] t = this.receive().split("\t");
+		final String[] t = this.receive().split("\t");
 
 		if (t.length < 2 || t[1].length() == 0) {
 			throw new Exception("Did not receive correct metric count and mmap filename");
@@ -94,7 +94,7 @@ public class Client {
 			throw new Exception("Did not receive correct mmap filename");
 		}
 
-		String mmapFilename = t[1].substring(7);
+		final String mmapFilename = t[1].substring(7);
 
 		this.v("Received metric count %d and mmap filename %s", this.count, mmapFilename);
 
@@ -307,16 +307,16 @@ public class Client {
 			while (this.netInQueue.size() == 0) {
 				byte[] buf = new byte[Client.TirionBufferSize];
 
-				int ret = this.netIn.read(buf, 0, Client.TirionBufferSize - 1);
+				final int ret = this.netIn.read(buf, 0, Client.TirionBufferSize - 1);
 
 				if (ret == -1) {
 					throw new Exception("End of the stream");
 				}
 
-				String s = new String(buf, 0, ret);
+				final String s = new String(buf, 0, ret);
 
 				for (String i : s.split("\n")) {
-					if (i.compareTo("") != 0) {
+					if (i.length() != 0) {
 						this.netInQueue.push(i);
 					}
 				}
@@ -346,7 +346,7 @@ public class Client {
 				}
 
 				if (err == null) {
-					char com = rec.charAt(0);
+					final char com = rec.charAt(0);
 
 					switch (com) {
 					default:
