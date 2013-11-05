@@ -9,7 +9,7 @@
 #include <stdbool.h>
 
 /**
- * The version of the tirion client
+ * The version of the Tirion client
  * The version is also used in the communication with the agent and
  * dictates the whole communication protocol.
  */
