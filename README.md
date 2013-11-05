@@ -137,6 +137,7 @@ The following programming languages currently have a working client library. Ple
 
 * [C-client](/clients/c-client)
 * [Go-client](/clients/go-client)
+* [Java-client](/clients/java-client)
 
 If you do not see your favorite language here and are eager to try out Tirion with your application, just submit an [issue via project the tracker](https://github.com/zimmski/tirion/issues/new) and I will see what I can do.
 
