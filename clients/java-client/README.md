@@ -62,7 +62,7 @@ Due to the [architecture of Tirion's agent](/#how-does-tirion-work) it is very i
 
 ## API
 
-Please have a look at the [Java API documentation](https://rawgithub.com/zimmski/tirion/master/clients/java-client/Tirion/doc/tirion/Client.html) or [tirion.h](/clients/java-client/Tirion/src/tirion/Client.java) for a complete API overview of Tirion's C client library.
+Please have a look at the [Java API documentation](https://rawgithub.com/zimmski/tirion/master/clients/java-client/Tirion/doc/tirion/Client.html) or [Client.java](/clients/java-client/Tirion/src/tirion/Client.java) for a complete API overview of Tirion's Java client library.
 
 ## Example usage
 
