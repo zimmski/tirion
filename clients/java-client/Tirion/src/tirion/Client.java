@@ -28,7 +28,7 @@ public class Client {
 	private Lock metricLock;
 	private UnixDomainSocketClient net;
 	private InputStream netIn;
-	LinkedList<String> netInQueue;
+	private LinkedList<String> netInQueue;
 	private OutputStream netOut;
 	private boolean running;
 	private String socket;
@@ -36,11 +36,6 @@ public class Client {
 
 	public Client(String socket, boolean verbose) {
 		this.count = 0;
-		this.handleCommands = null;
-		this.metrics = null;
-		this.net = null;
-		this.netIn = null;
-		this.netOut = null;
 		this.running = false;
 		this.socket = socket;
 		this.verbose = verbose;
@@ -58,7 +53,6 @@ public class Client {
 
 		this.v("Open unix socket to %s", this.socket);
 		this.net = new UnixDomainSocketClient(this.socket, JUDS.SOCK_STREAM);
-		//this.netIn = new BufferedReader(new InputStreamReader(this.net.getInputStream()));
 		this.netIn = this.net.getInputStream();
 		this.netOut = this.net.getOutputStream();
 
@@ -70,7 +64,7 @@ public class Client {
 		String[] t = this.receive().split("\t");
 
 		if (t.length < 2 || t[1].length() == 0) {
-			throw new Exception("Did not receive correct metric count and protocol URL");
+			throw new Exception("Did not receive correct metric count and mmap filename");
 		}
 
 		try {
@@ -84,14 +78,14 @@ public class Client {
 		this.metricLock = new ReentrantLock();
 
 		if (!t[1].startsWith("mmap://")) {
-			throw new Exception("Did not receive correct protocol URL");
+			throw new Exception("Did not receive correct mmap filename");
 		}
 
-		String u = t[1].substring(7);
+		String mmapFilename = t[1].substring(7);
 
-		this.v("Received metric count %d and protocol URL %s", this.count, u);
+		this.v("Received metric count %d and mmap filename %s", this.count, mmapFilename);
 
-		this.mmapOpen(u);
+		this.mmapOpen(mmapFilename);
 
 		this.v("Initialized metric collector mmap");
 
@@ -141,26 +135,26 @@ public class Client {
 			return 0.0f;
 		}
 
-		float f = 0.0f;
+		float ret = 0.0f;
 
 		this.metricLock.lock();
 
 		try {
 			if (this.metrics != null) {
-				f = this.metrics.get(i) + v;
+				ret = this.metrics.get(i) + v;
 
-				this.metrics.put(i, f);
+				this.metrics.put(i, ret);
 			}
 		} finally {
 			this.metricLock.unlock();
 		}
 
-		return f;
+		return ret;
 	}
 
 	// Dec decrements a metric by 1.0
 	public float dec(int i) {
-		return this.sub(i, 1.0f);
+		return this.add(i, -1.0f);
 	}
 
 	// Inc increments a metric by 1.0
@@ -170,25 +164,7 @@ public class Client {
 
 	// Sub subtracts a value of a metric
 	public float sub(int i, float v) {
-		if (i < 0 || i >= this.count) {
-			return 0.0f;
-		}
-
-		float f = 0.0f;
-
-		this.metricLock.lock();
-
-		try {
-			if (this.metrics != null) {
-				f = this.metrics.get(i) - v;
-
-				this.metrics.put(i, f);
-			}
-		} finally {
-			this.metricLock.unlock();
-		}
-
-		return f;
+		return this.add(i, -v);
 	}
 
 	public boolean running() {
@@ -200,31 +176,27 @@ public class Client {
 		this.send(this.prepareTag(String.format("t" + format, args)));
 	}
 
-	// D outputs a Tirion debug message.
-	public void d(String format, Object... args) {
+	private void m(String type, String format, Object... args) {
 		if (!this.verbose) {
 			return;
 		}
 
-		System.err.print(Client.LogPrefix + "[debug] " + String.format(format, args) + "\n");
+		System.err.print(Client.LogPrefix + "[" + type + "] " + String.format(format, args) + "\n");
+	}
+
+	// D outputs a Tirion debug message.
+	public void d(String format, Object... args) {
+		this.m("debug", format, args);
 	}
 
 	// E outputs a Tirion error message.
 	public void e(String format, Object... args) {
-		if (!this.verbose) {
-			return;
-		}
-
-		System.err.print(Client.LogPrefix + "[error] " + String.format(format, args) + "\n");
+		this.m("error", format, args);
 	}
 
 	// V outputs a Tirion verbose message.
 	public void v(String format, Object... args) {
-		if (!this.verbose) {
-			return;
-		}
-
-		System.err.print(Client.LogPrefix + "[verbose] " + String.format(format, args) + "\n");
+		this.m("verbose", format, args);
 	}
 
 	private void mmapOpen(String filename) throws IOException {
@@ -260,7 +232,7 @@ public class Client {
 		return tag.replace("\n", " ");
 	}
 
-	private String receive() throws Exception {
+	private synchronized String receive() throws Exception {
 		if (this.netInQueue.size() != 0) {
 			return this.netInQueue.pop();
 		} else {
@@ -296,24 +268,24 @@ public class Client {
 			Client.this.v("Start listening to commands");
 
 			while (Client.this.running) {
-				Exception e = null;
-				String s = null;
+				Exception err = null;
+				String rec = null;
 
 				try {
-					s = Client.this.receive();
+					rec = Client.this.receive();
 				} catch (Exception t) {
-					e = t;
+					err = t;
 				}
 
-				if (e == null) {
-					char com = s.charAt(0);
+				if (err == null) {
+					char com = rec.charAt(0);
 
 					switch (com) {
 					default:
 						Client.this.e("Unknown command '%c'", com);
 					}
 				} else {
-					Client.this.e("Unix socket error: " + e);
+					Client.this.e("Unix socket error: " + err);
 
 					Client.this.running = false;
 				}
