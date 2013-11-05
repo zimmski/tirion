@@ -52,6 +52,10 @@ try {
 }
 ```
 
+## Client <-> agent communication
+
+The Tirion Java library uses a Unix Domain Socket via the excellent [JUDS library](https://github.com/mcfunley/juds) to communicate with the corresponding agent. Internal metrics of the client application are exchanged through a memory mapped file (mmap) which is attached to a float array. Changing metric values is therefore very fast but still a synchronized operation.
+
 ## Multi-process applications
 
 Due to the [architecture of Tirion's agent](/#how-does-tirion-work) it is very important that the initialization of the Tirion object must occur before forking new child processes. Otherwise, they would not inherit the group id of the parent process which is needed for [restricting](/tirion-agent#limits) and completely killing the monitored process.
