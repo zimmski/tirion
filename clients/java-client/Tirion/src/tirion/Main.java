@@ -5,6 +5,9 @@ import java.io.IOException;
 import org.apache.commons.cli.*;
 
 public class Main {
+	private static tirion.Client t;
+	private static int runtime;
+
 	private static Option getCommandlineOption(String opt, String longOpt, String description, boolean hasArg, String argName) {
 		Option option = new Option(opt, hasArg, description);
 		
@@ -21,7 +24,7 @@ public class Main {
 	
 	public static void main(final String[] args) throws InterruptedException, IOException {
 		boolean help = false;
-		int runtime = 5;
+		runtime = 5;
 		String socket = "/tmp/tirion.sock";
 		boolean verbose = false;
 		
@@ -68,7 +71,7 @@ public class Main {
             System.exit(1);
 		}
 		
-		tirion.Client t = new tirion.Client(socket, verbose);
+		t = new tirion.Client(socket, verbose);
 		
 		try {
 			t.init();

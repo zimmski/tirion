@@ -112,8 +112,6 @@ public class Client {
 			try {
 				this.handleCommands.join();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 			this.handleCommands = null;
 		}
