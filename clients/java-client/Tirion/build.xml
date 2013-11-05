@@ -12,9 +12,11 @@
     <target name="clean">
         <delete dir="bin"/>
         <delete dir="build/classes"/>
+    </target>
+    <target name="clean-doc">
         <delete dir="doc"/>
     </target>
-    <target name="cleanall" depends="clean"/>
+    <target name="cleanall" depends="clean,clean-doc"/>
     <target name="client" depends="init,compile">
         <mkdir dir="bin"/>
         <jar destfile="bin/java-client.jar">
@@ -31,7 +33,7 @@
             <classpath refid="tirion.classpath"/>
         </javac>
     </target>
-    <target name="doc">
+    <target name="doc" depends="clean-doc">
         <mkdir dir="doc"/>
         <javadoc access="public" author="true" destdir="doc" doctitle="Tirion's Java client library API" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="1.7" splitindex="true" use="true" version="true" additionalparam="-notimestamp">
             <classpath refid="tirion.classpath"/>
@@ -58,7 +60,9 @@
                 <include name="**/*.class"/>
                 <exclude name="**/Main*"/>
             </fileset>
-            <zipgroupfileset dir="lib" includes="**/*.jar"/>
+            <zipgroupfileset dir="lib" includes="**/*.jar" excludes="META-INF/*.SF,META-INF/*.DSA,META-INF/*.RSA">
+                <exclude name="**/commons-cli-1.2.jar"/>
+            </zipgroupfileset>
         </jar>
     </target>
 </project>
