@@ -15,6 +15,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.etsy.net.*;
 
 public class Client {
+	/**
+	 * The version of the Tirion client
+	 * The version is also used in the communication with the agent and
+	 * dictates the whole communication protocol.
+	 */
 	public static String TirionVersion = "0.2";
 
 	private static int FloatSize = 4;
@@ -34,6 +39,12 @@ public class Client {
 	private String socket;
 	private boolean verbose;
 
+	/**
+	 * Create a new Tirion client object
+	 *
+	 * @param socket the socket filepath to connect to the agent
+	 * @param verbose enable or disable verbose output of the client library
+	 */
 	public Client(String socket, boolean verbose) {
 		this.count = 0;
 		this.running = false;
@@ -41,7 +52,9 @@ public class Client {
 		this.verbose = verbose;
 	}
 
-	// Init initializes the client
+	/**
+	 * Initialize a Tirion client object
+	 */
 	public void init() throws Exception {
 		/*
 		 * TODO find out how to do this in java... if r, err :=
@@ -96,7 +109,9 @@ public class Client {
 		this.handleCommands.start();
 	}
 
-	// Close uninitializes the client by closing all connections of the client.
+	/**
+	 * Uninitialized a Tirion client object
+	 */
 	public void close() throws IOException {
 		this.running = false;
 
@@ -123,13 +138,22 @@ public class Client {
 		}
 	}
 
-	// Destroy deallocates all data of the client.
+	/**
+	 * Cleanup everything that was allocated by the Tirion client object
+	 */
 	public void destroy() {
 		this.metricLock = null;
 		this.netInQueue = null;
 	}
 
-	// Add adds a value to a metric
+	/**
+	 * Add a value to a metric
+	 *
+	 * @param i the index of the metric
+	 * @param v the value to be add to the metric
+	 *
+	 * @return the new value of the metric
+	 */
 	public float add(int i, float v) {
 		if (i < 0 || i >= this.count) {
 			return 0.0f;
@@ -152,26 +176,55 @@ public class Client {
 		return ret;
 	}
 
-	// Dec decrements a metric by 1.0
+	/**
+	 * Decrement a metric by 1.0
+	 *
+	 * @param i the index of the metric
+	 *
+	 * @return the new value of the metric
+	 */
 	public float dec(int i) {
 		return this.add(i, -1.0f);
 	}
 
-	// Inc increments a metric by 1.0
+	/**
+	 * Increment a metric by 1.0
+	 *
+	 * @param i the index of the metric
+	 *
+	 * @return the new value of the metric
+	 */
 	public float inc(int i) {
 		return this.add(i, 1.0f);
 	}
 
-	// Sub subtracts a value of a metric
+	/**
+	 * Subtract a value of a metric
+	 *
+	 * @param i the index of the metric
+	 * @param v the value to be subtracted of the metric
+	 *
+	 * @return the new value of the metric
+	 */
 	public float sub(int i, float v) {
 		return this.add(i, -v);
 	}
 
+	/**
+	 * States if the Tirion Client object is running
+	 * 
+	 * @return running state
+	 */
 	public boolean running() {
 		return this.running;
 	}
 
-	// Tag sends a tag to the agent
+	/**
+	 * Send a tag to the agent
+	 *
+	 * @param format the tag string that follows the same specifications as format in String.format
+	 * @param args additional arguments for format
+	 */
 	public void tag(String format, Object... args) throws IOException {
 		this.send(this.prepareTag(String.format("t" + format, args)));
 	}
@@ -184,17 +237,32 @@ public class Client {
 		System.err.print(Client.LogPrefix + "[" + type + "] " + String.format(format, args) + "\n");
 	}
 
-	// D outputs a Tirion debug message.
+	/**
+	 * Output a Tirion debug message
+	 *
+	 * @param format the message string that follows the same specifications as format in String.format
+	 * @param args additional arguments for format
+	 */
 	public void d(String format, Object... args) {
 		this.m("debug", format, args);
 	}
 
-	// E outputs a Tirion error message.
+	/**
+	 * Output a Tirion error message
+	 *
+	 * @param format the message string that follows the same specifications as format in String.format
+	 * @param args additional arguments for format
+	 */
 	public void e(String format, Object... args) {
 		this.m("error", format, args);
 	}
 
-	// V outputs a Tirion verbose message.
+	/**
+	 * Output a Tirion verbose message
+	 *
+	 * @param format the message string that follows the same specifications as format in String.format
+	 * @param args additional arguments for format
+	 */
 	public void v(String format, Object... args) {
 		this.m("verbose", format, args);
 	}
