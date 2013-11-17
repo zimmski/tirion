@@ -20,13 +20,13 @@ def main():
 
 	parser = argparse.ArgumentParser(description="Tirion Java example client v%s" % (tirion.__version__))
 
-	parser.add_argument("-r", "--runtime", nargs=1, type=int, default=runtime, help="Runtime of the example client in seconds. Default is %d." % (runtime))
-	parser.add_argument("-s", "--socket", nargs=1, default=socket, help="Unix socket path for client<-->agent communication. Default is %s" % (socket))
-	parser.add_argument("-v", "--verbose", help="Enable verbose output.")
+	parser.add_argument("-r", "--runtime", type=int, default=runtime, help="Runtime of the example client in seconds. Default is %d." % (runtime))
+	parser.add_argument("-s", "--socket", default=socket, help="Unix socket path for client<-->agent communication. Default is %s" % (socket))
+	parser.add_argument("-v", "--verbose", action='store_true', default=False, help="Enable verbose output.")
 
 	args = parser.parse_args()
 
-	tirion_client = tirion.client.Client(args.socket, True if args.verbose else False)
+	tirion_client = tirion.client.Client(args.socket, args.verbose)
 
 	try:
 		tirion_client.init()
@@ -35,7 +35,7 @@ def main():
 
 		sys.exit(1)
 
-	threading.Thread(target=__after, args=(tirion_client, args.runtime,)).start()
+	threading.Thread(target=__after, args=(tirion_client, args.runtime)).start()
 
 	while tirion_client.running():
 		ret = tirion_client.inc(0)
@@ -57,7 +57,7 @@ def main():
 def __after(tirion_client, runtime):
 	"""this function stops the Tirion client after x seconds"""
 
-	time.sleep(runtime)
+	time.sleep(float(runtime))
 
 	tirion_client.debug("Program ran for {} seconds, this is enough data.", runtime)
 

@@ -56,7 +56,9 @@ class Client:
 		if len(header) < 2 or len(header[1]) == 0:
 			raise RuntimeError("Did not receive correct metric count and mmap filename")
 
-		if not header[0].isdigit():
+		try:
+			self.__count = int(header[0])
+		except ValueError:
 			self.error("Did not receive correct metric count")
 
 			raise RuntimeError("Metric count is not a number")
@@ -70,7 +72,7 @@ class Client:
 
 		self.verbose("Received metric count {} and mmap filename {}", self.__count, mmap_filename)
 
-		self.__mmap_open(mmap_filename)
+		self.__metrics = numpy.memmap(mmap_filename, dtype='float32', mode='r+', shape=(self.__count,))
 
 		self.verbose("Initialized metric collector mmap")
 
@@ -82,18 +84,24 @@ class Client:
 
 	def close(self):
 		"""Uninitialized a Tirion client object"""
-
 		self.__running = False
 
-		self.__mmap_close()
+		self.__metric_lock.acquire()
+
+		if self.__metrics is not None:
+			# self.__metrics.close()
+			self.__metrics = None
 
 		if self.__net is not None:
+			self.__net.shutdown(socket.SHUT_RDWR)
 			self.__net.close()
 			self.__net = None
 
-		if self.__command_thread  is not None:
+		if self.__command_thread is not None:
 			self.__command_thread.join()
 			self.__command_thread = None
+
+		self.__metric_lock.release()
 
 	def destroy(self):
 		"""Cleanup everything that was allocated by the Tirion client object"""
@@ -170,7 +178,7 @@ class Client:
 		@param args additional arguments for format_string
 		"""
 
-		self.__send(self.__prepare_tag("t" + format_string.format(args)))
+		self.__send(self.__prepare_tag("t" + format_string.format(*args)))
 
 	def __message(self, message_type, format_string, *args):
 		"""Output a Tirion message"""
@@ -196,7 +204,7 @@ class Client:
 		@param args additional arguments for format_string
 		"""
 
-		self.__message("error", format_string, args)
+		self.__message("error", format_string, *args)
 
 	def verbose(self, format_string, *args):
 		"""Output a Tirion verbose message
@@ -205,23 +213,7 @@ class Client:
 		@param args additional arguments for format_string
 		"""
 
-		self.__message("verbose", format_string, args)
-
-	def __mmap_open(self, filename):
-		"""Open and Initialize a memory mapped space"""
-
-		self.__metrics = numpy.memmap(filename, dtype='float32', mode='r+', shape=(self.__count,))
-
-	def __mmap_close(self):
-		"""Close a memory mapped space"""
-
-		self.__metric_lock.acquire()
-
-		if self.__metrics is not None:
-			# self.__metrics.close()
-			self.__metrics = None
-
-		self.__metric_lock.release()
+		self.__message("verbose", format_string, *args)
 
 	def __prepare_tag(self, tag):
 		"""Prepare a tag string for sending"""
@@ -260,7 +252,7 @@ class Client:
 
 		self.verbose("Start listening to commands")
 
-		while self.running:
+		while self.__running:
 			try:
 				rec = self.__receive()
 
