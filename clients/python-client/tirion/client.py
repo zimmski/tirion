@@ -16,9 +16,9 @@ from __init__ import __version__
 class Client:
 	"""Tirion client"""
 
-	LOG_PREFIX = "[client]"
-	TIRION_BUFFER_SIZE = 4096
-	TIRION_TAG_SIZE = 513
+	__LOG_PREFIX = "[client]"
+	__TIRION_BUFFER_SIZE = 4096
+	__TIRION_TAG_SIZE = 513
 
 	def __init__(self, socket_filename, verbose):
 		"""Tirion client constructor
@@ -34,7 +34,7 @@ class Client:
 		self.__net = None
 		self.__running = False
 		self.__socket = socket_filename
-		self.verbose_output = verbose
+		self.__verbose_output = verbose
 
 	def init(self):
 		"""Initialize a Tirion client object"""
@@ -183,10 +183,10 @@ class Client:
 	def __message(self, message_type, format_string, *args):
 		"""Output a Tirion message"""
 
-		if not self.verbose_output:
+		if not self.__verbose_output:
 			return
 
-		sys.stderr.write(Client.LOG_PREFIX + "[" + message_type + "] " + format_string.format(*args) + "\n")
+		sys.stderr.write(Client.__LOG_PREFIX + "[" + message_type + "] " + format_string.format(*args) + "\n")
 
 	def debug(self, format_string, *args):
 		"""Output a Tirion debug message
@@ -218,15 +218,15 @@ class Client:
 	def __prepare_tag(self, tag):
 		"""Prepare a tag string for sending"""
 
-		if len(tag) > self.TIRION_TAG_SIZE:
-			tag = tag[:self.TIRION_TAG_SIZE]
+		if len(tag) > self.__TIRION_TAG_SIZE:
+			tag = tag[:self.__TIRION_TAG_SIZE]
 
 		return tag.replace("\n", " ")
 
 	def __receive(self):
 		"""Receive a message over the unix socket"""
 
-		msg = self.__net.recv(self.TIRION_BUFFER_SIZE)
+		msg = self.__net.recv(self.__TIRION_BUFFER_SIZE)
 
 		if msg == '':
 			raise RuntimeError("socket connection broken")
