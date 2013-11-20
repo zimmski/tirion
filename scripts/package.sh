@@ -80,6 +80,12 @@ cp $GOPATH/pkg/${GOOS}_${GOARCH}/github.com/zimmski/tirion.a $TMPFOLDER/lib/go/p
 mkdir -p $TMPFOLDER/lib/java
 cp $GOPATH/src/github.com/zimmski/tirion/clients/java-client/Tirion/bin/tirion.jar $TMPFOLDER/lib/java/tirion.jar
 
+mkdir -p $TMPFOLDER/lib/python
+cp $GOPATH/src/github.com/zimmski/tirion/clients/python-client/setup.py $TMPFOLDER/lib/python/setup.py
+mkdir -p $TMPFOLDER/lib/python/tirion
+cp $GOPATH/src/github.com/zimmski/tirion/clients/python-client/tirion/__init__.py $TMPFOLDER/lib/python/tirion/__init__.py
+cp $GOPATH/src/github.com/zimmski/tirion/clients/python-client/tirion/client.py $TMPFOLDER/lib/python/tirion/client.py
+
 # server
 
 echo

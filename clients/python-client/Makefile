@@ -8,3 +8,6 @@ BB = $(GOPATH)/src/github.com/zimmski/tirion/clients/python-client
 doc:
 	cd $(BB)/doc ;\
 	doxygen doxygen.conf
+
+lib:
+	sudo python setup.py install --verbose

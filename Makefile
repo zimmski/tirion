@@ -1,4 +1,4 @@
-.PHONY: all c-client c-doc c-lib clients docs examples fmt go-client go-doc go-lib java-client java-doc java-lib python-doc tirion-agent vet
+.PHONY: all c-client c-doc c-lib clients docs examples fmt go-client go-doc go-lib java-client java-doc java-lib python-client python-doc python-lib tirion-agent vet
 all: tirion-agent
 clean:
 	rm -fr $(GOPATH)/pkg/*/github.com/zimmski/tirion*
@@ -13,7 +13,7 @@ clean:
 
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/examples/c-multiprocess clean
 	go clean github.com/zimmski/tirion/examples/go-mandelbrot
-clients: c-client java-client go-client
+clients: c-client java-client go-client python-client
 c-client:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client
 go-client:
@@ -21,28 +21,32 @@ go-client:
 java-client:
 	ant -buildfile $(GOPATH)/src/github.com/zimmski/tirion/clients/java-client/Tirion/build.xml client
 	cp $(GOPATH)/src/github.com/zimmski/tirion/clients/java-client/Tirion/bin/java-client.jar $(GOPATH)/bin/java-client.jar
+python-client: python-lib
+	cp $(GOPATH)/src/github.com/zimmski/tirion/clients/python-client/python_client.py $(GOPATH)/bin/python_client.py
+	chmod +x $(GOPATH)/bin/python_client.py
 dependencies:
 	sh $(GOPATH)/src/github.com/zimmski/tirion/scripts/dependencies.sh
-docs: c-doc java-doc
+docs: c-doc java-doc python-doc
 c-doc:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client doc
 java-doc:
 	ant -buildfile $(GOPATH)/src/github.com/zimmski/tirion/clients/java-client/Tirion/build.xml doc
 python-doc:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/python-client doc
-libs: c-lib java-lib go-lib
+libs: c-lib java-lib go-lib python-lib
 c-lib:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client lib
 go-lib:
 	go install github.com/zimmski/tirion
 java-lib:
 	ant -buildfile $(GOPATH)/src/github.com/zimmski/tirion/clients/java-client/Tirion/build.xml lib
+python-lib:
+	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/python-client lib
 tirion-agent:
 	go install github.com/zimmski/tirion/tirion-agent
 examples:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/examples/c-multiprocess
 	go install github.com/zimmski/tirion/examples/go-mandelbrot
-# Go coding conventions
 fmt:
 	gofmt -l -w -tabs=true $(GOPATH)/src/github.com/zimmski/tirion
 package: clean
@@ -55,6 +59,5 @@ package:
 
 	GOOS=linux sh $(GOPATH)/src/github.com/zimmski/tirion/scripts/package.sh
 universe: libs clients docs all examples
-# Go static analysis
 vet:
 	go tool vet -all=true -v=true $(GOPATH)/src/github.com/zimmski/tirion
