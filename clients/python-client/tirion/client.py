@@ -86,7 +86,8 @@ class Client:
 		"""Uninitialized a Tirion client object"""
 		self.__running = False
 
-		self.__metric_lock.acquire()
+		if self.__metric_lock is not None:
+			self.__metric_lock.acquire()
 
 		if self.__metrics is not None:
 			# self.__metrics.close()
@@ -101,7 +102,8 @@ class Client:
 			self.__command_thread.join()
 			self.__command_thread = None
 
-		self.__metric_lock.release()
+		if self.__metric_lock is not None:
+			self.__metric_lock.release()
 
 	def destroy(self):
 		"""Cleanup everything that was allocated by the Tirion client object"""
@@ -117,7 +119,7 @@ class Client:
 		@return the new value of the metric
 		"""
 
-		if index < 0 or index >= self.__count:
+		if index < 0 or index >= self.__count or self.__metric_lock is None:
 			return 0.0
 
 		ret = 0.0
