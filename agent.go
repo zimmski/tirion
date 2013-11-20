@@ -626,7 +626,9 @@ func (a *TirionAgent) Run() {
 
 		if err != nil {
 			if strings.HasSuffix(err.Error(), "use of closed network connection") {
-				a.sPanic("Unix socket got closed already")
+				a.E("Unix socket got already closed")
+
+				return
 			} else {
 				a.sPanic(fmt.Sprintf("Accept %v", err))
 			}
