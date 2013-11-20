@@ -13,7 +13,7 @@
  * The version is also used in the communication with the agent and
  * dictates the whole communication protocol.
  */
-#define TIRION_VERSION "0.2"
+#define TIRION_VERSION "0.3"
 
 /**
  * Error codes for all Tirion functions

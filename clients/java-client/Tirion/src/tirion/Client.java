@@ -20,7 +20,7 @@ public class Client {
 	 * The version is also used in the communication with the agent and
 	 * dictates the whole communication protocol.
 	 */
-	public  final static String TirionVersion = "0.2";
+	public  final static String TirionVersion = "0.3";
 
 	private final static int FloatSize = 4;
 	private final static String LogPrefix = "[client]";
@@ -212,7 +212,7 @@ public class Client {
 
 	/**
 	 * States if the Tirion Client object is running
-	 * 
+	 *
 	 * @return running state
 	 */
 	public boolean running() {
