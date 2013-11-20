@@ -107,8 +107,10 @@ rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/app/tmp
 rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/app/init.go
 rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/conf/.gitignore
 rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/conf/app.conf
+rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/doc
 rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/tests
 rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/README.md
+rm -r $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/tirion-server-ui.md
 
 mv $TMPFOLDER/share/github.com/zimmski/tirion/tirion-server/scripts $TMPFOLDER/share/scripts
 
