@@ -1,4 +1,4 @@
-# T H E   T O D O   O F   T I R I O N,   P A R T   I
+# T H E\ \ \ T O D O\ \ \ O F\ \ \ T I R I O N,\ \ \ P A R T\ \ \ I
 
 ## Agent
 
@@ -22,22 +22,16 @@
 * Program name cannot have URL forbidden characters. Put this in a function, use it in server, agent and client libraries and document it.
 * JSON export of all informations about a run without metrics and tags
 * Add limit parameters for metric and tag exports concerning their timestamps
-
 	* "from"
 	* "to"
-
 * Add limit parameters for metrics concerning selection of metrics for example just m1 and m2 instead of all
 * Export metrics via
-
 	* CSV
 	* JSON
-
 * service files
-
 	* initd
 	* systemd
 	* upstart
-
 * "COPY run1 FROM STDIN ..." to insert metrics and tags for PostgreSQL backend
 * SQLite backend
 * MySQL backend
@@ -48,9 +42,7 @@
 * Show Min, Max, Average, Mean, ... in graphs
 * Find an alternative for Highstock graphs maybe [nvd3](https://github.com/novus/nvd3)
 * Live graphs if the run is still ongoing
-
 	* Switches to normal view if run has finished
-
 * Compare more than one metric of the same run (in one or more graphs)
 * Compare metrics of different runs (in one or more graphs)
 * Tabs to switch between metric comparisons
