@@ -149,17 +149,12 @@ External metrics of the client are recorded by the tirion-agent and consist most
 #### Currently supported external metrics
 
 * proc.all
-
 	If the client is a multi-process program other external metric groups like <code>proc.io</code> and <code>proc.stat</code> state only metrics of the program’s process (parent) but not of the spawned child processes. <code>proc.all</code> metrics are accumulated values of all processes of the running program. This does not only include the parent process and the parent's child processes but also the child processes of these child processes recursively.
 
 	* proc.all.rssize int64
-
 		<code>proc.all.rssize</code> is the accumulated <code>Resident Set Size</code> (RSS, the memory size (in KByte) of all pages in real memory) of all processes of the running program.
-
 	* proc.all.vsize int64
-
 		<code>proc.all.vsize</code> is the accumulated <code>Virtual Memory Size</code> (VSS, the memory size (in KByte) of all pages in real memory as well as swapped and allocated but not yet used memory) of all processes of the running program.
-
 * proc.io (see the [proc man page](http://man7.org/linux/man-pages/man5/proc.5.html) header <code>/proc/[pid]/io</code> for a description of each metric)
 	* proc.io.cancelled_write_bytes int
 	* proc.io.rchar int
