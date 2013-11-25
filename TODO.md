@@ -2,6 +2,14 @@
 
 * Use the time of the agent for metrics and tags NOT the time of the server. This makes the metric timestamps more exact because of HTTP and server delays.
 * A program is monitored as long as the process of the program is alive and not as long as the socket.
+* Make memory reports more accurate (especially for multi process programs)
+	* Convert all memory metrics to KiloByte
+	* [ps_mem](https://raw.github.com/pixelb/ps_mem) does some interesting things
+	* Have a look at /proc/<pid>/smaps "Private_Dirty"
+	* Consider shared memory/PSS
+	* Consider swapped out memory
+	* Consider the language/VM of the program for example connect to the Java VM
+	* Find a linux/unix pendant to "vmmap" and have a look on how it works
 * Sockets can reconnect
 * A program which is not started by the agent should be able to connect to the agent via a socket.
 * It is not a fatal if a connection fails or got closed. So fail gracefully.
