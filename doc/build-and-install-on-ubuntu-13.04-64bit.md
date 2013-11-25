@@ -79,7 +79,7 @@ The Tirion server needs a configuration file and a initialized backend. Both can
 
 ```bash
 cp $GOPATH/src/github.com/zimmski/tirion/tirion-server/conf/app.conf.sample $GOPATH/src/github.com/zimmski/tirion/tirion-server/conf/app.conf
-sed -i "s/user=zimmski dbname=tirion/user=$USER dbname=$USER password='YOUR PASSWORD'/" $GOPATH/src/github.com/zimmski/tirion/tirion-server/conf/app.conf
+sed -i "s/user=zimmski dbname=tirion/user=$USER dbname=$USER password='YOUR PASSWORD' host=localhost/" $GOPATH/src/github.com/zimmski/tirion/tirion-server/conf/app.conf
 psql < $GOPATH/src/github.com/zimmski/tirion/tirion-server/scripts/postgresql_ddl.sql
 ```
 
