@@ -1,5 +1,3 @@
-# T H E\ \ \ T O D O\ \ \ O F\ \ \ T I R I O N,\ \ \ P A R T\ \ \ I
-
 ## Agent
 
 * Use the time of the agent for metrics and tags NOT the time of the server. This makes the metric timestamps more exact because of HTTP and server delays.
