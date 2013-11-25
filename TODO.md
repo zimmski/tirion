@@ -1,5 +1,14 @@
+## General
+
+* It is not a fatal if a connection fails or got closed. So fail gracefully. (especially agent and client libraries)
+* Use the openSUSE build service to build packages for openSUSE, ubuntu and fedora. 32 and 64 bit
+	* tirion-agent
+	* tirion-server
+	* client-libraries separately
+
 ## Agent
 
+* Move /shm to /collector and refactor
 * Use the time of the agent for metrics and tags NOT the time of the server. This makes the metric timestamps more exact because of HTTP and server delays.
 * A program is monitored as long as the process of the program is alive and not as long as the socket.
 * Make memory reports more accurate (especially for multi process programs)
@@ -12,13 +21,13 @@
 	* Find a linux/unix pendant to "vmmap" and have a look on how it works
 * Sockets can reconnect
 * A program which is not started by the agent should be able to connect to the agent via a socket.
-* It is not a fatal if a connection fails or got closed. So fail gracefully.
 * Add CPU limit (if the agent starts the program)
 * Oversee client process with Linux containers [LXC](https://wiki.deimos.fr/LXC_:_Install_and_configure_the_Linux_Containers#Memory)
 
 ## Client libraries
 
-* It is not a fatal if a connection fails or got closed. So fail gracefully.
+* Reduce add, sub, inc and dec to add. Can be seen in the Java and Python library.
+* Add "get" and "set" functions for metrics
 * Init functions must handle open connections of all their members -> only start disconnected members
 * Sockets can reconnect
 * Shared memory and MMap can reconnect
