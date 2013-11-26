@@ -29,6 +29,8 @@ void tirionShmSet(Tirion *tirion, long i, float v);
 long tirionSocketReceive(Tirion *tirion, char *buf, long size);
 long tirionSocketSend(Tirion *tirion, const char *msg);
 
+void tirionM(const Tirion *tirion, const char *type, const char *format, va_list args);
+
 typedef struct TirionShmStruct {
 	float *addr;
 	bool create;
@@ -368,50 +370,38 @@ long tirionSocketSend(Tirion *tirion, const char *msg) {
 	return TIRION_OK;
 }
 
-void tirionD(const Tirion *tirion, const char *format, ...) {
+void tirionM(const Tirion *tirion, const char *type, const char *format, va_list args) {
 	if (! tirion->verbose) {
 		return;
 	}
 
-	va_list args;
-
 	char buf[TIRION_BUFFER_SIZE];
 
-	va_start(args, format);
 	vsprintf(buf, format, args);
-	va_end(args);
 
-	fprintf(stderr, "%s[debug] %s\n", tirion->p->logPrefix, buf);
+	fprintf(stderr, "%s[%s] %s\n", tirion->p->logPrefix, type, buf);
+}
+
+void tirionD(const Tirion *tirion, const char *format, ...) {
+	va_list args;
+
+	va_start(args, format);
+	tirionM(tirion, "debug", format, args);
+	va_end(args);
 }
 
 void tirionE(const Tirion *tirion, const char *format, ...) {
-	if (! tirion->verbose) {
-		return;
-	}
-
 	va_list args;
 
-	char buf[TIRION_BUFFER_SIZE];
-
 	va_start(args, format);
-	vsprintf(buf, format, args);
+	tirionM(tirion, "error", format, args);
 	va_end(args);
-
-	fprintf(stderr, "%s[error] %s\n", tirion->p->logPrefix, buf);
 }
 
 void tirionV(const Tirion *tirion, const char *format, ...) {
-	if (! tirion->verbose) {
-		return;
-	}
-
 	va_list args;
 
-	char buf[TIRION_BUFFER_SIZE];
-
 	va_start(args, format);
-	vsprintf(buf, format, args);
+	tirionM(tirion, "verbose", format, args);
 	va_end(args);
-
-	fprintf(stderr, "%s[verbose] %s\n", tirion->p->logPrefix, buf);
 }

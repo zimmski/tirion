@@ -144,29 +144,25 @@ func (t *Tirion) send(msg string) error {
 	return err
 }
 
-// D outputs a Tirion debug message.
-func (t *Tirion) D(format string, a ...interface{}) (n int, err error) {
+func (t *Tirion) m(messageType string, format string, a ...interface{}) (n int, err error) {
 	if !t.verbose {
 		return
 	}
 
-	return fmt.Fprintf(os.Stderr, t.logPrefix+"[debug] "+format+"\n", a...)
+	return fmt.Fprintf(os.Stderr, t.logPrefix+"["+messageType+"] "+format+"\n", a...)
+}
+
+// D outputs a Tirion debug message.
+func (t *Tirion) D(format string, a ...interface{}) (n int, err error) {
+	return t.m("debug", format, a...)
 }
 
 // E outputs a Tirion error message.
 func (t *Tirion) E(format string, a ...interface{}) (n int, err error) {
-	if !t.verbose {
-		return
-	}
-
-	return fmt.Fprintf(os.Stderr, t.logPrefix+"[error] "+format+"\n", a...)
+	return t.m("error", format, a...)
 }
 
 // V outputs a Tirion verbose message.
 func (t *Tirion) V(format string, a ...interface{}) (n int, err error) {
-	if !t.verbose {
-		return
-	}
-
-	return fmt.Fprintf(os.Stderr, t.logPrefix+"[verbose] "+format+"\n", a...)
+	return t.m("verbose", format, a...)
 }
