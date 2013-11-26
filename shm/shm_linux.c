@@ -58,7 +58,7 @@ float shmAdd(float* addr, long i, float v) {
 }
 
 float shmDec(float* addr, long i) {
-	return shmSub(addr, i, 1.0);
+	return shmAdd(addr, i, -1.0);
 }
 
 float shmInc(float* addr, long i) {
@@ -66,6 +66,6 @@ float shmInc(float* addr, long i) {
 }
 
 float shmSub(float* addr, long i, float v) {
-	return addr[i] = (addr[i] - v);
+	return shmAdd(addr, i, -v);
 }
 

@@ -297,7 +297,7 @@ float tirionAdd(Tirion *tirion, long i, float v) {
 }
 
 float tirionDec(Tirion *tirion, long i) {
-	return tirionSub(tirion, i, 1.0);
+	return tirionAdd(tirion, i, -1.0);
 }
 
 float tirionInc(Tirion *tirion, long i) {
@@ -305,11 +305,7 @@ float tirionInc(Tirion *tirion, long i) {
 }
 
 float tirionSub(Tirion *tirion, long i, float v) {
-	if (i < 0 || i >= tirion->p->metricCount) {
-		return 0.0f;
-	}
-
-	return tirion->p->shm.addr[i] = (tirion->p->shm.addr[i] - v);
+	return tirionAdd(tirion, i, -v);
 }
 
 long tirionTag(Tirion *tirion, const char *format, ...) {

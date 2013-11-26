@@ -68,7 +68,7 @@ float mmapAdd(float* addr, long i, float v) {
 }
 
 float mmapDec(float* addr, long i) {
-	return mmapSub(addr, i, 1.0);
+	return mmapAdd(addr, i, -1.0);
 }
 
 float mmapInc(float* addr, long i) {
@@ -76,5 +76,5 @@ float mmapInc(float* addr, long i) {
 }
 
 float mmapSub(float* addr, long i, float v) {
-	return addr[i] = (addr[i] - v);
+	return mmapAdd(addr, i, -v);
 }
