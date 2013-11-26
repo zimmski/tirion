@@ -27,6 +27,8 @@
 ## Client libraries
 
 * Reduce add, sub, inc and dec to add. Can be seen in the Java and Python library.
+* Use a lock with all metrics related like in the Java and Python library
+* Use a queue for receive like in Java library. Otherwise more than one command during one receive would be lost.
 * Add "get" and "set" functions for metrics
 * Init functions must handle open connections of all their members -> only start disconnected members
 * Sockets can reconnect
