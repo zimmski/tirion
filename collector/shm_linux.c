@@ -5,6 +5,20 @@
 
 #include "shm_linux.h"
 
+long shmOpen(char* filename, char create, long count) {
+	key_t key = ftok(filename, 0x03);
+
+	if (key == -1) {
+		return -1;
+	}
+
+	if (create) {
+		return shmget(key, sizeof(float) * count, IPC_CREAT|IPC_EXCL|0600);
+	} else {
+		return shmget(key, 0, 0);
+	}
+}
+
 float* shmAttach(long shm_id) {
 	float* addr = (float*)shmat(shm_id, NULL, 0);
 
@@ -19,6 +33,10 @@ long shmClose(long shm_id) {
 	return shmctl(shm_id, IPC_RMID, NULL);
 }
 
+long shmDetach(float *addr) {
+	return shmdt(addr);
+}
+
 void shmCopy(float* from, float* to, long count) {
 	long i = 0;
 
@@ -27,26 +45,8 @@ void shmCopy(float* from, float* to, long count) {
 	}
 }
 
-long shmDetach(float *addr) {
-	return shmdt(addr);
-}
-
 float shmGet(float* addr, long i) {
 	return addr[i];
-}
-
-long shmOpen(char* filename, char create, long count) {
-	key_t key = ftok(filename, 0x03);
-
-	if (key == -1) {
-		return -1;
-	}
-
-	if (create) {
-		return shmget(key, sizeof(float) * count, IPC_CREAT|IPC_EXCL|0600);
-	} else {
-		return shmget(key, 0, 0);
-	}
 }
 
 float shmSet(float *addr, long i, float v) {
@@ -68,4 +68,3 @@ float shmInc(float* addr, long i) {
 float shmSub(float* addr, long i, float v) {
 	return shmAdd(addr, i, -v);
 }
-

@@ -8,7 +8,6 @@
 
 ## Agent
 
-* Move /shm to /collector and refactor
 * Use the time of the agent for metrics and tags NOT the time of the server. This makes the metric timestamps more exact because of HTTP and server delays.
 * A program is monitored as long as the process of the program is alive and not as long as the socket.
 * Make memory reports more accurate (especially for multi process programs)
@@ -27,8 +26,8 @@
 ## Client libraries
 
 * Use a lock with all metrics related like in the Java and Python library
-* Use a queue for receive like in Java library. Otherwise more than one command during one receive would be lost.
 * Add "get" and "set" functions for metrics
+* Use a queue for receive like in Java library. Otherwise more than one command during one receive would be lost.
 * Init functions must handle open connections of all their members -> only start disconnected members
 * Sockets can reconnect
 * Shared memory and MMap can reconnect

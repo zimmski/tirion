@@ -110,25 +110,13 @@ func (c *CollectorMmap) Add(i int32, v float32) float32 {
 }
 
 func (c *CollectorMmap) Dec(i int32) float32 {
-	if i < 0 || i >= c.count {
-		return 0.0
-	}
-
-	return float32(C.mmapDec(c.addr, C.long(i)))
+	return c.Add(i, -1.0)
 }
 
 func (c *CollectorMmap) Inc(i int32) float32 {
-	if i < 0 || i >= c.count {
-		return 0.0
-	}
-
-	return float32(C.mmapInc(c.addr, C.long(i)))
+	return c.Add(i, 1.0)
 }
 
 func (c *CollectorMmap) Sub(i int32, v float32) float32 {
-	if i < 0 || i >= c.count {
-		return 0.0
-	}
-
-	return float32(C.mmapSub(c.addr, C.long(i), C.float(v)))
+	return c.Add(i, -v)
 }

@@ -3,6 +3,7 @@
 
 float *mmapOpen(const char *filename, char create, long count);
 int mmapClose(float *addr, const char *filename, char create, long count);
+
 void mmapCopy(float* from, float* to, long count);
 
 float mmapAdd(float* addr, long i, float v);
