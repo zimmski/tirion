@@ -1,4 +1,4 @@
-.PHONY: all c-client c-doc c-lib clients docs examples fmt go-client go-doc go-lib java-client java-doc java-lib python-client python-doc python-lib tirion-agent vet
+.PHONY: all c-client c-doc c-lib clients docs examples fmt go-client go-doc go-lib java-client java-doc java-lib lint python-client python-doc python-lib tirion-agent vet
 all: tirion-agent
 clean:
 	rm -fr $(GOPATH)/pkg/*/github.com/zimmski/tirion*
@@ -42,6 +42,8 @@ java-lib:
 	ant -buildfile $(GOPATH)/src/github.com/zimmski/tirion/clients/java-client/Tirion/build.xml lib
 python-lib:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/python-client lib
+lint:
+	golint $(GOPATH)/src/github.com/zimmski/tirion
 tirion-agent:
 	go install github.com/zimmski/tirion/tirion-agent
 examples:
