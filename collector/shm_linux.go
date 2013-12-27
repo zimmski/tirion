@@ -7,7 +7,6 @@ package collector
 import "C"
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -38,7 +37,7 @@ func (c *CollectorShm) InitAgent(pid int32, metricCount int32) (*url.URL, error)
 
 func (c *CollectorShm) InitClient(u *url.URL, metricCount int32) error {
 	if _, err := os.Stat(u.Path); os.IsNotExist(err) {
-		return errors.New(fmt.Sprintf("Cannot open shm path: %v", err))
+		return fmt.Errorf("cannot open shm path: %v", err)
 	}
 
 	return c.initShm(u.Path, false, metricCount)
@@ -62,7 +61,7 @@ func (c *CollectorShm) initShm(filename string, create bool, count int32) error 
 	c.id = int32(C.shmOpen(f, cr, C.long(c.count)))
 
 	if c.id == -1 {
-		return errors.New("Shm open error")
+		return fmt.Errorf("shm open error")
 	}
 
 	/**
@@ -88,7 +87,7 @@ func (c *CollectorShm) Close() error {
 
 	if c.create {
 		if C.shmClose(C.long(c.id)) != 0 {
-			return errors.New("Shm close error")
+			return fmt.Errorf("shm close error")
 		}
 	}
 
@@ -100,9 +99,7 @@ func (c *CollectorShm) Get(i int32) float32 {
 		return 0.0
 	}
 
-	var v C.float = C.shmGet(c.addr, C.long(i))
-
-	return float32(v)
+	return float32(C.shmGet(c.addr, C.long(i)))
 }
 
 func (c *CollectorShm) Set(i int32, v float32) float32 {

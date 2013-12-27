@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -28,13 +27,13 @@ func (p *Postgresql) Init(params BackendParameters) error {
 	p.Db, err = sql.Open("postgres", params.Spec)
 
 	if err != nil {
-		return errors.New(fmt.Sprintf("Cannot connect to database: %v", err))
+		return fmt.Errorf("cannot connect to database: %v", err)
 	}
 
 	err = p.Db.Ping()
 
 	if err != nil {
-		return errors.New(fmt.Sprintf("Cannot ping database: %v", err))
+		return fmt.Errorf("cannot ping database: %v", err)
 	}
 
 	p.Db.SetMaxIdleConns(params.MaxIdleConns)
@@ -83,25 +82,25 @@ func (p *Postgresql) SearchPrograms() ([]tirion.Program, error) {
 	return programs, nil
 }
 
-func (p *Postgresql) FindRun(programName string, runId int32) (*tirion.Run, error) {
+func (p *Postgresql) FindRun(programName string, runID int32) (*tirion.Run, error) {
 	tx, err := p.Db.Begin()
 
 	if err != nil {
 		return nil, err
 	}
 
-	row := tx.QueryRow("SELECT id, name, sub_name, interval, metrics, metric_count, prog, prog_arguments, extract(epoch from start), extract(epoch from stop) FROM run WHERE name = $1 and id = $2", programName, runId)
+	row := tx.QueryRow("SELECT id, name, sub_name, interval, metrics, metric_count, prog, prog_arguments, extract(epoch from start), extract(epoch from stop) FROM run WHERE name = $1 and id = $2", programName, runID)
 
 	var run = tirion.Run{}
 	var metrics, start string
 	var stop *string
 
-	if err := row.Scan(&run.Id, &run.Name, &run.SubName, &run.Interval, &metrics, &run.MetricCount, &run.Prog, &run.ProgArguments, &start, &stop); err != nil {
+	if err := row.Scan(&run.ID, &run.Name, &run.SubName, &run.Interval, &metrics, &run.MetricCount, &run.Prog, &run.ProgArguments, &start, &stop); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
-		} else {
-			return nil, err
 		}
+
+		return nil, err
 	}
 
 	json.Unmarshal([]byte(metrics), &run.Metrics)
@@ -149,7 +148,7 @@ func (p *Postgresql) SearchRuns(programName string) ([]tirion.Run, error) {
 
 		var start, stop *string
 
-		if err := rows.Scan(&run.Id, &run.Name, &run.SubName, &run.Interval, &run.Prog, &run.ProgArguments, &start, &stop); err != nil {
+		if err := rows.Scan(&run.ID, &run.Name, &run.SubName, &run.Interval, &run.Prog, &run.ProgArguments, &start, &stop); err != nil {
 			return nil, err
 		}
 
@@ -190,7 +189,7 @@ func (p *Postgresql) StartRun(run *tirion.Run) error {
 
 	var metrics, _ = json.Marshal(run.Metrics)
 
-	err = tx.QueryRow("INSERT INTO run(name, sub_name, interval, metrics, metric_count, prog, prog_arguments, start) VALUES($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP) RETURNING id", run.Name, run.SubName, run.Interval, string(metrics), len(run.Metrics), run.Prog, run.ProgArguments).Scan(&run.Id)
+	err = tx.QueryRow("INSERT INTO run(name, sub_name, interval, metrics, metric_count, prog, prog_arguments, start) VALUES($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP) RETURNING id", run.Name, run.SubName, run.Interval, string(metrics), len(run.Metrics), run.Prog, run.ProgArguments).Scan(&run.ID)
 
 	if err != nil {
 		return err
@@ -209,43 +208,13 @@ func (p *Postgresql) StartRun(run *tirion.Run) error {
 		}
 	}
 
-	_, err = tx.Exec("CREATE TABLE r" + strconv.FormatInt(int64(run.Id), 10) + "(t TIMESTAMP NOT NULL, " + strings.Join(columns, ",") + ", PRIMARY KEY(t))")
+	_, err = tx.Exec("CREATE TABLE r" + strconv.FormatInt(int64(run.ID), 10) + "(t TIMESTAMP NOT NULL, " + strings.Join(columns, ",") + ", PRIMARY KEY(t))")
 
 	if err != nil {
 		return err
 	}
 
-	_, err = tx.Exec("CREATE TABLE rt" + strconv.FormatInt(int64(run.Id), 10) + "(t TIMESTAMP NOT NULL, message TEXT NOT NULL, PRIMARY KEY(t))")
-
-	if err != nil {
-		return err
-	}
-
-	err = tx.Commit()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (p *Postgresql) StopRun(runId int32) error {
-	tx, err := p.Db.Begin()
-
-	if err != nil {
-		return err
-	}
-
-	var run = tirion.Run{}
-
-	err = tx.QueryRow("SELECT id FROM run WHERE id = $1 AND stop IS NULL", runId).Scan(&run.Id)
-
-	if err != nil {
-		return err
-	}
-
-	_, err = tx.Exec("UPDATE run SET stop = CURRENT_TIMESTAMP WHERE id = $1", runId)
+	_, err = tx.Exec("CREATE TABLE rt" + strconv.FormatInt(int64(run.ID), 10) + "(t TIMESTAMP NOT NULL, message TEXT NOT NULL, PRIMARY KEY(t))")
 
 	if err != nil {
 		return err
@@ -260,7 +229,7 @@ func (p *Postgresql) StopRun(runId int32) error {
 	return nil
 }
 
-func (p *Postgresql) CreateMetrics(runId int32, metrics []tirion.MessageData) error {
+func (p *Postgresql) StopRun(runID int32) error {
 	tx, err := p.Db.Begin()
 
 	if err != nil {
@@ -269,7 +238,37 @@ func (p *Postgresql) CreateMetrics(runId int32, metrics []tirion.MessageData) er
 
 	var run = tirion.Run{}
 
-	err = tx.QueryRow("SELECT id, metric_count FROM run WHERE id = $1 AND stop IS NULL", runId).Scan(&run.Id, &run.MetricCount)
+	err = tx.QueryRow("SELECT id FROM run WHERE id = $1 AND stop IS NULL", runID).Scan(&run.ID)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec("UPDATE run SET stop = CURRENT_TIMESTAMP WHERE id = $1", runID)
+
+	if err != nil {
+		return err
+	}
+
+	err = tx.Commit()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *Postgresql) CreateMetrics(runID int32, metrics []tirion.MessageData) error {
+	tx, err := p.Db.Begin()
+
+	if err != nil {
+		return err
+	}
+
+	var run = tirion.Run{}
+
+	err = tx.QueryRow("SELECT id, metric_count FROM run WHERE id = $1 AND stop IS NULL", runID).Scan(&run.ID, &run.MetricCount)
 
 	if err != nil {
 		return err
@@ -278,14 +277,14 @@ func (p *Postgresql) CreateMetrics(runId int32, metrics []tirion.MessageData) er
 	// check metrics data before insert to save roundtrips
 	for i, m := range metrics {
 		if int32(len(m.Data)) != run.MetricCount {
-			return errors.New(fmt.Sprintf("Metric count of %d is unequal to the run's metric count", i))
+			return fmt.Errorf("metric count of %d is unequal to the run's metric count", i)
 		}
 	}
 
 	for _, m := range metrics {
 		var ffff bytes.Buffer
 
-		ffff.WriteString("INSERT INTO r" + strconv.FormatInt(int64(runId), 10) + " VALUES(TO_TIMESTAMP($1)")
+		ffff.WriteString("INSERT INTO r" + strconv.FormatInt(int64(runID), 10) + " VALUES(TO_TIMESTAMP($1)")
 
 		for _, i := range m.Data {
 			ffff.WriteString("," + strconv.FormatFloat(float64(i), 'f', 5, 32))
@@ -321,7 +320,7 @@ func (p *Postgresql) SearchMetricOfRun(run *tirion.Run, metricName string) ([][]
 	}
 
 	if !found {
-		return nil, errors.New("metric name not found")
+		return nil, fmt.Errorf("metric name not found")
 	}
 
 	tx, err := p.Db.Begin()
@@ -332,7 +331,7 @@ func (p *Postgresql) SearchMetricOfRun(run *tirion.Run, metricName string) ([][]
 
 	metrics := make([][]interface{}, 0)
 
-	rows, err := tx.Query("SELECT EXTRACT(EPOCH FROM t) * 1000.0, " + strings.Replace(metricName, ".", "_", -1) + " FROM r" + strconv.FormatInt(int64(run.Id), 10) + " ORDER BY t")
+	rows, err := tx.Query("SELECT EXTRACT(EPOCH FROM t) * 1000.0, " + strings.Replace(metricName, ".", "_", -1) + " FROM r" + strconv.FormatInt(int64(run.ID), 10) + " ORDER BY t")
 
 	if err != nil {
 		return nil, err
@@ -383,7 +382,7 @@ func (p *Postgresql) SearchMetricsOfRun(run *tirion.Run) ([][]float32, error) {
 
 	var t string
 
-	rows, err := tx.Query("SELECT * FROM r" + strconv.FormatInt(int64(run.Id), 10) + " ORDER BY t")
+	rows, err := tx.Query("SELECT * FROM r" + strconv.FormatInt(int64(run.ID), 10) + " ORDER BY t")
 
 	if err != nil {
 		return nil, err
@@ -428,7 +427,7 @@ func (p *Postgresql) SearchMetricsOfRun(run *tirion.Run) ([][]float32, error) {
 	return metrics, nil
 }
 
-func (p *Postgresql) CreateTag(runId int32, tag *tirion.Tag) error {
+func (p *Postgresql) CreateTag(runID int32, tag *tirion.Tag) error {
 	tx, err := p.Db.Begin()
 
 	if err != nil {
@@ -437,13 +436,13 @@ func (p *Postgresql) CreateTag(runId int32, tag *tirion.Tag) error {
 
 	var run = tirion.Run{}
 
-	err = tx.QueryRow("SELECT id FROM run WHERE id = $1 AND stop IS NULL", runId).Scan(&run.Id)
+	err = tx.QueryRow("SELECT id FROM run WHERE id = $1 AND stop IS NULL", runID).Scan(&run.ID)
 
 	if err != nil {
 		return err
 	}
 
-	_, err = tx.Exec("INSERT INTO rt"+strconv.FormatInt(int64(runId), 10)+"(t, message) VALUES(TO_TIMESTAMP($1), $2)", float64(tag.Time.UnixNano())/1000000000.0, tag.Tag)
+	_, err = tx.Exec("INSERT INTO rt"+strconv.FormatInt(int64(runID), 10)+"(t, message) VALUES(TO_TIMESTAMP($1), $2)", float64(tag.Time.UnixNano())/1000000000.0, tag.Tag)
 
 	if err != nil {
 		return err
@@ -467,7 +466,7 @@ func (p *Postgresql) SearchTagsOfRun(run *tirion.Run) ([]tirion.HighStockTag, er
 
 	tags := make([]tirion.HighStockTag, 0)
 
-	rows, err := tx.Query("SELECT EXTRACT(EPOCH FROM t) * 1000.0, message FROM rt" + strconv.FormatInt(int64(run.Id), 10) + " ORDER BY t")
+	rows, err := tx.Query("SELECT EXTRACT(EPOCH FROM t) * 1000.0, message FROM rt" + strconv.FormatInt(int64(run.ID), 10) + " ORDER BY t")
 
 	if err != nil {
 		return nil, err

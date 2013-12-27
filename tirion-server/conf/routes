@@ -4,16 +4,16 @@
 
 GET		/														App.Index
 GET		/program/:programName									App.ProgramIndex
-POST		/program/:programName/run/start							App.ProgramRunStart
-GET		/program/:programName/run/:runId							App.ProgramRunIndex
-GET		/program/:programName/run/:runId/metric/:metricName		App.ProgramRunMetric
-POST		/program/:programName/run/:runId/insert					App.ProgramRunInsert
-GET		/program/:programName/run/:runId/stop					App.ProgramRunStop
-POST		/program/:programName/run/:runId/tag						App.ProgramRunTag
-GET		/program/:programName/run/:runId/tags					App.ProgramRunTags
+POST	/program/:programName/run/start							App.ProgramRunStart
+GET		/program/:programName/run/:runID						App.ProgramRunIndex
+GET		/program/:programName/run/:runID/metric/:metricName		App.ProgramRunMetric
+POST	/program/:programName/run/:runID/insert					App.ProgramRunInsert
+GET		/program/:programName/run/:runID/stop					App.ProgramRunStop
+POST	/program/:programName/run/:runID/tag					App.ProgramRunTag
+GET		/program/:programName/run/:runID/tags					App.ProgramRunTags
 
 # Ignore favicon requests
-GET		/favicon.ico					404
+GET		/favicon.ico											404
 
 # Map static resources from the /app/public folder to the /public path
-GET		/public/*filepath			Static.Serve("public")
+GET		/public/*filepath										Static.Serve("public")

@@ -1,7 +1,6 @@
 package collector
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 )
@@ -25,6 +24,6 @@ func NewCollector(typ string) (Collector, error) {
 	case "shm":
 		return new(CollectorShm), nil
 	default:
-		return nil, errors.New(fmt.Sprintf("Unknown metric protocol \"%s\"", typ))
+		return nil, fmt.Errorf("unknown metric protocol \"%s\"", typ)
 	}
 }

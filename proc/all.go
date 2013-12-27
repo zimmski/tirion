@@ -1,7 +1,6 @@
 package proc
 
 import (
-	"errors"
 	"fmt"
 	"os/exec"
 	"regexp"
@@ -52,27 +51,26 @@ func ReadAll(pid int) (*ProcAll, error) {
 			continue
 		}
 
-		var o = r.FindStringSubmatch(i)
+		o := r.FindStringSubmatch(i)
+		if o == nil {
+			return nil, fmt.Errorf("cannot match: %s\n", i)
+		}
 
-		if o != nil {
-			if inParent || o[1] == pidS {
-				if !inParent {
-					parentDepth = o[2]
-				} else if o[2] == parentDepth {
-					// out of parent again
+		if inParent || o[1] == pidS {
+			if !inParent {
+				parentDepth = o[2]
+			} else if o[2] == parentDepth {
+				// out of parent again
 
-					break
-				}
-
-				inParent = true
-
-				rssize, _ := strconv.ParseInt(o[3], 10, 64)
-				pAllRaw.RSSize += rssize
-				vsize, _ := strconv.ParseInt(o[4], 10, 64)
-				pAllRaw.VSize += vsize
+				break
 			}
-		} else {
-			return nil, errors.New(fmt.Sprintf("Cannot match: %s\n", i))
+
+			inParent = true
+
+			rssize, _ := strconv.ParseInt(o[3], 10, 64)
+			pAllRaw.RSSize += rssize
+			vsize, _ := strconv.ParseInt(o[4], 10, 64)
+			pAllRaw.VSize += vsize
 		}
 	}
 

@@ -39,25 +39,25 @@ func (c *App) ProgramIndex(programName string) revel.Result {
 	return c.Render(programName, runs)
 }
 
-func (c *App) ProgramRunIndex(programName string, runId int32) revel.Result {
-	run, err := app.Db.FindRun(programName, runId)
+func (c *App) ProgramRunIndex(programName string, runID int32) revel.Result {
+	run, err := app.Db.FindRun(programName, runID)
 
 	if err != nil {
 		panic(err)
 	} else if run == nil {
-		return c.NotFound("Run %d of program \"%s\" does not exists", runId, programName)
+		return c.NotFound("Run %d of program \"%s\" does not exists", runID, programName)
 	}
 
 	return c.Render(programName, run)
 }
 
-func (c *App) ProgramRunMetric(programName string, runId int32, metricName string) revel.Result {
-	run, err := app.Db.FindRun(programName, runId)
+func (c *App) ProgramRunMetric(programName string, runID int32, metricName string) revel.Result {
+	run, err := app.Db.FindRun(programName, runID)
 
 	if err != nil {
 		panic(err)
 	} else if run == nil {
-		return c.NotFound("Run %d of program \"%s\" does not exists", runId, programName)
+		return c.NotFound("Run %d of program \"%s\" does not exists", runID, programName)
 	}
 
 	metric, err := app.Db.SearchMetricOfRun(run, metricName)
@@ -99,15 +99,14 @@ func (c *App) ProgramRunStart(programName string) revel.Result {
 	}
 
 	err = app.Db.StartRun(&run)
-
 	if err != nil {
 		return c.RenderJson(tirion.MessageReturnStart{Error: fmt.Sprintf("%+v", err)})
-	} else {
-		return c.RenderJson(tirion.MessageReturnStart{Run: run.Id, Error: ""})
 	}
+
+	return c.RenderJson(tirion.MessageReturnStart{Run: run.ID, Error: ""})
 }
 
-func (c *App) ProgramRunInsert(programName string, runId int32) revel.Result {
+func (c *App) ProgramRunInsert(programName string, runID int32) revel.Result {
 	var metrics []tirion.MessageData
 
 	var err = json.Unmarshal([]byte(c.Params.Get("metrics")), &metrics)
@@ -116,26 +115,25 @@ func (c *App) ProgramRunInsert(programName string, runId int32) revel.Result {
 		return c.RenderJson(tirion.MessageReturnStart{Error: fmt.Sprintf("Parse metrics: %v", err)})
 	}
 
-	err = app.Db.CreateMetrics(runId, metrics)
-
+	err = app.Db.CreateMetrics(runID, metrics)
 	if err != nil {
 		return c.RenderJson(tirion.MessageReturnInsert{Error: fmt.Sprintf("%+v", err)})
-	} else {
-		return c.RenderJson(tirion.MessageReturnInsert{Error: ""})
 	}
+
+	return c.RenderJson(tirion.MessageReturnInsert{Error: ""})
 }
 
-func (c *App) ProgramRunStop(programName string, runId int32) revel.Result {
-	var err = app.Db.StopRun(runId)
+func (c *App) ProgramRunStop(programName string, runID int32) revel.Result {
+	var err = app.Db.StopRun(runID)
 
 	if err != nil {
 		return c.RenderJson(tirion.MessageReturnStop{Error: fmt.Sprintf("%+v", err)})
-	} else {
-		return c.RenderJson(tirion.MessageReturnStop{Error: ""})
 	}
+
+	return c.RenderJson(tirion.MessageReturnStop{Error: ""})
 }
 
-func (c *App) ProgramRunTag(programName string, runId int32) revel.Result {
+func (c *App) ProgramRunTag(programName string, runID int32) revel.Result {
 	var t, err = strconv.ParseInt(c.Params.Get("time"), 10, 64)
 
 	var tag = tirion.Tag{
@@ -143,26 +141,25 @@ func (c *App) ProgramRunTag(programName string, runId int32) revel.Result {
 		Time: time.Unix(0, t),
 	}
 
-	err = app.Db.CreateTag(runId, &tag)
+	err = app.Db.CreateTag(runID, &tag)
 
 	if err != nil {
 		return c.RenderJson(tirion.MessageReturnTag{Error: fmt.Sprintf("%+v", err)})
-	} else {
-		return c.RenderJson(tirion.MessageReturnTag{Error: ""})
 	}
+
+	return c.RenderJson(tirion.MessageReturnTag{Error: ""})
 }
 
-func (c *App) ProgramRunTags(programName string, runId int32) revel.Result {
-	run, err := app.Db.FindRun(programName, runId)
+func (c *App) ProgramRunTags(programName string, runID int32) revel.Result {
+	run, err := app.Db.FindRun(programName, runID)
 
 	if err != nil {
 		panic(err)
 	} else if run == nil {
-		return c.NotFound("Run %d of program \"%s\" does not exists", runId, programName)
+		return c.NotFound("Run %d of program \"%s\" does not exists", runID, programName)
 	}
 
 	tags, err := app.Db.SearchTagsOfRun(run)
-
 	if err != nil {
 		panic(err)
 	}

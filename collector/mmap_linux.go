@@ -7,7 +7,6 @@ package collector
 import "C"
 
 import (
-	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -38,7 +37,7 @@ func (c *CollectorMmap) InitAgent(pid int32, metricCount int32) (*url.URL, error
 
 func (c *CollectorMmap) InitClient(u *url.URL, metricCount int32) error {
 	if _, err := os.Stat(u.Path); os.IsNotExist(err) {
-		return errors.New(fmt.Sprintf("Cannot open mmap file: %v", err))
+		return fmt.Errorf("cannot open mmap file: %v", err)
 	}
 
 	return c.initMmap(u.Path, false, metricCount)
@@ -68,7 +67,7 @@ func (c *CollectorMmap) initMmap(filename string, create bool, count int32) erro
 	c.addr = C.mmapOpen(f, cr, C.long(count))
 
 	if c.addr == nil {
-		return errors.New("Cannot open mmap")
+		return fmt.Errorf("cannot open mmap")
 	}
 
 	return nil
@@ -95,7 +94,7 @@ func (c *CollectorMmap) Close() error {
 	}
 
 	if C.mmapClose(c.addr, f, cr, C.long(c.count)) != 0 {
-		return errors.New("Mmap close error")
+		return fmt.Errorf("mmap close error")
 	}
 
 	return nil

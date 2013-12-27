@@ -1,7 +1,6 @@
 package tirion
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"net"
@@ -18,7 +17,7 @@ import (
 // protocol between agent and client communication.
 const Version = "0.3"
 
-const tirion_tag_size = 513
+const tirionTagSize = 513
 
 // HighStockTag contains all data of a tag used with the HighStock library.
 type HighStockTag struct {
@@ -45,7 +44,7 @@ type Program struct {
 
 // Run contains all data of a run.
 type Run struct {
-	Id            int32
+	ID            int32
 	Name          string
 	SubName       string
 	Interval      int32
@@ -75,9 +74,9 @@ type Tirion struct {
 // CheckMetrics validates a array of metrics.
 func CheckMetrics(metrics []Metric) error {
 	if len(metrics) == 0 {
-		return errors.New("No metrics defined")
+		return fmt.Errorf("no metrics defined")
 	} else if len(metrics) >= math.MaxInt32 {
-		return errors.New(fmt.Sprintf("Maximum of %d metrics allowed", math.MaxInt32))
+		return fmt.Errorf("maximum of %d metrics allowed", math.MaxInt32)
 	}
 
 	var metricNameRegex = regexp.MustCompile("[^a-zA-Z0-9.-_]")
@@ -85,17 +84,17 @@ func CheckMetrics(metrics []Metric) error {
 
 	for i, m := range metrics {
 		if m.Name == "" {
-			return errors.New(fmt.Sprintf("No name defined for metric[%d]", i))
+			return fmt.Errorf("no name defined for metric[%d]", i)
 		} else if len(m.Name) > 256 {
-			return errors.New(fmt.Sprintf("Name of metric[%d] exceeds maximum of 256 characters", i))
+			return fmt.Errorf("name of metric[%d] exceeds maximum of 256 characters", i)
 		} else if metricNameRegex.MatchString(m.Name) {
-			return errors.New(fmt.Sprintf("Name  of metric[%d] uses illegal characters. Only a-z, A-Z, 0-9, ., - and _ are allowed!", i))
+			return fmt.Errorf("name  of metric[%d] uses illegal characters. Only a-z, A-Z, 0-9, ., - and _ are allowed", i)
 		} else if v, ok := metricNames[m.Name]; ok {
-			return errors.New(fmt.Sprintf("Name \"%s\" of metric[%d] alreay used for metric[%d]", m.Name, i, v))
+			return fmt.Errorf("name \"%s\" of metric[%d] alreay used for metric[%d]", m.Name, i, v)
 		} else if m.Type == "" {
-			return errors.New(fmt.Sprintf("No type defined for metric[%d]", i))
+			return fmt.Errorf("no type defined for metric[%d]", i)
 		} else if _, ok := metricTypes[m.Type]; !ok {
-			return errors.New(fmt.Sprintf("Unknown metric type \"%s\" for metric[%d]", m.Type, i))
+			return fmt.Errorf("unknown metric type \"%s\" for metric[%d]", m.Type, i)
 		}
 
 		metricNames[m.Name] = int32(i)
@@ -106,8 +105,8 @@ func CheckMetrics(metrics []Metric) error {
 
 // PrepareTag modifies a raw tag to a valid state.
 func PrepareTag(tag string) string {
-	if len(tag) > tirion_tag_size {
-		tag = tag[:tirion_tag_size]
+	if len(tag) > tirionTagSize {
+		tag = tag[:tirionTagSize]
 	}
 
 	return strings.Replace(tag, "\n", " ", -1)

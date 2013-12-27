@@ -1,7 +1,6 @@
 package tirion
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -52,79 +51,79 @@ func (c *TirionClient) Init() error {
 		}
 
 		return err
-	} else {
-		c.V("Request tirion protocol version v%s", Version)
-		if err := c.send("tirion v" + Version + "\t" + c.PreferredMetricProtocoll); err != nil {
+	}
+
+	c.V("Request tirion protocol version v%s", Version)
+	if err := c.send("tirion v" + Version + "\t" + c.PreferredMetricProtocoll); err != nil {
+		c.E(err.Error())
+
+		return err
+	}
+
+	m, err := c.receive()
+
+	switch err {
+	case nil:
+		var t = strings.SplitN(m, "\t", 2)
+
+		if len(t) == 1 || t[1] == "" {
+			err := fmt.Errorf("did not receive correct metric count and protocol URL")
+
 			c.E(err.Error())
 
 			return err
 		}
 
-		m, err := c.receive()
+		var metricCount, err = strconv.Atoi(t[0])
 
-		switch err {
-		case nil:
-			var t = strings.SplitN(m, "\t", 2)
-
-			if len(t) == 1 || t[1] == "" {
-				err := errors.New("Did not receive correct metric count and protocol URL")
-
-				c.E(err.Error())
-
-				return err
-			}
-
-			var metricCount, err = strconv.Atoi(t[0])
-
-			if err != nil {
-				c.E("Did not receive correct metric count")
-
-				return err
-			}
-
-			u, err := url.Parse(t[1])
-
-			if err != nil {
-				c.E("Did not receive correct protocol URL")
-
-				return err
-			}
-
-			c.V("Received metric count %d and protocol URL %v", metricCount, u)
-
-			c.metricsCollector, err = collector.NewCollector(u.Scheme)
-
-			if err != nil {
-				c.E("Cannot create metric collector")
-
-				return err
-			}
-
-			err = c.metricsCollector.InitClient(u, int32(metricCount))
-
-			if err != nil {
-				c.E("Cannot initialize metrics collector")
-
-				return err
-			}
-
-			c.V("Initialized metric collector %s", u.Scheme)
-
-			c.Running = true
-
-			// we want to handle commands not in the main thread
-			go c.handleCommands()
-		case io.EOF:
-			c.V("Unix socket got closed with EOF")
-
-			return err
-		default:
-			if strings.HasSuffix(err.Error(), "use of closed network connection") {
-				c.V("Unix socket suddenly got closed")
-			}
+		if err != nil {
+			c.E("Did not receive correct metric count")
 
 			return err
 		}
+
+		u, err := url.Parse(t[1])
+
+		if err != nil {
+			c.E("Did not receive correct protocol URL")
+
+			return err
+		}
+
+		c.V("Received metric count %d and protocol URL %v", metricCount, u)
+
+		c.metricsCollector, err = collector.NewCollector(u.Scheme)
+
+		if err != nil {
+			c.E("Cannot create metric collector")
+
+			return err
+		}
+
+		err = c.metricsCollector.InitClient(u, int32(metricCount))
+
+		if err != nil {
+			c.E("Cannot initialize metrics collector")
+
+			return err
+		}
+
+		c.V("Initialized metric collector %s", u.Scheme)
+
+		c.Running = true
+
+		// we want to handle commands not in the main thread
+		go c.handleCommands()
+	case io.EOF:
+		c.V("Unix socket got closed with EOF")
+
+		return err
+	default:
+		if strings.HasSuffix(err.Error(), "use of closed network connection") {
+			c.V("Unix socket suddenly got closed")
+		}
+
+		return err
 	}
 
 	return nil

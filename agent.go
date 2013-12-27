@@ -594,7 +594,7 @@ func (a *TirionAgent) Run() {
 							return
 						}
 
-						var c int64 = all.RSSize / 1024
+						c := all.RSSize / 1024
 
 						if c > a.program.limitMemory {
 							a.V("Limit reached. Program has %d out of %d allowed MB of memory.", c, a.program.limitMemory)
@@ -629,9 +629,9 @@ func (a *TirionAgent) Run() {
 				a.E("Unix socket got already closed")
 
 				return
-			} else {
-				a.sPanic(fmt.Sprintf("Accept %v", err))
 			}
+
+			a.sPanic(fmt.Sprintf("Accept %v", err))
 		}
 
 		clientVersion, err := a.receive()
@@ -666,18 +666,18 @@ func (a *TirionAgent) Run() {
 			a.sPanic(fmt.Sprintf("Cannot create metric collector: %v", err))
 		}
 
-		colUrl, err := a.metricsCollector.InitAgent(a.program.pid, int32(metricCount))
+		colURL, err := a.metricsCollector.InitAgent(a.program.pid, int32(metricCount))
 
 		if err != nil {
 			a.sPanic(fmt.Sprintf("Cannot initialize metric collector: %v", err))
 		}
 
-		a.V("Initialized metric collector %s", colUrl.Scheme)
+		a.V("Initialized metric collector %s", colURL.Scheme)
 
 		defer a.metricsCollector.Close()
 
-		a.V("Send metric count %d and metric protocol URL %s", metricCount, colUrl.String())
-		if err := a.send(fmt.Sprintf("%d\t%s", metricCount, colUrl.String())); err != nil {
+		a.V("Send metric count %d and metric protocol URL %s", metricCount, colURL.String())
+		if err := a.send(fmt.Sprintf("%d\t%s", metricCount, colURL.String())); err != nil {
 			a.sPanic(fmt.Sprintf("Send error: %v", err))
 		}
 	}

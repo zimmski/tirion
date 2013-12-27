@@ -46,7 +46,7 @@ func ReadIOArray(filename string) ([]string, error) {
 	var io = strings.Split(pIORaw, "\n")
 	io = io[:len(io)-1]
 
-	for i, _ := range io {
+	for i := range io {
 		io[i] = io[i][strings.Index(io[i], " "):]
 	}
 
@@ -76,7 +76,7 @@ func ParseIO(io string) (*ProcIO, error) {
 	ioRaw = ioRaw[:len(io)-1]
 	var r = make([]int64, len(ioRaw))
 
-	for i, _ := range r {
+	for i := range r {
 		r[i], _ = strconv.ParseInt(ioRaw[i][strings.Index(ioRaw[i], " "):], 10, 32)
 	}
 
