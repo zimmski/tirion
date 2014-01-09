@@ -12,7 +12,8 @@ The tirion-agent is the connective link between the client (your application) an
   -limit-memory=0: Limit the memory of the program and its children (in MB)
   -limit-memory-interval=5: Interval for checking the memory limit (in milliseconds)
   -limit-time=0: Limit the runtime of the program (in seconds)
-  -metrics-file="": Definition of needed program metrics
+  -metrics="": Definition of needed program metrics
+  -metrics-file="": Definition of needed program metrics as a JSON file
   -name="": The name of this run (defaults to exec)
   -pid=-1: PID of program which should be monitored
   -send-interval=5: How often data is pushed to the server (in seconds)
@@ -22,12 +23,21 @@ The tirion-agent is the connective link between the client (your application) an
   -verbose=false: Verbose output of what is going on
 ```
 
-The <code>-metrics-file</code> argument is required as well as <code>-pid</code> which monitors an existing process or <code>-exec</code> which starts a new one. To allow communication between client and agent, and therefore the exchange of internal metrics, the <code>-socket</code> argument is needed.
+The <code>-pid</code> which monitors an existing process or <code>-exec</code> which starts a new one are required. The <code>-metrics</code> or the <code>-metrics-file</code> arguments are required as well to define the metrics of the program. To allow communication between client and agent, and therefore the exchange of internal metrics, the <code>-socket</code> argument is needed.
+
+The <code>-metrics</code> argument has the following [EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form) format
+
+> metric = &lt;name> , "," , &lt;type> ;<br/>
+> metrics = metric | metrics , ";" , metric ;
+
+For example <code>proc.stat.utime,int;proc.statm.data,int</code> is a valid value for the <code>-metrics</code> argument. Please have a look at the [internal metrics](/#internal-metrics) section for valid metric types.
 
 Usage:
 
-* tirion-agent -pid <pid> -metrics-file <json file> [other options]
-* tirion-agent -exec <program> -metrics-file <json file> [other options]
+* tirion-agent -pid <pid> -metrics <metrics> [other options]
+* tirion-agent -pid <pid> -metrics-file <metrics json file> [other options]
+* tirion-agent -exec <program> -metrics-file <metrics> [other options]
+* tirion-agent -exec <program> -metrics-file <metrics json file> [other options]
 
 If no <code>-server</code> argument is used, the agent will write all data to STDOUT formatted as CSV.
 

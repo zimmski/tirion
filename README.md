@@ -121,6 +121,12 @@ Then issue the following command for letting the program <code>md5sum</code> run
 bin/tirion-agent -verbose -interval 50 -metrics-file metrics.json -exec md5sum -exec-arguments "/dev/random" -server "localhost:9000" -limit-time 10
 ```
 
+You can also define the metrics via the <code>-metrics</code> argument instead of creating a metrics file.
+
+```bash
+bin/tirion-agent -verbose -interval 50 -metrics "proc.stat.utime,int;proc.stat.stime,int;proc.statm.resident,int;proc.stat.num_threads,int" -exec md5sum -exec-arguments "/dev/random" -server "localhost:9000" -limit-time 10
+```
+
 After the command has finished open up the Tirion UI at [http://localhost:9000](http://localhost:9000). The program <code>md5sum</code> is now displayed in the program list. A click on it will lead you to the program's run list. Click on the available run to inspect it. This should present you with four different metrics which were defined via the metrics file. <code>proc.stat.utime</code> should display a stair line. <code>proc.stat.stime</code> should be linearly growing.
 
 ## How do I set up a Tirion infrastructure?

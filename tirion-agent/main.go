@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 	"time"
@@ -18,6 +20,7 @@ func main() {
 	var flagLimitMemory int
 	var flagLimitMemoryInterval int
 	var flagLimitTime int
+	var flagMetrics string
 	var flagMetricsFile string
 	var flagName string
 	var flagPid int
@@ -34,7 +37,8 @@ func main() {
 	flag.IntVar(&flagLimitMemory, "limit-memory", 0, "Limit the memory of the program and its children (in MB)")
 	flag.IntVar(&flagLimitMemoryInterval, "limit-memory-interval", 5, "Interval for checking the memory limit (in milliseconds)")
 	flag.IntVar(&flagLimitTime, "limit-time", 0, "Limit the runtime of the program (in seconds)")
-	flag.StringVar(&flagMetricsFile, "metrics-file", "", "Definition of needed program metrics")
+	flag.StringVar(&flagMetrics, "metrics", "", "Definition of needed program metrics")
+	flag.StringVar(&flagMetricsFile, "metrics-file", "", "Definition of needed program metrics as a JSON file")
 	flag.StringVar(&flagName, "name", "", "The name of this run (defaults to exec)")
 	flag.IntVar(&flagPid, "pid", -1, "PID of program which should be monitored")
 	flag.IntVar(&flagSendInterval, "send-interval", 5, "How often data is pushed to the server (in seconds)")
@@ -45,11 +49,13 @@ func main() {
 
 	flag.Parse()
 
-	if (flagPid == -1 && flagExec == "") || flagMetricsFile == "" || flagHelp {
+	if (flagPid == -1 && flagExec == "") || (flagMetrics == "" && flagMetricsFile == "") || flagHelp {
 		fmt.Printf("Tirion agent v%s\n", tirion.Version)
 		fmt.Printf("usage:\n")
-		fmt.Printf("\t%s -pid <pid> -metrics-file <json file> [other options]\n", os.Args[0])
-		fmt.Printf("\t%s -exec <program> -metrics-file <json file> [other options]\n", os.Args[0])
+		fmt.Printf("\t%s -pid <pid> -metrics <metrics> [other options]\n", os.Args[0])
+		fmt.Printf("\t%s -pid <pid> -metrics-file <metrics json file> [other options]\n", os.Args[0])
+		fmt.Printf("\t%s -exec <program> -metrics <metrics> [other options]\n", os.Args[0])
+		fmt.Printf("\t%s -exec <program> -metrics-file <metrics json file> [other options]\n", os.Args[0])
 		fmt.Printf("options\n")
 		flag.PrintDefaults()
 		fmt.Printf("\n")
@@ -90,13 +96,41 @@ func main() {
 		execArguments = strings.Split(flagExecArguments, " ")
 	}
 
+	var metrics []tirion.Metric
+
+	if flagMetrics != "" {
+		metrics = make([]tirion.Metric, 0)
+
+		for _, m := range strings.Split(flagMetrics, ";") {
+			mi := strings.Split(m, ",")
+
+			if len(mi) != 2 {
+				panic("wrong format for metrics argument")
+			}
+
+			metrics = append(metrics, tirion.Metric{Name: mi[0], Type: mi[1]})
+		}
+	} else {
+		jsonFile, err := ioutil.ReadFile(flagMetricsFile)
+
+		if err != nil {
+			panic(fmt.Sprintf("Read metrics file: %v", err))
+		}
+
+		err = json.Unmarshal(jsonFile, &metrics)
+
+		if err != nil {
+			panic(fmt.Sprintf("Parse metrics file: %v", err))
+		}
+	}
+
 	a := tirion.NewTirionAgent(
 		flagName,
 		flagSubName,
 		flagServer,
 		int32(flagSendInterval),
 		int32(flagPid),
-		flagMetricsFile,
+		metrics,
 		flagExec,
 		execArguments,
 		int32(flagInterval),

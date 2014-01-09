@@ -47,7 +47,6 @@ type TirionAgent struct {
 	metricsExternalStat  map[int32]int32
 	metricsExternalStatm map[int32]int32
 	metricsInternal      []int32
-	metricsFilename      string
 	name                 string
 	run                  int32
 	sendInterval         int32
@@ -59,7 +58,7 @@ type TirionAgent struct {
 }
 
 // NewTirionAgent allocates a new TirionAgent object
-func NewTirionAgent(name string, subName string, server string, sendInterval int32, pid int32, metricsFilename string, exec string, execArguments []string, interval int32, socket string, verbose bool, limitMemory int64, limitMemoryInterval int32, limitTime int32) *TirionAgent {
+func NewTirionAgent(name string, subName string, server string, sendInterval int32, pid int32, metrics []Metric, exec string, execArguments []string, interval int32, socket string, verbose bool, limitMemory int64, limitMemoryInterval int32, limitTime int32) *TirionAgent {
 	var rBadChars = regexp.MustCompile(`[\/]`)
 
 	name = rBadChars.ReplaceAllLiteralString(name, "-")
@@ -70,12 +69,12 @@ func NewTirionAgent(name string, subName string, server string, sendInterval int
 			verbose:   verbose,
 			logPrefix: "[agent]",
 		},
-		name:            name,
-		subName:         subName,
-		server:          server,
-		sendInterval:    sendInterval,
-		interval:        interval,
-		metricsFilename: metricsFilename,
+		name:         name,
+		subName:      subName,
+		server:       server,
+		sendInterval: sendInterval,
+		interval:     interval,
+		metrics:      metrics,
 		program: execProgram{
 			pid:                 pid,
 			exec:                exec,
@@ -134,21 +133,9 @@ func (a *TirionAgent) closeSocket() {
 
 // Init initializes the agent
 func (a *TirionAgent) Init() {
+	var err error
+
 	a.initSigHandler()
-
-	a.V("Read metrics file %s", a.metricsFilename)
-
-	jsonFile, err := ioutil.ReadFile(a.metricsFilename)
-
-	if err != nil {
-		a.sPanic(fmt.Sprintf("Read metrics file: %v", err))
-	}
-
-	err = json.Unmarshal(jsonFile, &a.metrics)
-
-	if err != nil {
-		a.sPanic(fmt.Sprintf("Parse metrics file: %v", err))
-	}
 
 	if err := CheckMetrics(a.metrics); err != nil {
 		a.sPanic(err.Error())
