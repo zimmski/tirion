@@ -18,7 +18,7 @@ func main() {
 	var flagLimitMemory int
 	var flagLimitMemoryInterval int
 	var flagLimitTime int
-	var flagMetricsFilename string
+	var flagMetricsFile string
 	var flagName string
 	var flagPid int
 	var flagSendInterval int
@@ -34,7 +34,7 @@ func main() {
 	flag.IntVar(&flagLimitMemory, "limit-memory", 0, "Limit the memory of the program and its children (in MB)")
 	flag.IntVar(&flagLimitMemoryInterval, "limit-memory-interval", 5, "Interval for checking the memory limit (in milliseconds)")
 	flag.IntVar(&flagLimitTime, "limit-time", 0, "Limit the runtime of the program (in seconds)")
-	flag.StringVar(&flagMetricsFilename, "metrics-filename", "", "Definition of needed program metrics")
+	flag.StringVar(&flagMetricsFile, "metrics-file", "", "Definition of needed program metrics")
 	flag.StringVar(&flagName, "name", "", "The name of this run (defaults to exec)")
 	flag.IntVar(&flagPid, "pid", -1, "PID of program which should be monitored")
 	flag.IntVar(&flagSendInterval, "send-interval", 5, "How often data is pushed to the server (in seconds)")
@@ -45,11 +45,11 @@ func main() {
 
 	flag.Parse()
 
-	if (flagPid == -1 && flagExec == "") || flagMetricsFilename == "" || flagHelp {
+	if (flagPid == -1 && flagExec == "") || flagMetricsFile == "" || flagHelp {
 		fmt.Printf("Tirion agent v%s\n", tirion.Version)
 		fmt.Printf("usage:\n")
-		fmt.Printf("\t%s -pid <pid> -metrics-filename <json file> [other options]\n", os.Args[0])
-		fmt.Printf("\t%s -exec <program> -metrics-filename <json file> [other options]\n", os.Args[0])
+		fmt.Printf("\t%s -pid <pid> -metrics-file <json file> [other options]\n", os.Args[0])
+		fmt.Printf("\t%s -exec <program> -metrics-file <json file> [other options]\n", os.Args[0])
 		fmt.Printf("options\n")
 		flag.PrintDefaults()
 		fmt.Printf("\n")
@@ -96,7 +96,7 @@ func main() {
 		flagServer,
 		int32(flagSendInterval),
 		int32(flagPid),
-		flagMetricsFilename,
+		flagMetricsFile,
 		flagExec,
 		execArguments,
 		int32(flagInterval),

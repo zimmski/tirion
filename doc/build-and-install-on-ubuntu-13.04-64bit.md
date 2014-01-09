@@ -94,7 +94,7 @@ revel run github.com/zimmski/tirion/tirion-server dev
 This start the HTTP server on port 9000. Now open up a new terminal for the following command.
 
 ```bash
-tirion-agent -verbose -interval 100 -metrics-filename $GOPATH/src/github.com/zimmski/tirion/clients/example-metrics.json -exec go-client -exec-arguments "-verbose -runtime 2" -socket /tmp/tirion.sock -server "localhost:9000"
+tirion-agent -verbose -interval 100 -metrics-file $GOPATH/src/github.com/zimmski/tirion/clients/example-metrics.json -exec go-client -exec-arguments "-verbose -runtime 2" -socket /tmp/tirion.sock -server "localhost:9000"
 ```
 
 After the agent has finished you can look at the results via the HTTP server [http://localhost:9000](http://localhost:9000).
