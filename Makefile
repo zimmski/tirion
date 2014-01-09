@@ -4,6 +4,7 @@ clean:
 	rm -fr $(GOPATH)/pkg/*/github.com/zimmski/tirion*
 
 	go clean github.com/zimmski/tirion
+	go clean github.com/zimmski/tirion/backend
 	go clean github.com/zimmski/tirion/tirion-agent
 	go clean github.com/zimmski/tirion/tirion-server
 
@@ -43,6 +44,8 @@ java-lib:
 python-lib:
 	make -C $(GOPATH)/src/github.com/zimmski/tirion/clients/python-client lib
 lint:
+	go install github.com/zimmski/tirion/backend
+
 	go tool vet -all=true -v=true $(GOPATH)/src/github.com/zimmski/tirion
 	golint $(GOPATH)/src/github.com/zimmski/tirion
 tirion-agent:
