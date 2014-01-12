@@ -22,9 +22,7 @@ void *tirionThreadHandleCommands(void* arg);
 
 long tirionShmInit(Tirion *tirion, const char *filename, long count);
 long tirionShmClose(Tirion *tirion);
-float tirionShmGet(Tirion *tirion, long i);
 long tirionShmRead(Tirion *tirion);
-void tirionShmSet(Tirion *tirion, long i, float v);
 
 long tirionSocketReceive(Tirion *tirion, char *buf, long size);
 long tirionSocketSend(Tirion *tirion, const char *msg);
@@ -45,6 +43,7 @@ struct TirionPrivateStruct {
 	TirionShm shm;
 	char *socket;
 	pthread_t *tHandleCommands;
+	pthread_mutex_t lock;
 };
 
 Tirion *tirionNew(const char *socket, bool verbose) {
@@ -73,6 +72,12 @@ long tirionInit(Tirion *tirion) {
 
 		return TIRION_ERROR_SET_SID;
 	}
+
+	if (pthread_mutex_init(&tirion->p->lock, NULL) != 0) {
+        tirionE(tirion, "lcok create error");
+
+        return TIRION_ERROR_LOCK_CREATE;
+    }
 
 	tirionV(tirion, "Open unix socket to %s", tirion->p->socket);
 
@@ -166,6 +171,7 @@ long tirionClose(Tirion *tirion) {
 	if ((err = tirionShmClose(tirion)) != TIRION_OK) {
 		return err;
 	}
+	pthread_mutex_destroy(&tirion->p->lock);
 	if (shutdown(tirion->p->fd, SHUT_RDWR) == -1) {
 		tirionE(tirion, "Cannot shutdown socket");
 
@@ -252,14 +258,6 @@ long tirionShmClose(Tirion *tirion) {
 	return TIRION_OK;
 }
 
-float tirionShmGet(Tirion *tirion, long i) {
-	if (i < 0 || i >= tirion->p->metricCount) {
-		return 0.0f;
-	}
-
-	return tirion->p->shm.addr[i];
-}
-
 long tirionShmRead(Tirion *tirion) {
 	if (tirion->p->shm.id <= 0) {
 		tirionE(tirion, "Shm is not initialized");
@@ -280,12 +278,26 @@ long tirionShmRead(Tirion *tirion) {
 	return TIRION_OK;
 }
 
-void tirionShmSet(Tirion *tirion, long i, float v) {
+float tirionGet(Tirion *tirion, long i) {
 	if (i < 0 || i >= tirion->p->metricCount) {
-		return;
+		return 0.0f;
 	}
 
-	tirion->p->shm.addr[i] = v;
+	return tirion->p->shm.addr[i];
+}
+
+float tirionSet(Tirion *tirion, long i, float v) {
+	if (i < 0 || i >= tirion->p->metricCount) {
+		return 0.0f;
+	}
+
+	pthread_mutex_lock(&tirion->p->lock);
+
+	float ret = tirion->p->shm.addr[i] = v;
+
+	pthread_mutex_unlock(&tirion->p->lock);
+
+	return ret;
 }
 
 float tirionAdd(Tirion *tirion, long i, float v) {
@@ -293,7 +305,13 @@ float tirionAdd(Tirion *tirion, long i, float v) {
 		return 0.0f;
 	}
 
-	return tirion->p->shm.addr[i] = (tirion->p->shm.addr[i] + v);
+	pthread_mutex_lock(&tirion->p->lock);
+
+	float ret = tirion->p->shm.addr[i] = (tirion->p->shm.addr[i] + v);
+
+	pthread_mutex_unlock(&tirion->p->lock);
+
+	return ret;
 }
 
 float tirionDec(Tirion *tirion, long i) {

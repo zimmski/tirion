@@ -110,6 +110,43 @@ class Client:
 
 		self.__metric_lock = None
 
+	def get(self, index):
+		"""Return the current value of a metric
+
+		@param index the index of the metric
+
+		@return the value of the metric
+		"""
+
+		if index < 0 or index >= self.__count or self.__metric_lock is None or self.__metrics is None:
+			return 0.0
+
+		return self.__metrics[index]
+
+	def set(self, index, value):
+		"""Set a value for a metric
+
+		@param index the index of the metric
+		@param value the value to be set to the metric
+
+		@return the new value of the metric
+		"""
+
+		if index < 0 or index >= self.__count or self.__metric_lock is None:
+			return 0.0
+
+		ret = 0.0
+
+		self.__metric_lock.acquire()
+
+		if self.__metrics is not None:
+			ret = value
+			self.__metrics[index] = ret
+
+		self.__metric_lock.release()
+
+		return ret
+
 	def add(self, index, value):
 		"""Add a value to a metric
 

@@ -22,6 +22,8 @@ Internal metric indices are defined via a [metric file](/#metric-file) which is 
 
 The following functions can be used on the object to interact with metrics and tags. Have a look at the [API](#api) section for a more complete documentation.
 
+* <code>Get(i int)</code>
+* <code>Set(i int, v float32)</code>
 * <code>Add(i int, v float32)</code>
 * <code>Dec(i int)</code>
 * <code>Inc(i int)</code>

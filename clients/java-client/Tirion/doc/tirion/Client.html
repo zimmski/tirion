@@ -197,20 +197,33 @@ extends java.lang.Object</pre>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>float</code></td>
+<td class="colLast"><code><strong><a href="../tirion/Client.html#get(int)">get</a></strong>(int&nbsp;i)</code>
+<div class="block">Return the current value of a metric</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>float</code></td>
 <td class="colLast"><code><strong><a href="../tirion/Client.html#inc(int)">inc</a></strong>(int&nbsp;i)</code>
 <div class="block">Increment a metric by 1.0</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../tirion/Client.html#init()">init</a></strong>()</code>
 <div class="block">Initialize a Tirion client object</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><strong><a href="../tirion/Client.html#running()">running</a></strong>()</code>
 <div class="block">States if the Tirion Client object is running</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>float</code></td>
+<td class="colLast"><code><strong><a href="../tirion/Client.html#set(int, float)">set</a></strong>(int&nbsp;i,
+   float&nbsp;v)</code>
+<div class="block">Set a value for a metric</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -331,6 +344,31 @@ extends java.lang.Object</pre>
 <h4>destroy</h4>
 <pre>public&nbsp;void&nbsp;destroy()</pre>
 <div class="block">Cleanup everything that was allocated by the Tirion client object</div>
+</li>
+</ul>
+<a name="get(int)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>get</h4>
+<pre>public&nbsp;float&nbsp;get(int&nbsp;i)</pre>
+<div class="block">Return the current value of a metric</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>i</code> - the index of the metric</dd>
+<dt><span class="strong">Returns:</span></dt><dd>the value of the metric</dd></dl>
+</li>
+</ul>
+<a name="set(int, float)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>set</h4>
+<pre>public&nbsp;float&nbsp;set(int&nbsp;i,
+        float&nbsp;v)</pre>
+<div class="block">Set a value for a metric</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>i</code> - the index of the metric</dd><dd><code>v</code> - the value to be set for the metric</dd>
+<dt><span class="strong">Returns:</span></dt><dd>the new value of the metric</dd></dl>
 </li>
 </ul>
 <a name="add(int, float)">

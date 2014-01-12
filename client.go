@@ -37,7 +37,7 @@ func (c *TirionClient) Init() error {
 	var err error
 
 	if r, err := syscall.Setsid(); r == -1 {
-		c.E("Cannot set new session and group id of process: %v")
+		c.E("Cannot set new session and group id of process: %v", err)
 
 		return err
 	}
@@ -191,6 +191,16 @@ func (c *TirionClient) handleCommands() {
 	}
 
 	c.V("Stop listening to commands")
+}
+
+// Get returns the current value of a metric
+func (c *TirionClient) Get(i int32) float32 {
+	return c.metricsCollector.Get(i)
+}
+
+// Set sets a value for a metric
+func (c *TirionClient) Set(i int32, v float32) float32 {
+	return c.metricsCollector.Set(i, v)
 }
 
 // Add adds a value to a metric

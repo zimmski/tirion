@@ -31,7 +31,7 @@ int main (int argc, char **argv) {
 
 	bool flagHelp = false;
 	int flagRuntime = 5;
-	char *flagSocket = "/tmp/tirion.sock";
+	const char *flagSocket = "/tmp/tirion.sock";
 	bool flagVerbose = false;
 
 	char c;
@@ -98,6 +98,7 @@ int main (int argc, char **argv) {
 				tirionDec(tirion, 1);
 				tirionAdd(tirion, 2, 0.3);
 				tirionSub(tirion, 3, 0.3);
+				tirionSet(tirion, 4, tirionGet(tirion, 4) + 4.0);
 
 				usleep(10 * 1000);
 

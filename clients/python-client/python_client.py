@@ -42,6 +42,7 @@ def main():
 		tirion_client.dec(1)
 		tirion_client.add(2, 0.3)
 		tirion_client.sub(3, 0.3)
+		tirion_client.set(4, tirion_client.get(4) + 4.0)
 
 		time.sleep(0.01)
 

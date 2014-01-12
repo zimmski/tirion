@@ -111,6 +111,12 @@ def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtirion_1_1client_1_1Client.html#a5e9e8023d7999a7b4bf9155dac6ac6de">destroy</a></td></tr>
 <tr class="memdesc:a5e9e8023d7999a7b4bf9155dac6ac6de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cleanup everything that was allocated by the Tirion client object. <br/></td></tr>
 <tr class="separator:a5e9e8023d7999a7b4bf9155dac6ac6de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac1e15efe3aa88104840faaaa4153b0f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtirion_1_1client_1_1Client.html#aac1e15efe3aa88104840faaaa4153b0f">get</a></td></tr>
+<tr class="memdesc:aac1e15efe3aa88104840faaaa4153b0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current value of a metric.  <a href="#aac1e15efe3aa88104840faaaa4153b0f">More...</a><br/></td></tr>
+<tr class="separator:aac1e15efe3aa88104840faaaa4153b0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14af09942601a32322e0bee4db2b1433"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtirion_1_1client_1_1Client.html#a14af09942601a32322e0bee4db2b1433">set</a></td></tr>
+<tr class="memdesc:a14af09942601a32322e0bee4db2b1433"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a value for a metric.  <a href="#a14af09942601a32322e0bee4db2b1433">More...</a><br/></td></tr>
+<tr class="separator:a14af09942601a32322e0bee4db2b1433"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3a13be0ee99203c91cac07514c0acb3"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtirion_1_1client_1_1Client.html#ae3a13be0ee99203c91cac07514c0acb3">add</a></td></tr>
 <tr class="memdesc:ae3a13be0ee99203c91cac07514c0acb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a value to a metric.  <a href="#ae3a13be0ee99203c91cac07514c0acb3">More...</a><br/></td></tr>
 <tr class="separator:ae3a13be0ee99203c91cac07514c0acb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -343,6 +349,41 @@ def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 
 </div>
 </div>
+<a class="anchor" id="aac1e15efe3aa88104840faaaa4153b0f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def tirion.client.Client.get </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the current value of a metric. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>the index of the metric</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the value of the metric </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a1928c7286d52aa1bef3c5a04e4523176"></a>
 <div class="memitem">
 <div class="memproto">
@@ -394,6 +435,48 @@ def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 
 <p>States if the Tirion <a class="el" href="classtirion_1_1client_1_1Client.html" title="Tirion client. ">Client</a> object is running. </p>
 <dl class="section return"><dt>Returns</dt><dd>running state </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a14af09942601a32322e0bee4db2b1433"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def tirion.client.Client.set </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>self</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set a value for a metric. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">index</td><td>the index of the metric </td></tr>
+    <tr><td class="paramname">value</td><td>the value to be set to the metric</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the new value of the metric </dd></dl>
 
 </div>
 </div>

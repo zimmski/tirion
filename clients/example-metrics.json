@@ -20,6 +20,10 @@
       "type" : "float"
    },
    {
+      "name" : "e",
+      "type" : "float"
+   },
+   {
       "name" : "proc.statm.data",
       "type" : "int"
    },

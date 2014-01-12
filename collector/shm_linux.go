@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"sync"
 	"unsafe"
 )
 
@@ -18,6 +19,7 @@ type CollectorShm struct {
 	create bool
 	addr   *C.float
 	count  int32
+	lock   sync.Mutex
 }
 
 func (c *CollectorShm) InitAgent(pid int32, metricCount int32) (*url.URL, error) {
@@ -107,7 +109,13 @@ func (c *CollectorShm) Set(i int32, v float32) float32 {
 		return 0.0
 	}
 
-	return float32(C.shmSet(c.addr, C.long(i), C.float(v)))
+	c.lock.Lock()
+
+	ret := float32(C.shmSet(c.addr, C.long(i), C.float(v)))
+
+	c.lock.Unlock()
+
+	return ret
 }
 
 func (c *CollectorShm) Add(i int32, v float32) float32 {
@@ -115,7 +123,13 @@ func (c *CollectorShm) Add(i int32, v float32) float32 {
 		return 0.0
 	}
 
-	return float32(C.shmAdd(c.addr, C.long(i), C.float(v)))
+	c.lock.Lock()
+
+	ret := float32(C.shmAdd(c.addr, C.long(i), C.float(v)))
+
+	c.lock.Unlock()
+
+	return ret
 }
 
 func (c *CollectorShm) Dec(i int32) float32 {

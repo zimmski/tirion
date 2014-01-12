@@ -24,8 +24,6 @@
 
 ## Client libraries
 
-* Use a lock with all metrics related like in the Java and Python library
-* Add "get" and "set" functions for metrics
 * Use a queue for receive like in Java library. Otherwise more than one command during one receive would be lost.
 * Init functions must handle open connections of all their members -> only start disconnected members
 * Sockets can reconnect

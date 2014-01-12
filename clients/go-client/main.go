@@ -59,6 +59,7 @@ func main() {
 		c.Dec(1)
 		c.Add(2, 0.3)
 		c.Sub(3, 0.3)
+		c.Set(4, c.Get(4)+4)
 
 		time.Sleep(10 * time.Millisecond)
 

@@ -20,6 +20,7 @@
  */
 enum {
 	TIRION_OK,                            /**< everything is ok */
+	TIRION_ERROR_LOCK_CREATE,             /**< could not create metrics lock */
 	TIRION_ERROR_METRIC_COUNT,            /**< did not receive a correct metric count */
 	TIRION_ERROR_METRIC_URL,              /**< did not receive a correct metric protocol URL */
 	TIRION_ERROR_SET_SID,                 /**< could not create a new process session and group id */
@@ -109,6 +110,27 @@ long tirionClose(Tirion *tirion);
  *    - TIRION_OK everything is ok
  */
 long tirionDestroy(Tirion *tirion);
+
+/**
+ * Return the current value of a metric
+ *
+ * @param tirion the Tirion object
+ * @param i the index of the metric
+ *
+ * @return the value of the metric
+ */
+float tirionGet(Tirion *tirion, long i);
+
+/**
+ * Set a value for a metric
+ *
+ * @param tirion the Tirion object
+ * @param i the index of the metric
+ * @param v the value to be set to the metric
+ *
+ * @return the new value of the metric
+ */
+float tirionSet(Tirion *tirion, long i, float v);
 
 /**
  * Add a value to a metric

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"sync"
 	"unsafe"
 )
 
@@ -18,6 +19,7 @@ type CollectorMmap struct {
 	count    int32
 	create   bool
 	filename string
+	lock     sync.Mutex
 }
 
 func (c *CollectorMmap) InitAgent(pid int32, metricCount int32) (*url.URL, error) {
@@ -100,12 +102,40 @@ func (c *CollectorMmap) Close() error {
 	return nil
 }
 
+func (c *CollectorMmap) Get(i int32) float32 {
+	if i < 0 || i >= c.count {
+		return 0.0
+	}
+
+	return float32(C.mmapGet(c.addr, C.long(i)))
+}
+
+func (c *CollectorMmap) Set(i int32, v float32) float32 {
+	if i < 0 || i >= c.count {
+		return 0.0
+	}
+
+	c.lock.Lock()
+
+	ret := float32(C.mmapSet(c.addr, C.long(i), C.float(v)))
+
+	c.lock.Unlock()
+
+	return ret
+}
+
 func (c *CollectorMmap) Add(i int32, v float32) float32 {
 	if i < 0 || i >= c.count {
 		return 0.0
 	}
 
-	return float32(C.mmapAdd(c.addr, C.long(i), C.float(v)))
+	c.lock.Lock()
+
+	ret := float32(C.mmapAdd(c.addr, C.long(i), C.float(v)))
+
+	c.lock.Unlock()
+
+	return ret
 }
 
 func (c *CollectorMmap) Dec(i int32) float32 {

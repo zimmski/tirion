@@ -63,6 +63,14 @@ void mmapCopy(float* from, float* to, long count) {
 	}
 }
 
+float mmapGet(float* addr, long i) {
+	return addr[i];
+}
+
+float mmapSet(float *addr, long i, float v) {
+	return addr[i] = v;
+}
+
 float mmapAdd(float* addr, long i, float v) {
 	return addr[i] = (addr[i] + v);
 }

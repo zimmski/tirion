@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['tirion_5ferror_5flock_5fcreate',['TIRION_ERROR_LOCK_CREATE',['../tirion_8h.html#a06fc87d81c62e9abb8790b6e5713c55ba0175e4854b45e7dd38a2501c33afd6e0',1,'tirion.h']]],
   ['tirion_5ferror_5fmetric_5fcount',['TIRION_ERROR_METRIC_COUNT',['../tirion_8h.html#a06fc87d81c62e9abb8790b6e5713c55bacfb90a8b6887af3425b6b8579a88c7f8',1,'tirion.h']]],
   ['tirion_5ferror_5fmetric_5furl',['TIRION_ERROR_METRIC_URL',['../tirion_8h.html#a06fc87d81c62e9abb8790b6e5713c55ba0e913bb0017081520cd08c2769a7c38d',1,'tirion.h']]],
   ['tirion_5ferror_5fset_5fsid',['TIRION_ERROR_SET_SID',['../tirion_8h.html#a06fc87d81c62e9abb8790b6e5713c55ba66d896aa49389fe1b98e47309b2faab0',1,'tirion.h']]],

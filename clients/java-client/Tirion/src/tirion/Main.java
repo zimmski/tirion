@@ -101,6 +101,7 @@ public class Main {
 			t.dec(1);
 			t.add(2, 0.3f);
 			t.sub(3, 0.3f);
+			t.set(4, t.get(4) + 4);
 
 			Thread.sleep(10);
 

@@ -11,6 +11,9 @@ type Collector interface {
 	Data() []float32
 	Close() error
 
+	Get(i int32) float32
+	Set(i int32, v float32) float32
+
 	Add(i int32, v float32) float32
 	Dec(i int32) float32
 	Inc(i int32) float32

@@ -147,6 +147,47 @@ public class Client {
 	}
 
 	/**
+	 * Return the current value of a metric
+	 *
+	 * @param i the index of the metric
+	 *
+	 * @return the value of the metric
+	 */
+	public float get(int i) {
+		return (this.metrics != null) ? this.metrics.get(i) : 0.0f;
+	}
+
+	/**
+	 * Set a value for a metric
+	 *
+	 * @param i the index of the metric
+	 * @param v the value to be set for the metric
+	 *
+	 * @return the new value of the metric
+	 */
+	public float set(int i, float v) {
+		if (i < 0 || i >= this.count) {
+			return 0.0f;
+		}
+
+		float ret = 0.0f;
+
+		this.metricLock.lock();
+
+		try {
+			if (this.metrics != null) {
+				ret = v;
+
+				this.metrics.put(i, ret);
+			}
+		} finally {
+			this.metricLock.unlock();
+		}
+
+		return ret;
+	}
+
+	/**
 	 * Add a value to a metric
 	 *
 	 * @param i the index of the metric

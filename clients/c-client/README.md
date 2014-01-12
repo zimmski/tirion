@@ -12,6 +12,8 @@ Internal metric indices are defined via a [metric file](/#metric-file) which is 
 
 The following functions can be used to interact with metrics and tags. Have a look at the [API](#api) section for a more complete documentation.
 
+* <code>tirionGet(Tirion *tirion, int i)</code>
+* <code>tirionSet(Tirion *tirion, int i, float v)</code>
 * <code>tirionAdd(Tirion *tirion, int i, float v)</code>
 * <code>tirionDec(Tirion *tirion, int i)</code>
 * <code>tirionInc(Tirion *tirion, int i)</code>

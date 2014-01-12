@@ -18,6 +18,8 @@ Internal metric indices are defined via a [metric file](/#metric-file) which is 
 
 The following functions can be used to interact with metrics and tags. Have a look at the [API](#api) section for a more complete documentation.
 
+* <code>get(index)</code>
+* <code>set(index, value)</code>
 * <code>add(index, value)</code>
 * <code>dec(index)</code>
 * <code>inc(index)</code>
