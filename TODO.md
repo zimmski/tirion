@@ -8,7 +8,6 @@
 
 ## Agent
 
-* Use the time of the agent for metrics and tags NOT the time of the server. This makes the metric timestamps more exact because of HTTP and server delays.
 * A program is monitored as long as the process of the program is alive and not as long as the socket.
 * Make memory reports more accurate (especially for multi process programs)
 	* Convert all memory metrics to KiloByte
