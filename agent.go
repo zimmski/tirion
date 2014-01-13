@@ -300,8 +300,7 @@ func (a *TirionAgent) handleCommands(c chan<- bool) {
 func (a *TirionAgent) handleMessages(c chan<- bool) {
 	a.V("Start handling messages")
 
-	var arr = make([]string, len(a.metrics))
-	var emptyMetric = make([]string, len(a.metrics))
+	var currentMetrics = make([]string, len(a.metrics))
 
 	var metrics []MessageData
 	var metricsQueue chan MessageData
@@ -391,17 +390,17 @@ func (a *TirionAgent) handleMessages(c chan<- bool) {
 		case MessageData:
 			if a.writerCSV != nil {
 				for i, v := range m.Data {
-					arr[i] = strconv.FormatFloat(float64(v), 'f', 3, 32)
+					currentMetrics[i] = strconv.FormatFloat(float64(v), 'f', 3, 32)
 				}
 
-				a.writerCSV.Write(append([]string{strconv.FormatInt(m.Time.UnixNano(), 10), ""}, arr...))
+				a.writerCSV.Write(append([]string{strconv.FormatInt(m.Time.UnixNano(), 10), ""}, currentMetrics...))
 				a.writerCSV.Flush()
 			} else {
 				metricsQueue <- m
 			}
 		case MessageTag:
 			if a.writerCSV != nil {
-				a.writerCSV.Write(append([]string{strconv.FormatInt(m.Time.UnixNano(), 10), m.Tag}, emptyMetric...))
+				a.writerCSV.Write(append([]string{strconv.FormatInt(m.Time.UnixNano(), 10), m.Tag}, currentMetrics...))
 				a.writerCSV.Flush()
 			} else {
 				a.D("Send tag to server %+v", m)
