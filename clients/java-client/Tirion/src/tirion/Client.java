@@ -342,29 +342,25 @@ public class Client {
 	}
 
 	private synchronized String receive() throws Exception {
-		if (this.netInQueue.size() != 0) {
-			return this.netInQueue.pop();
-		} else {
-			while (this.netInQueue.size() == 0) {
-				byte[] buf = new byte[Client.TirionBufferSize];
+		while (this.netInQueue.size() == 0) {
+			byte[] buf = new byte[Client.TirionBufferSize];
 
-				final int ret = this.netIn.read(buf, 0, Client.TirionBufferSize - 1);
+			final int ret = this.netIn.read(buf, 0, Client.TirionBufferSize - 1);
 
-				if (ret == -1) {
-					throw new Exception("End of the stream");
-				}
-
-				final String s = new String(buf, 0, ret);
-
-				for (String i : s.split("\n")) {
-					if (i.length() != 0) {
-						this.netInQueue.push(i);
-					}
-				}
+			if (ret == -1) {
+				throw new Exception("End of the stream");
 			}
 
-			return this.netInQueue.pop();
+			final String s = new String(buf, 0, ret);
+
+			for (String i : s.split("\n")) {
+				if (i.length() != 0) {
+					this.netInQueue.push(i);
+				}
+			}
 		}
+
+		return this.netInQueue.poll();
 	}
 
 	private void send(String msg) throws IOException {
