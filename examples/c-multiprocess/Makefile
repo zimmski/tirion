@@ -3,7 +3,8 @@ BB = $(GOPATH)/src/github.com/zimmski/tirion/examples/c-multiprocess
 LD = $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client
 LIBS = -lm -lpthread -ltirion
 CC = clang
-CFLAGS = -Wall -Wextra -W -g
+CFLAGS = -W -g
+CWFLAGS = -Wall -Weverything
 
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 HEADERS = $(wildcard *.h)
@@ -18,7 +19,7 @@ all: $(PROG)
 
 $(PROG): $(OBJECTS)
 	mkdir -p $(GOPATH)/bin
-	$(CC) $(CFLAGS) -L $(LD) $(OBJECTS) $(LIBS) -o $(GOPATH)/bin/$@
+	$(CC) $(CWFLAGS) $(CFLAGS) -L $(LD) $(OBJECTS) $(LIBS) -o $(GOPATH)/bin/$@
 
 clean:
 	echo $(BB)
@@ -26,5 +27,6 @@ clean:
 	-rm -f $(GOPATH)/bin/$(PROG)
 
 gcc: CC = gcc
+gcc: CWFLAGS = -Wall -Wextra
 gcc: all
 

@@ -2,7 +2,8 @@ PROG = c-client
 BB = $(GOPATH)/src/github.com/zimmski/tirion/clients/c-client
 LIBS = -lm -lpthread
 CC = clang
-CFLAGS = -Wall -Wextra -W -g
+CFLAGS = -W -g
+CWFLAGS = -Wall -Weverything
 
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 HEADERS = $(wildcard *.h)
@@ -13,11 +14,11 @@ HEADERS = $(wildcard *.h)
 all: $(PROG)
 
 %.o: %.c $(HEADERS)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CWFLAGS) $(CFLAGS) -c $< -o $@
 
 $(PROG): $(OBJECTS)
 	mkdir -p $(GOPATH)/bin
-	$(CC) $(CFLAGS) $(OBJECTS) $(LIBS) -o $(GOPATH)/bin/$@
+	$(CC) $(CWFLAGS) $(CFLAGS) $(OBJECTS) $(LIBS) -o $(GOPATH)/bin/$@
 
 doc:
 	cd $(BB)/doc ;\
@@ -29,6 +30,7 @@ clean:
 	-rm -f $(GOPATH)/bin/$(PROG)
 
 gcc: CC = gcc
+gcc: CWFLAGS = -Wall -Wextra
 gcc: all
 
 lib: tirion.o
