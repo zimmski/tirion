@@ -1,4 +1,4 @@
-# Tirion
+# Tirion [![GoDoc](https://godoc.org/github.com/zimmski/tirion?status.png)](https://godoc.org/github.com/zimmski/tirion)
 
 ## What is Tirion?
 
