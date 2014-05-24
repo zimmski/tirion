@@ -26,8 +26,3 @@ _testmain.go
 tirion-server.log
 tirion-*.zip
 
-# editors and IDEs
-
-tirion.sublime-project
-tirion.sublime-workspace
-
