@@ -21,7 +21,7 @@ func NewBackendPostgresql() Backend {
 	return new(Postgresql)
 }
 
-func (p *Postgresql) Init(params BackendParameters) error {
+func (p *Postgresql) Init(params Parameters) error {
 	var err error
 
 	p.Db, err = sql.Open("postgres", params.Spec)
@@ -49,7 +49,7 @@ func (p *Postgresql) SearchPrograms() ([]tirion.Program, error) {
 		return nil, err
 	}
 
-	programs := make([]tirion.Program, 0)
+	var programs []tirion.Program
 
 	rows, err := tx.Query("SELECT name FROM run GROUP BY name ORDER BY name")
 
@@ -133,7 +133,7 @@ func (p *Postgresql) SearchRuns(programName string) ([]tirion.Run, error) {
 		return nil, err
 	}
 
-	runs := make([]tirion.Run, 0)
+	var runs []tirion.Run
 
 	rows, err := tx.Query("SELECT id, name, sub_name, interval, prog, prog_arguments, extract(epoch from start), extract(epoch from stop) FROM run WHERE name = $1 ORDER BY start desc", programName)
 
@@ -329,7 +329,7 @@ func (p *Postgresql) SearchMetricOfRun(run *tirion.Run, metricName string) ([][]
 		return nil, err
 	}
 
-	metrics := make([][]interface{}, 0)
+	var metrics [][]interface{}
 
 	rows, err := tx.Query("SELECT EXTRACT(EPOCH FROM t) * 1000.0, " + strings.Replace(metricName, ".", "_", -1) + " FROM r" + strconv.FormatInt(int64(run.ID), 10) + " ORDER BY t")
 
@@ -378,7 +378,7 @@ func (p *Postgresql) SearchMetricsOfRun(run *tirion.Run) ([][]float32, error) {
 	}
 
 	pointers := make([]interface{}, len(run.Metrics)+1)
-	metrics := make([][]float32, 0)
+	var metrics [][]float32
 
 	var t string
 
@@ -464,7 +464,7 @@ func (p *Postgresql) SearchTagsOfRun(run *tirion.Run) ([]tirion.HighStockTag, er
 		return nil, err
 	}
 
-	tags := make([]tirion.HighStockTag, 0)
+	var tags []tirion.HighStockTag
 
 	rows, err := tx.Query("SELECT EXTRACT(EPOCH FROM t) * 1000.0, message FROM rt" + strconv.FormatInt(int64(run.ID), 10) + " ORDER BY t")
 

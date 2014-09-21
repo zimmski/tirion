@@ -38,7 +38,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	c := tirion.NewTirionClient(flagSocket, flagVerbose)
+	c := tirion.NewClient(flagSocket, flagVerbose)
 
 	if flagMmap {
 		c.PreferredMetricProtocoll = "mmap"

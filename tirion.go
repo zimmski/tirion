@@ -62,7 +62,7 @@ type Tag struct {
 	Tag  string
 }
 
-// Tirion contains all common data of a Tirion object like TirionAgent and TirionClient.
+// Tirion contains all common data of a Tirion object like Agent and Client.
 type Tirion struct {
 	fd        net.Conn
 	Running   bool // states if the given Tirion object is still running

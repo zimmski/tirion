@@ -124,7 +124,7 @@ func main() {
 		}
 	}
 
-	a := tirion.NewTirionAgent(
+	a := tirion.NewAgent(
 		flagName,
 		flagSubName,
 		flagServer,

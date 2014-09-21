@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-type ProcStat struct {
+type Stat struct {
 	Pid                 int
 	Comm                string
 	State               byte
@@ -53,7 +53,7 @@ type ProcStat struct {
 	CguestTime          int
 }
 
-var ProcStatIndizes = map[string]int{
+var StatIndizes = map[string]int{
 	"proc.stat.pid":                   0,
 	"proc.stat.comm":                  1,
 	"proc.stat.state":                 2,
@@ -120,7 +120,7 @@ func ReadStatArray(filename string) ([]string, error) {
 	return strings.Split(pStatRaw, " "), nil
 }
 
-func ReadStat(filename string) (*ProcStat, error) {
+func ReadStat(filename string) (*Stat, error) {
 	pStatRaw, err := readStat(filename)
 
 	if err != nil {
@@ -136,8 +136,8 @@ func ReadStat(filename string) (*ProcStat, error) {
 	return p, nil
 }
 
-func ParseStat(stat string) (*ProcStat, error) {
-	pStat := new(ProcStat)
+func ParseStat(stat string) (*Stat, error) {
+	pStat := new(Stat)
 	pStatRaw := strings.Split(stat, " ")
 
 	// original scan format "%d (%s) %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %llu %lu %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %d %d %u %u %llu %lu %ld"

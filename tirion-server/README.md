@@ -131,14 +131,14 @@ The tirion-server provides the following HTTP routes.
 		- <code>404</code> if there is no program with the given program name
 		- <code>non-empty Error field</code> on various errors concerning the validation of the run parameters
 
-- GET <code>/program/:programName/run/:runId</code>
+- GET <code>/program/:programName/run/:runID</code>
 
 	Shows all information and all metrics (as graphs) of a run.
 
 	- URI parameters
 
 		- <code>:programName</code> URI-cleaned program name
-		- <code>:runId</code> ID of the run
+		- <code>:runID</code> ID of the run
 
 	- Request parameters
 
@@ -149,14 +149,14 @@ The tirion-server provides the following HTTP routes.
 		- <code>404</code> if there is no program with the given program name
 		- <code>404</code> if there is no run with the given ID
 
-- GET <code>/program/:programName/run/:runId/metric/:metricName</code>
+- GET <code>/program/:programName/run/:runID/metric/:metricName</code>
 
 	Returns all data of single metric of a given run.
 
 	- URI parameters
 
 		- <code>:programName</code> URI-cleaned program name
-		- <code>:runId</code> ID of the run
+		- <code>:runID</code> ID of the run
 
 	- Request parameters
 
@@ -176,14 +176,14 @@ The tirion-server provides the following HTTP routes.
 		- <code>404</code> if there is no program with the given program name
 		- <code>404</code> if there is no run with the given ID
 
-- POST <code>/program/:programName/run/:runId/insert</code>
+- POST <code>/program/:programName/run/:runID/insert</code>
 
 	Inserts rows of metric data for a given ongoing run.
 
 	- URI parameters
 
 		- <code>:programName</code> URI-cleaned program name
-		- <code>:runId</code> ID of the run
+		- <code>:runID</code> ID of the run
 
 	- Request parameters
 
@@ -216,14 +216,14 @@ The tirion-server provides the following HTTP routes.
 		- <code>404</code> if there is no run with the given ID
 		- <code>non-empty Error field</code> on various errors concerning the validation of the metric values
 
-- GET <code>/program/:programName/run/:runId/stop</code>
+- GET <code>/program/:programName/run/:runID/stop</code>
 
 	Stops an ongoing run.
 
 	- URI parameters
 
 		- <code>:programName</code> URI-cleaned program name
-		- <code>:runId</code> ID of the run
+		- <code>:runID</code> ID of the run
 
 	- Request parameters
 
@@ -243,14 +243,14 @@ The tirion-server provides the following HTTP routes.
 		- <code>404</code> if there is no run with the given ID
 		- <code>non-empty Error field</code> on various errors concerning stopping the program
 
-- POST <code>/program/:programName/run/:runId/tag</code>
+- POST <code>/program/:programName/run/:runID/tag</code>
 
 	Inserts a tag for a given ongoing run.
 
 	- URI parameters
 
 		- <code>:programName</code> URI-cleaned program name
-		- <code>:runId</code> ID of the run
+		- <code>:runID</code> ID of the run
 
 	- Request parameters
 
@@ -271,14 +271,14 @@ The tirion-server provides the following HTTP routes.
 		- <code>404</code> if there is no run with the given ID
 		- <code>non-empty Error field</code> on various errors concerning the validation of the tag  values
 
-- GET <code>/program/:programName/run/:runId/tags</code>
+- GET <code>/program/:programName/run/:runID/tags</code>
 
 	Returns all tags of a given run.
 
 	- URI parameters
 
 		- <code>:programName</code> URI-cleaned program name
-		- <code>:runId</code> ID of the run
+		- <code>:runID</code> ID of the run
 
 	- Request parameters
 

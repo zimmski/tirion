@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-type ProcStatm struct {
+type Statm struct {
 	Size     int
 	Resident int
 	Share    int
@@ -16,7 +16,7 @@ type ProcStatm struct {
 	Dt       int
 }
 
-var ProcStatmIndizes = map[string]int{
+var StatmIndizes = map[string]int{
 	"proc.statm.size":     0,
 	"proc.statm.resident": 1,
 	"proc.statm.share":    2,
@@ -46,7 +46,7 @@ func ReadStatmArray(filename string) ([]string, error) {
 	return strings.Split(pStatmRaw, " "), nil
 }
 
-func ReadStatm(filename string) (*ProcStatm, error) {
+func ReadStatm(filename string) (*Statm, error) {
 	pStatmRaw, err := readStatm(filename)
 
 	if err != nil {
@@ -62,8 +62,8 @@ func ReadStatm(filename string) (*ProcStatm, error) {
 	return p, nil
 }
 
-func ParseStatm(statm string) (*ProcStatm, error) {
-	var pStatm = new(ProcStatm)
+func ParseStatm(statm string) (*Statm, error) {
+	var pStatm = new(Statm)
 
 	fmt.Sscanf(statm, "%d %d %d %d %d %d %d", &pStatm.Size, &pStatm.Resident, &pStatm.Share, &pStatm.Text, &pStatm.Lib, &pStatm.Data, &pStatm.Dt)
 

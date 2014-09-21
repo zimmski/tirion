@@ -31,8 +31,8 @@ type execProgram struct {
 	limitTime           int32
 }
 
-// TirionAgent contains the state of an agent.
-type TirionAgent struct {
+// Agent contains the state of an agent.
+type Agent struct {
 	Tirion
 	chMessages           chan interface{}
 	cmd                  *exec.Cmd
@@ -57,13 +57,13 @@ type TirionAgent struct {
 	writerCSV            *csv.Writer
 }
 
-// NewTirionAgent allocates a new TirionAgent object
-func NewTirionAgent(name string, subName string, server string, sendInterval int32, pid int32, metrics []Metric, exec string, execArguments []string, interval int32, socket string, verbose bool, limitMemory int64, limitMemoryInterval int32, limitTime int32) *TirionAgent {
+// NewAgent allocates a new Agent object
+func NewAgent(name string, subName string, server string, sendInterval int32, pid int32, metrics []Metric, exec string, execArguments []string, interval int32, socket string, verbose bool, limitMemory int64, limitMemoryInterval int32, limitTime int32) *Agent {
 	var rBadChars = regexp.MustCompile(`[\/]`)
 
 	name = rBadChars.ReplaceAllLiteralString(name, "-")
 
-	return &TirionAgent{
+	return &Agent{
 		Tirion: Tirion{
 			socket:    socket,
 			verbose:   verbose,
@@ -87,12 +87,12 @@ func NewTirionAgent(name string, subName string, server string, sendInterval int
 }
 
 // Close uninitializes the agent by closing all connections and programs of the agent.
-func (a *TirionAgent) Close() {
+func (a *Agent) Close() {
 	a.closeProgram()
 	a.closeSocket()
 }
 
-func (a *TirionAgent) closeServerConn() {
+func (a *Agent) closeServerConn() {
 	if a.serverClient != nil {
 		a.serverClient.Close()
 
@@ -101,7 +101,7 @@ func (a *TirionAgent) closeServerConn() {
 	}
 }
 
-func (a *TirionAgent) closeProgram() {
+func (a *Agent) closeProgram() {
 	if a.cmd != nil {
 		if a.cmd.ProcessState == nil {
 			a.V("Program still running. Let's kill it.")
@@ -122,7 +122,7 @@ func (a *TirionAgent) closeProgram() {
 	}
 }
 
-func (a *TirionAgent) closeSocket() {
+func (a *Agent) closeSocket() {
 	if a.fd != nil {
 		a.fd.Close()
 	}
@@ -132,7 +132,7 @@ func (a *TirionAgent) closeSocket() {
 }
 
 // Init initializes the agent
-func (a *TirionAgent) Init() {
+func (a *Agent) Init() {
 	var err error
 
 	a.initSigHandler()
@@ -152,13 +152,13 @@ func (a *TirionAgent) Init() {
 
 			a.metricsExternal = append(a.metricsExternal, int32(i))
 
-			if k, ok := proc.ProcAllIndizes[m.Name]; ok {
+			if k, ok := proc.AllIndizes[m.Name]; ok {
 				a.metricsExternalAll[int32(k)] = int32(i)
-			} else if k, ok := proc.ProcIOIndizes[m.Name]; ok {
+			} else if k, ok := proc.IOIndizes[m.Name]; ok {
 				a.metricsExternalIO[int32(k)] = int32(i)
-			} else if k, ok := proc.ProcStatIndizes[m.Name]; ok {
+			} else if k, ok := proc.StatIndizes[m.Name]; ok {
 				a.metricsExternalStat[int32(k)] = int32(i)
-			} else if k, ok := proc.ProcStatmIndizes[m.Name]; ok {
+			} else if k, ok := proc.StatmIndizes[m.Name]; ok {
 				a.metricsExternalStatm[int32(k)] = int32(i)
 			} else {
 				a.sPanic(fmt.Sprintf("Unknown metric \"%s\"", m.Name))
@@ -260,7 +260,7 @@ func (a *TirionAgent) Init() {
 	}
 }
 
-func (a *TirionAgent) handleCommands(c chan<- bool) {
+func (a *Agent) handleCommands(c chan<- bool) {
 	a.V("Start listening to commands")
 
 	for a.Running {
@@ -297,7 +297,7 @@ func (a *TirionAgent) handleCommands(c chan<- bool) {
 	c <- true
 }
 
-func (a *TirionAgent) handleMessages(c chan<- bool) {
+func (a *Agent) handleMessages(c chan<- bool) {
 	a.V("Start handling messages")
 
 	var currentMetrics = make([]string, len(a.metrics))
@@ -440,7 +440,7 @@ func (a *TirionAgent) handleMessages(c chan<- bool) {
 	c <- true
 }
 
-func (a *TirionAgent) handleMetrics(c chan<- bool) {
+func (a *Agent) handleMetrics(c chan<- bool) {
 	pidFolder := fmt.Sprintf("/proc/%d/", a.program.pid)
 
 	a.V("Start fetching metrics")
@@ -537,7 +537,7 @@ func (a *TirionAgent) handleMetrics(c chan<- bool) {
 }
 
 // Run starts all communication and programs of the agent.
-func (a *TirionAgent) Run() {
+func (a *Agent) Run() {
 	var err error
 
 	a.Running = true
@@ -720,7 +720,7 @@ func (a *TirionAgent) Run() {
 	a.V("Stopped run")
 }
 
-func (a *TirionAgent) sPanic(err interface{}) {
+func (a *Agent) sPanic(err interface{}) {
 	/**
 	 * TODO
 	 * This whole function is needed because otherwise the shm stays open.

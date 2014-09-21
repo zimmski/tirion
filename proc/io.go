@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-type ProcIO struct {
+type IO struct {
 	Rchar               int64
 	Wchar               int64
 	Syscr               int64
@@ -16,7 +16,7 @@ type ProcIO struct {
 	CancelledWriteBytes int64
 }
 
-var ProcIOIndizes = map[string]int{
+var IOIndizes = map[string]int{
 	"proc.io.rchar":                 0,
 	"proc.io.wchar":                 1,
 	"proc.io.syscr":                 2,
@@ -53,7 +53,7 @@ func ReadIOArray(filename string) ([]string, error) {
 	return io, nil
 }
 
-func ReadIO(filename string) (*ProcIO, error) {
+func ReadIO(filename string) (*IO, error) {
 	pIORaw, err := readIO(filename)
 
 	if err != nil {
@@ -69,8 +69,8 @@ func ReadIO(filename string) (*ProcIO, error) {
 	return p, nil
 }
 
-func ParseIO(io string) (*ProcIO, error) {
-	var pIO = new(ProcIO)
+func ParseIO(io string) (*IO, error) {
+	var pIO = new(IO)
 
 	var ioRaw = strings.Split(io, "\n")
 	ioRaw = ioRaw[:len(io)-1]

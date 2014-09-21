@@ -38,7 +38,7 @@ var bytesPerRow int
 // This func is responsible for rendering a row of pixels,
 // and when complete writing it out to the file.
 
-var c *tirion.TirionClient
+var c *tirion.Client
 
 func renderRow(w, h, bytes int, workChan chan int, iter int, finishChan chan bool) {
 	var Zr, Zi, Tr, Ti, Cr float64
@@ -80,7 +80,7 @@ func renderRow(w, h, bytes int, workChan chan int, iter int, finishChan chan boo
 }
 
 func main() {
-	c = tirion.NewTirionClient("/tmp/tirion.sock", true)
+	c = tirion.NewClient("/tmp/tirion.sock", true)
 
 	if err := c.Init(); err != nil {
 		panic(err)

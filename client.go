@@ -12,16 +12,16 @@ import (
 	"github.com/zimmski/tirion/collector"
 )
 
-// TirionClient contains the state of a client.
-type TirionClient struct {
+// Client contains the state of a client.
+type Client struct {
 	Tirion
 	metricsCollector         collector.Collector
 	PreferredMetricProtocoll string // which metric protocols should be tried first. default is "shm,mmap"
 }
 
-// NewTirionClient allocates a new TirionClient object
-func NewTirionClient(socket string, verbose bool) *TirionClient {
-	return &TirionClient{
+// NewClient allocates a new Client object
+func NewClient(socket string, verbose bool) *Client {
+	return &Client{
 		Tirion: Tirion{
 			socket:    socket,
 			verbose:   verbose,
@@ -33,7 +33,7 @@ func NewTirionClient(socket string, verbose bool) *TirionClient {
 }
 
 // Init initializes the client
-func (c *TirionClient) Init() error {
+func (c *Client) Init() error {
 	var err error
 
 	if r, err := syscall.Setsid(); r == -1 {
@@ -130,7 +130,7 @@ func (c *TirionClient) Init() error {
 }
 
 // Close uninitializes the client by closing all connections of the client.
-func (c *TirionClient) Close() error {
+func (c *Client) Close() error {
 	c.Running = false
 
 	if c.metricsCollector != nil {
@@ -153,11 +153,11 @@ func (c *TirionClient) Close() error {
 }
 
 // Destroy deallocates all data of the client.
-func (c *TirionClient) Destroy() error {
+func (c *Client) Destroy() error {
 	return nil
 }
 
-func (c *TirionClient) handleCommands() {
+func (c *Client) handleCommands() {
 	c.V("Start listening to commands")
 
 	for c.Running {
@@ -194,36 +194,36 @@ func (c *TirionClient) handleCommands() {
 }
 
 // Get returns the current value of a metric
-func (c *TirionClient) Get(i int32) float32 {
+func (c *Client) Get(i int32) float32 {
 	return c.metricsCollector.Get(i)
 }
 
 // Set sets a value for a metric
-func (c *TirionClient) Set(i int32, v float32) float32 {
+func (c *Client) Set(i int32, v float32) float32 {
 	return c.metricsCollector.Set(i, v)
 }
 
 // Add adds a value to a metric
-func (c *TirionClient) Add(i int32, v float32) float32 {
+func (c *Client) Add(i int32, v float32) float32 {
 	return c.metricsCollector.Add(i, v)
 }
 
 // Dec decrements a metric by 1.0
-func (c *TirionClient) Dec(i int32) float32 {
+func (c *Client) Dec(i int32) float32 {
 	return c.metricsCollector.Dec(i)
 }
 
 // Inc increments a metric by 1.0
-func (c *TirionClient) Inc(i int32) float32 {
+func (c *Client) Inc(i int32) float32 {
 	return c.metricsCollector.Inc(i)
 }
 
 // Sub subtracts a value of a metric
-func (c *TirionClient) Sub(i int32, v float32) float32 {
+func (c *Client) Sub(i int32, v float32) float32 {
 	return c.metricsCollector.Sub(i, v)
 }
 
 // Tag sends a tag to the agent
-func (c *TirionClient) Tag(format string, a ...interface{}) {
+func (c *Client) Tag(format string, a ...interface{}) {
 	c.send(PrepareTag(fmt.Sprintf("t"+format, a...)))
 }

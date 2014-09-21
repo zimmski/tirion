@@ -40,7 +40,7 @@ func init() {
 			panic(err)
 		}
 
-		var dbParams backend.BackendParameters
+		var dbParams backend.Parameters
 
 		dbParams.Spec, _ = revel.Config.String("db.spec")
 		dbParams.MaxIdleConns, _ = revel.Config.Int("db.maxIdleConns")

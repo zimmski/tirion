@@ -8,12 +8,12 @@ import (
 	"strings"
 )
 
-type ProcAll struct {
+type All struct {
 	RSSize int64
 	VSize  int64
 }
 
-var ProcAllIndizes = map[string]int{
+var AllIndizes = map[string]int{
 	"proc.all.rssize": 0,
 	"proc.all.vsize":  1,
 }
@@ -28,8 +28,8 @@ func ReadAllArray(pid int) ([]string, error) {
 	return []string{strconv.FormatInt(pAllRaw.RSSize, 10), strconv.FormatInt(pAllRaw.VSize, 10)}, nil
 }
 
-func ReadAll(pid int) (*ProcAll, error) {
-	var pAllRaw ProcAll
+func ReadAll(pid int) (*All, error) {
+	var pAllRaw All
 
 	var cmd = exec.Command("ps", "-e", "--forest", "-o", "pid=", "-o", "ucmd=", "-o", "rss=", "-o", "vsz=")
 

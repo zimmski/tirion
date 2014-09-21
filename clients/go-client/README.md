@@ -14,7 +14,7 @@ and include the <code>github.com/zimmski/tirion</code> package.
 import "github.com/zimmski/tirion"
 ```
 
-After that, you have to instantiate a client object with the function <code>NewTirionClient(socket string, verbose bool)</code>. The socket is needed for the client <-> agent communication. The verbose parameter states whether the library should print verbose output or not.
+After that, you have to instantiate a client object with the function <code>NewClient(socket string, verbose bool)</code>. The socket is needed for the client <-> agent communication. The verbose parameter states whether the library should print verbose output or not.
 
 To initialize the client object <code>Init()</code> must be called with the object itself. If the function returns no error, the initialization was successful and the object can be used to set and modify internal metrics and send tags.
 
@@ -37,7 +37,7 @@ Have a look at the [example program](#example-usage) for a more complete example
 ```go
 import "github.com/zimmski/tirion"
 ...
-t := tirion.NewTirionClient("/tmp/tirion.socket", true)
+t := tirion.NewClient("/tmp/tirion.socket", true)
 
 if t.Init() == nil {
 	t.Tag("start loop")
@@ -60,7 +60,7 @@ Due to the [architecture of Tirion's agent](/#how-does-tirion-work) it is very i
 
 ## API
 
-Please have a look at the [Go API documentation](http://godoc.org/github.com/zimmski/tirion) (especially the TirionClient section) or [client.go](/client.go) for a complete API overview of Tirion's Go client library.
+Please have a look at the [Go API documentation](http://godoc.org/github.com/zimmski/tirion) (especially the Client section) or [client.go](/client.go) for a complete API overview of Tirion's Go client library.
 
 ## Example usage
 
