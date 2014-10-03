@@ -47,7 +47,7 @@ lint:
 	go install github.com/zimmski/tirion/backend
 
 	go tool vet -all=true -v=true $(GOPATH)/src/github.com/zimmski/tirion
-	golint $(GOPATH)/src/github.com/zimmski/tirion
+	golint $(GOPATH)/src/github.com/zimmski/tirion/...
 tirion-agent:
 	go install github.com/zimmski/tirion/tirion-agent
 examples:
